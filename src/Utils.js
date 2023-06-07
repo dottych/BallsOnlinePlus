@@ -61,7 +61,7 @@ class Utils {
     }
 
     loadMotd() {
-        this.motd = fs.readFileSync("./src/motd.txt", { encoding: 'ascii' }).split('\r\n');
+        this.motd = fs.readFileSync("./src/motd.txt", { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
     }
 
     isColor(color) {
