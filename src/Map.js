@@ -23,7 +23,6 @@ class Map {
     changeMap() {
         let prevMapID = this.mapID;
         while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
-        console.log("changing to ", this.mapID);
 
         for (let i of players) {
             i[1].x = 1930 + Math.round(Math.random() * 235);

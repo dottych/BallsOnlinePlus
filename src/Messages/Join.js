@@ -31,7 +31,6 @@ const m_Join = ({ c, data }) => {
         c: [c]
     });
 
-    console.log(map.mapID);
     tick.requests.push({
         r: {
             t: 'map',

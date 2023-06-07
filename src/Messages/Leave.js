@@ -4,6 +4,7 @@ const utils = require('../Utils');
 
 const m_Leave = ({ c, data }) => {
     if (!c.hasOwnProperty("id") || c.id === "0") return;
+    if (!players.get(c.id)) return;
     
     players.delete(c.id);
 

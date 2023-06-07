@@ -7,6 +7,7 @@ const map = require('../Map');
 
 const m_Message = ({ c, data }) => {
     if (!c.hasOwnProperty("id") || c.id === "0") return;
+    if (!players.get(c.id)) return;
 
     if (data.r.m.trim() !== null && data.r.m.trim() !== "") {
         if (data.r.m[0] === "/") {
