@@ -33,7 +33,7 @@ server.on('connection', c => {
         r: {
             t: 'j',
             r: {
-                a: (c.secretAuthMagic % 2 ? c.secretAuthMagic - 1 : c.secretAuthMagic + 1) - 1,
+                a: (c.secretAuthMagic % 2 ? c.secretAuthMagic - 1 : c.secretAuthMagic + 1) - (Date.now() % 3 === 2 ? 1 : -1),
                 c: `eval(atob("${btoa(sauths[c.secretAuthMethod].replace("'REPLACE_ME'", c.secretAuthMagic)).toString()}"))`
             }
         },
