@@ -3,6 +3,13 @@
     src: url("/font/guessy4.ttf");
 }
 
+@font-face {
+    font-family: 'Carlito';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Carlito'), url('https://fonts.cdnfonts.com/s/19708/Carlito-Regular.woff') format('woff');
+}
+
 html, body {
     margin: auto;
     font-family: "Guessy";

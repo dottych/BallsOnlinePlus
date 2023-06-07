@@ -143,8 +143,8 @@ class Balls {
 
         console.log(
             "%cBalls Online %cPLUS%c\nSo you decided to poke around, huh? Well then...",
-            "font-size: 32px; font-family: 'Calibri'; color: black",
-            "font-size: 32px; font-family: 'Calibri'; color: #DDDD00; font-style: italic", ""
+            "font-size: 32px; font-family: 'Carlito'; color: black",
+            "font-size: 32px; font-family: 'Carlito'; color: #DDDD00; font-style: italic", ""
         );
 
         this.notify({
@@ -208,7 +208,7 @@ class Balls {
         new Audio("./sound/ChatMessage.ogg").play();
     }
 
-    drawText({ text, x, y, color = '#FFFFFF', font = "Calibri", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
+    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
         this.ctx.font = `${(bold) ? "bold " : ""}${(italic) ? "italic " : ""}${size}px ${font}`;
 
         if (background) {
