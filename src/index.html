@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./css/balls.css">
+        <title>Balls Online</title>
+        <meta name="title" content="Balls Online Plus | Weirdest multiplayer game">
+        <meta name="description" content="Just hang out, and be a ball! What else could you wish for?">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="./">
+        <meta property="og:title" content="Balls Online Plus | Weirdest multiplayer game">
+        <meta property="og:description" content="Just hang out, and be a ball! What else could you wish for?">
+        <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=0.5, user-scalable=no">
+        <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    </head>
+    <body>
+        <canvas id="ctx" width="1280" height="720"></canvas>
+        <form id="form" style="user-select: none;">
+            <input type="text" id="chat" maxlength="128" autocomplete="off"> <button id="chatmark">✔</button>
+        </form>
+
+        <button class="m" id="up" hidden></button>
+        <button class="m" id="left" hidden></button>
+        <button class="m" id="down" hidden></button>
+        <button class="m" id="right" hidden></button>
+        <button class="m" id="shift" hidden></button>
+
+        <script defer src="/js/main.js"></script>
+    </body>
+</html>

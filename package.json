@@ -1,0 +1,11 @@
+{
+  "name": "BallsOnlinePlus",
+  "version": "0.1.0",
+  "description": "Client and server for Balls Online Plus",
+  "dependencies": {
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "jimp": "^0.22.8",
+    "ws": "^8.13.0"
+  }
+}

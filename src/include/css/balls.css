@@ -1,0 +1,72 @@
+@font-face {
+    font-family: "Guessy";
+    src: url("/font/guessy4.ttf");
+}
+
+html, body {
+    margin: auto;
+    font-family: "Guessy";
+    overflow: hidden;
+}
+
+canvas {
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+    height: 100%;
+}
+
+#chat {
+    position: absolute;
+    left: 545px;
+    top: 9px;
+    background-color: gray;
+    border-style: none;
+    outline: none;
+    color: white;
+    font-family: 'Calibri';
+    font-weight: bold;
+}
+
+#chatmark {
+    position: absolute;
+    left: 690px;
+    top: 7px;
+}
+
+.m {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    outline: none;
+    border: none;
+    background-color: #FFFFFF40;
+}
+
+.m:active {
+    background-color: #00000040;
+}
+
+#up {
+    right: 128px;
+    bottom: 128px;
+}
+
+#left {
+    right: 256px;
+    bottom: 0px;
+}
+
+#down {
+    right: 128px;
+    bottom: 0px;
+}
+
+#right {
+    right: 0px;
+    bottom: 0px;
+}
+
+#shift {
+    left: 0px;
+    bottom: 0px;
+}
