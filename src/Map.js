@@ -15,51 +15,58 @@ for (let i of mapsInDir) {
     maps.set(mapFileID, mapData);
 }
 
-let mapID = Math.floor(Math.random() * maps.size);
+class Map {
+    constructor() {
+        this.mapID = Math.floor(Math.random() * maps.size);
+    }
 
-const changeMap = () => {
-    let prevMapID = mapID;
-    while (prevMapID === mapID) mapID = Math.floor(Math.random() * maps.size);
+    changeMap() {
+        let prevMapID = this.mapID;
+        while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
+        console.log("changing to ", this.mapID);
 
-    for (let i of players) {
-        i[1].x = 1930 + Math.round(Math.random() * 235);
-        i[1].y = 1930 + Math.round(Math.random() * 235);
+        for (let i of players) {
+            i[1].x = 1930 + Math.round(Math.random() * 235);
+            i[1].y = 1930 + Math.round(Math.random() * 235);
+
+            tick.requests.push({
+                r: {
+                    t: 'bm',
+                    r: { id: i[1].id, x: i[1].x, y: i[1].y }
+                },
+        
+                c: utils.getAllPlayerClients()
+            });
+        }
 
         tick.requests.push({
             r: {
-                t: 'bm',
-                r: { id: i[1].id, x: i[1].x, y: i[1].y }
+                t: 'map',
+                r: { map: maps.get(this.mapID) }
             },
-    
+
+            c: utils.getAllPlayerClients()
+        });
+
+        tick.requests.push({
+            r: {
+                t: 'n',
+                r: {
+                    n: `Map has changed!`,
+                    d: 1000,
+                    color: "00DD00"
+                }
+            },
+
             c: utils.getAllPlayerClients()
         });
     }
-
-    tick.requests.push({
-        r: {
-            t: 'map',
-            r: { map: maps.get(mapID) }
-        },
-
-        c: utils.getAllPlayerClients()
-    });
-
-    tick.requests.push({
-        r: {
-            t: 'n',
-            r: {
-                n: `Map has changed!`,
-                d: 1000,
-                color: "00DD00"
-            }
-        },
-
-        c: utils.getAllPlayerClients()
-    });
 }
 
+const map = new Map();
+
 setInterval(() => {
-    changeMap();
+    map.changeMap();
 }, 60000 * 5);
 
-module.exports = { mapID, changeMap };
+module.exports = map;

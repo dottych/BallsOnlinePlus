@@ -4,6 +4,8 @@ then we add those split messages individually and we tell Balls class how many s
 then according to that, subtract the i in the messages loop by the split amount, to make them yellow
 and done LOL! by the way, this is to save X space
 */
+// make a discord and add a discord button
+// fix weird problem with map being different for newcomers
 
 const 
 [
