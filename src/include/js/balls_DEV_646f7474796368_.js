@@ -4,11 +4,14 @@ then we add those split messages individually and we tell Balls class how many s
 then according to that, subtract the i in the messages loop by the split amount, to make them yellow
 and done LOL! by the way, this is to save X space
 */
-// make a discord and add a discord button + snap button + help button (H, D and O) next to Info bar
 // try doing the small boundary loop again
+// hide far away players and draw like a darker area
 
 const 
 [
+    info,
+    discord,
+    screenshot,
     form,
     chat,
     up,
@@ -17,6 +20,9 @@ const
     right,
     shift,
 ] = [
+    document.getElementById("info"),
+    document.getElementById("discord"),
+    document.getElementById("screenshot"),
     document.getElementById("form"),
     document.getElementById("chat"),
     document.getElementById("up"),
@@ -44,7 +50,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.0"
+        this.version = "0.1.1"
         this.dev = true;
         this.exhausted = false;
 
@@ -105,6 +111,7 @@ class Balls {
         this.messages = [];
         this.maxMsgs = 15;
         this.msgFade = 0;
+        this.msgSplit = 1; // using for future purposes
 
         this.points = [];
 
@@ -172,6 +179,15 @@ class Balls {
 
     getVersion() {
         return this.dev ? this.version + " (DEV)" : this.version;
+    }
+
+    screenshot() {
+        const url = this.canvas.toDataURL("image/png");
+        const screenshot = document.createElement("a");
+        screenshot.href = url;
+        screenshot.download = `${this.cid.replace(/[^A-Za-z0-9_]+$/,"").replaceAll(" ","").substr(0,6)}${Date.now().toString(16)}.png`;
+        screenshot.click();
+        screenshot.remove();
     }
 
     player(id) {
@@ -646,6 +662,8 @@ let balls = new Balls();
 
 window.onresize = e => { balls.canvas.width = window.innerWidth, balls.canvas.height = window.innerHeight - balls.initCtxPosY, balls.ctx.imageSmoothingEnabled = false; };
 
+// Chat
+
 form.addEventListener('submit', e => {
     e.preventDefault();
     if (chat.value) {
@@ -655,6 +673,22 @@ form.addEventListener('submit', e => {
             chat.value = '';
         }
     }
+});
+
+// Info buttons
+
+info.addEventListener('click', e => {
+    balls.addMessage("Info coming soon!");
+});
+
+discord.addEventListener('click', e => {
+    e.preventDefault();
+    balls.screenshot();
+});
+
+screenshot.addEventListener('click', e => {
+    e.preventDefault();
+    balls.screenshot();
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);

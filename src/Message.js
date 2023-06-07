@@ -23,7 +23,10 @@ class Message {
 
         switch (data.t) {
             case 'j':
-                if (data.r.r === "true" || data.r.hasOwnProperty("a"))
+                if (data.r.r === true &&
+                    data.r.hasOwnProperty("a") &&
+                    data.r.a === (c.secretAuthMagic % 2 ? c.secretAuthMagic + 1 : c.secretAuthMagic - 1)
+                )
                 m_Join({ c, data }); else c.close();
 
                 break;

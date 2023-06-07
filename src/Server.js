@@ -16,7 +16,7 @@ const event = require('./Event').e;
 
 const tick = require('./Tick');
 
-const map = require('./Map');
+const sauths = require('./Lists').sauths;
 
 const m_Leave = require('./Messages/Leave');
 
@@ -26,13 +26,15 @@ const m_Leave = require('./Messages/Leave');
 
 server.on('connection', c => {
     c.id = "0";
+    c.secretAuthMagic = Math.floor(performance.now() % 420) + 1;
+    c.secretAuthMethod = Math.floor(Math.random() * sauths.length);
 
     tick.requests.push({
         r: {
             t: 'j',
             r: {
-                a: 1,
-                c: 'eval(atob("KGZ1bmN0aW9uKCl7dHJ5e2xldF89d2luZG93Lmhhc093blByb3BlcnR5KGV2YWwoYXRvYignWW5SdllTZ2lzZWxmSWlrJykpKTtyZXR1cm4gSlNPTi5zdHJpbmdpZnkoW3t0OidqJyxyOnthOjIscjp3aW5kb3cuaGFzT3duUHJvcGVydHkoZXZhbChhdG9iKCdZblJ2WVNnaXNlbGZJaWsnKSkpfX1dKX1jYXRjaChlKXtyZXR1cm4gSlNPTi5zdHJpbmdpZnkoW3t0OidqJyxyOnthOjIscjphdG9iKCdTU0JtWVdsc1pXUWdkR2hsSUdOb1pXTnJJUT09Jyl9fV0pfX0pKCk="))'
+                a: (c.secretAuthMagic % 2 ? c.secretAuthMagic - 1 : c.secretAuthMagic + 1) - 1,
+                c: `eval(atob("${btoa(sauths[c.secretAuthMethod].replace("'REPLACE_ME'", c.secretAuthMagic)).toString()}"))`
             }
         },
         c: [c]
