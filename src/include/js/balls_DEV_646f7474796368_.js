@@ -1,11 +1,6 @@
-/* splitting chat messages
-may work like this: first a message is received, then is split into 32 characters (with ...s where appropiate),
-then we add those split messages individually and we tell Balls class how many splits were done,
-then according to that, subtract the i in the messages loop by the split amount, to make them yellow
-and done LOL! by the way, this is to save X space
-*/
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
+// finish the IDO buttons
 
 const 
 [
@@ -111,7 +106,7 @@ class Balls {
         this.messages = [];
         this.maxMsgs = 15;
         this.msgFade = 0;
-        this.msgSplit = 1; // using for future purposes
+        this.msgSplit = 3; // using for future purposes
 
         this.points = [];
 
@@ -202,9 +197,13 @@ class Balls {
     }
 
     addMessage(text) {
-        this.messages.push(text);
+        const messages = text.match(/.{1,64}/g);
+        for (let message of messages) this.messages.push(message);
+
         if (this.messages.length > this.maxMsgs) this.messages.shift();
+        this.msgSplit = messages.length;
         this.msgFade = 0;
+
         new Audio("./sound/ChatMessage.ogg").play();
     }
 
@@ -547,7 +546,7 @@ class Balls {
             text: this.messages[i], 
             x: 16*32,
             y: 16*3+i*16,
-            color: +i === +this.messages.length-1 ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
+            color: +i >= +this.messages.length-this.msgSplit ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
             font: 'Consolas'
         });
 
