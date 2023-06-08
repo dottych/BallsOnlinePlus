@@ -28,17 +28,7 @@ server.on('connection', c => {
     c.id = "0";
     c.secretAuthMagic = Math.floor(performance.now() % 420) + 1;
     c.secretAuthMethod = Math.floor(Math.random() * sauths.length);
-
-    tick.requests.push({
-        r: {
-            t: 'j',
-            r: {
-                a: (c.secretAuthMagic % 2 ? c.secretAuthMagic - 1 : c.secretAuthMagic + 1) - (Date.now() % 3 === 2 ? 1 : -1),
-                c: `eval(atob("${btoa(sauths[c.secretAuthMethod].replace("'REPLACE_ME'", c.secretAuthMagic)).toString()}"))`
-            }
-        },
-        c: [c]
-    });
+    c.initialised = false;
 
     //console.log(tick.requests);
 

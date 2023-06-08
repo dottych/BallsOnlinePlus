@@ -2,6 +2,7 @@
     Message importing time!
 */
 
+const m_Init = require('./Messages/Init');
 const m_Join = require('./Messages/Join');
 const m_Message = require('./Messages/Message');
 const m_Move = require('./Messages/Move');
@@ -22,6 +23,10 @@ class Message {
         if (!data.hasOwnProperty("r")) return;
 
         switch (data.t) {
+            case 'i':
+                m_Init({ c, data });
+                break;
+
             case 'j':
                 if (data.r.r === true &&
                     data.r.hasOwnProperty("a") &&

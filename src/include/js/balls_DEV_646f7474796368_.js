@@ -1,6 +1,8 @@
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
-// finish the IDO buttons
+// finish the IDOS buttons (info, discord, screenshot, settings)
+// in settings include chat characters split modes: 48, 64, 80
+// collision check on server?
 
 const 
 [
@@ -27,18 +29,14 @@ const
     document.getElementById("shift"),
 ]
 
-if (
-    window.navigator.userAgent.indexOf("Android") >= 0 ||
-    window.navigator.userAgent.indexOf("iOS") >= 0 ||
-    window.navigator.userAgent.indexOf("iPhone") >= 0 ||
-    window.navigator.userAgent.indexOf("iPad") >= 0
-) {
-    up.removeAttribute("hidden");
-    left.removeAttribute("hidden");
-    down.removeAttribute("hidden");
-    right.removeAttribute("hidden");
-    shift.removeAttribute("hidden");
-}
+let
+[
+    clicked,
+    initialised,
+] = [
+    false,
+    false,
+]
 
 class Balls {
     constructor() {
@@ -135,6 +133,8 @@ class Balls {
         ];
 
         this.splash = "I like rice.";
+        
+        this.t = "";
 
         console.log(
             "%cBalls Online %cPLUS%c\nSo you decided to poke around, huh? Well then...",
@@ -142,17 +142,8 @@ class Balls {
             "font-size: 32px; font-family: 'Carlito'; color: #DDDD00; font-style: italic", ""
         );
 
-        this.notify({
-            text: "Loading...",
-            duration: 1000,
-            color: "#DDDDDD",
-            sound: false
-        });
-
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
-        
-        requestAnimationFrame(this.draw.bind(this));
     }
 
     wait(ms) {
@@ -409,8 +400,10 @@ class Balls {
 
         this.ctx.textAlign = 'left';
 
-        let title = this.drawText({
-            text: "Balls Online", 
+        let t = "Balls Online";
+
+        this.drawText({
+            text: this.t, 
             x: 10,
             y: 24,
             color: "#EEEEEE", 
@@ -419,7 +412,7 @@ class Balls {
 
         this.drawText({
             text: "PLUS", 
-            x: this.ctx.measureText(title).width + 28,
+            x: this.t === "Balls Online" ? this.ctx.measureText(t).width + 15 : this.ctx.measureText(this.t).width + 15,
             y: 24,
             color: "#EEEE00", 
             font: "Guessy",
@@ -525,7 +518,7 @@ class Balls {
         });
 
         this.drawText({
-            text: balls.splash, 
+            text: this.splash, 
             x: 16*12,
             y: 16*9,
             color: "#DDDDDD",
@@ -592,7 +585,7 @@ class Balls {
         this.ctx.fillStyle = "#AAAAAA";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        if (this.canvas.width >= 0 && this.canvas.height >= 0) {
+        if (this.canvas.width >= 960 && this.canvas.height >= 540) {
             this.drawUpdate();
             this.drawPoints();
             this.drawPlayers();
@@ -654,6 +647,17 @@ class Balls {
         
         requestAnimationFrame(this.draw.bind(this));
     }
+
+    init() {
+        clicked = true;
+        requestAnimationFrame(this.draw.bind(this));
+        this.notify({
+            text: "Connecting...",
+            duration: 2000,
+            color: "DDDDDD",
+            sound: false
+        });
+    }
 }
 
 // Init 'em balls!
@@ -709,6 +713,19 @@ right.addEventListener("touchend", e => balls.keyboard[balls.keys.right] = false
 shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false);
 
 setInterval(() => {
+    if (balls.t === "") balls.t = Math.floor(Math.random() * 100) === 0 ?
+    'atob'['KeyboardEvent'.substring(0,3).length]+
+    'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
+    'atob'['KeyboardEvent'.substring(0,3).length]+
+    (typeof 'atob')[0]+"typeof 'string'"[6]+
+    (typeof !1)[Math.floor(Math.PI / 2)]+
+    (!1+'')[2]+
+    (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
+    (typeof Math.PI)[Math.sin(0 / Math.PI)]
+    : "Balls Online";
+
+    if (clicked && !initialised && balls.ws.readyState === 1) balls.ws.send(JSON.stringify([{ t: 'i', r: {} }])), initialised = true;
+
     balls.notifTransparency = balls.clamp(balls.notifTransparency - 10, 0, Math.min());
     balls.msgFade = balls.clamp(balls.msgFade + 17, 0, 221);
 
@@ -735,8 +752,32 @@ const splashing = setInterval(() => {
     balls.splash = balls.splashes[Math.floor(Math.random() * balls.splashes.length)];
 }, 1000 * 5);
 
+document.addEventListener('click', () => {
+    if (!clicked) {
+        document.getElementById("p").remove();
+        form.removeAttribute("hidden");
+        info.removeAttribute("hidden");
+        discord.removeAttribute("hidden");
+        screenshot.removeAttribute("hidden");
+        //settings.removeAttribute("hidden");
+        if (
+            window.navigator.userAgent.indexOf("Android") >= 0 ||
+            window.navigator.userAgent.indexOf("iOS") >= 0 ||
+            window.navigator.userAgent.indexOf("iPhone") >= 0 ||
+            window.navigator.userAgent.indexOf("iPad") >= 0
+        ) {
+            up.removeAttribute("hidden");
+            left.removeAttribute("hidden");
+            down.removeAttribute("hidden");
+            right.removeAttribute("hidden");
+            shift.removeAttribute("hidden");
+        }
+        balls.init();
+    }
+});
+
 balls.ws.addEventListener('open', () => {
-    console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
+    //balls.ws.send(JSON.stringify([{ t: 'i', r: {} }]));
 });
 
 balls.ws.addEventListener('message', msg => {
@@ -759,6 +800,13 @@ balls.ws.addEventListener('message', msg => {
         
         case 'c':
             balls.cid = data.r.id;
+            balls.notify({
+                text: "Loading...",
+                duration: 2000,
+                color: "DDDDDD",
+                sound: false
+            });
+            console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
             console.log(`%cGot client ID! >>> ${balls.cid}`, "font-size: 8px;");
 
             if (window.localStorage.getItem('name')) balls.ws.send(JSON.stringify([{ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } }]));

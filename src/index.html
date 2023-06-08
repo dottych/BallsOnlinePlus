@@ -14,19 +14,21 @@
     </head>
     <body>
         <canvas id="ctx" width="1280" height="720"></canvas>
-        <form id="form" style="user-select: none;">
+        <form id="form" style="user-select: none;" hidden>
             <input type="text" id="chat" maxlength="128" autocomplete="off"> <button id="chatmark">✔</button>
         </form>
 
-        <button class="n" id="info">I</button>
-        <button class="n" id="discord">D</button>
-        <button class="n" id="screenshot">O</button>
+        <button class="n" id="info" hidden>I</button>
+        <button class="n" id="discord" hidden>D</button>
+        <button class="n" id="screenshot" hidden>O</button>
 
         <button class="m" id="up" hidden></button>
         <button class="m" id="left" hidden></button>
         <button class="m" id="down" hidden></button>
         <button class="m" id="right" hidden></button>
         <button class="m" id="shift" hidden></button>
+
+        <p id="p" class="p" style="top: 0px; left: 10px;">Interact with the page to begin playing.</p>
 
         <script defer src="/js/balls_DEV_646f7474796368_.js"></script>
     </body>

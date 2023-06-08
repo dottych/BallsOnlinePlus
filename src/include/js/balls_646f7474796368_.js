@@ -523,7 +523,7 @@ class Balls {
             x: 16*32,
             y: 16*3+i*16,
             color: +i === +this.messages.length-1 ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
-            font: 'Consolas'
+            font: 'Lucida Console'
         });
 
         this.drawText({
@@ -552,7 +552,7 @@ class Balls {
                 x: 10,
                 y: 16*19+playerIndex*16,
                 color: `#${player.color}`,
-                font: 'Consolas'
+                font: 'Lucida Console'
             });
 
             playerIndex++;

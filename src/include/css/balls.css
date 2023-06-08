@@ -10,10 +10,18 @@
     src: local('Carlito'), url('https://fonts.cdnfonts.com/s/19708/Carlito-Regular.woff') format('woff');
 }
 
+@font-face{
+    font-family: 'Lucida Console';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Lucida Console'), url('https://fonts.cdnfonts.com/s/56356/lucon.woff') format('woff');
+}
+
 html, body {
     margin: auto;
     font-family: "Guessy";
     overflow: hidden;
+    background-color: #808080;
 }
 
 canvas {
@@ -97,4 +105,12 @@ canvas {
 #shift {
     left: 0px;
     bottom: 0px;
+}
+
+.p {
+    font-family: 'Lucida Console';
+    z-index: 1;
+    position: absolute;
+    color: white;
+    user-select: none;
 }
