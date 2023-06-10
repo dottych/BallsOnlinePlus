@@ -2,7 +2,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="./css/balls.css">
-        <title>Balls Online</title>
+        <title id="title">Balls Online</title>
         <meta name="title" content="Balls Online Plus | Weirdest multiplayer game">
         <meta name="description" content="Just hang out, and be a ball! What else could you wish for?">
         <meta property="og:type" content="website">
@@ -18,9 +18,10 @@
             <input type="text" id="chat" maxlength="128" autocomplete="off"> <button id="chatmark">✔</button>
         </form>
 
-        <button class="n" id="info" hidden>I</button>
-        <button class="n" id="discord" hidden>D</button>
-        <button class="n" id="screenshot" hidden>O</button>
+        <button class="n" id="info" alt="Info" hidden>I</button>
+        <button class="n" id="discord" alt="Discord" hidden>D</button>
+        <button class="n" id="screenshot" alt="Screenshot" hidden>O</button>
+        <button class="n" id="settings" alt="Settings" hidden>S</button>
 
         <button class="m" id="up" hidden></button>
         <button class="m" id="left" hidden></button>
@@ -30,6 +31,6 @@
 
         <p id="p" class="p" style="top: 0px; left: 10px;">Interact with the page to begin playing.</p>
 
-        <script defer src="/js/balls_DEV_646f7474796368_.js"></script>
+        <script defer src="/js/main.js"></script>
     </body>
 </html>

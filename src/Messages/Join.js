@@ -34,7 +34,7 @@ const m_Join = ({ c, data }) => {
     tick.requests.push({
         r: {
             t: 'map',
-            r: { map: maps.get(map.mapID) }
+            r: { map: maps.get(map.mapID)[1] }
         },
 
         c: [c]

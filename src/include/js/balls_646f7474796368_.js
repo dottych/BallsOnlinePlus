@@ -1,5 +1,9 @@
 const 
 [
+    info,
+    discord,
+    screenshot,
+    settings,
     form,
     chat,
     up,
@@ -7,7 +11,12 @@ const
     down,
     right,
     shift,
+    title,
 ] = [
+    document.getElementById("info"),
+    document.getElementById("discord"),
+    document.getElementById("screenshot"),
+    document.getElementById("settings"),
     document.getElementById("form"),
     document.getElementById("chat"),
     document.getElementById("up"),
@@ -15,27 +24,24 @@ const
     document.getElementById("down"),
     document.getElementById("right"),
     document.getElementById("shift"),
+    document.getElementById("title"),
 ]
 
-if (
-    window.navigator.userAgent.indexOf("Android") >= 0 ||
-    window.navigator.userAgent.indexOf("iOS") >= 0 ||
-    window.navigator.userAgent.indexOf("iPhone") >= 0 ||
-    window.navigator.userAgent.indexOf("iPad") >= 0
-) {
-    up.removeAttribute("hidden");
-    left.removeAttribute("hidden");
-    down.removeAttribute("hidden");
-    right.removeAttribute("hidden");
-    shift.removeAttribute("hidden");
-}
+let
+[
+    clicked,
+    initialised,
+] = [
+    false,
+    false,
+]
 
 class Balls {
     constructor() {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.0"
+        this.version = "0.1.1"
         this.dev = false;
         this.exhausted = false;
 
@@ -96,6 +102,7 @@ class Balls {
         this.messages = [];
         this.maxMsgs = 15;
         this.msgFade = 0;
+        this.msgSplit = 3; // using for future purposes
 
         this.points = [];
 
@@ -124,24 +131,19 @@ class Balls {
         ];
 
         this.splash = "I like rice.";
+        
+        this.t = "";
 
         console.log(
             "%cBalls Online %cPLUS%c\nSo you decided to poke around, huh? Well then...",
-            "font-size: 32px; font-family: 'Calibri'; color: black",
-            "font-size: 32px; font-family: 'Calibri'; color: #DDDD00; font-style: italic", ""
+            "font-size: 32px; font-family: 'Carlito'; color: black",
+            "font-size: 32px; font-family: 'Carlito'; color: #DDDD00; font-style: italic", ""
         );
-
-        this.notify({
-            text: "Loading...",
-            duration: 1000,
-            color: "#DDDDDD",
-            sound: false
-        });
 
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
-        
-        requestAnimationFrame(this.draw.bind(this));
+
+        title.innerHTML = this.dev ? "Balls Online DEV" : "Balls Online";
     }
 
     wait(ms) {
@@ -165,6 +167,15 @@ class Balls {
         return this.dev ? this.version + " (DEV)" : this.version;
     }
 
+    screenshot() {
+        const url = this.canvas.toDataURL("image/png");
+        const screenshot = document.createElement("a");
+        screenshot.href = url;
+        screenshot.download = `${this.cid.replace(/[^A-Za-z0-9_]+$/,"").replaceAll(" ","").substr(0,6)}${Date.now().toString(16)}.png`;
+        screenshot.click();
+        screenshot.remove();
+    }
+
     player(id) {
         return this.players.get(id);
     }
@@ -177,13 +188,18 @@ class Balls {
     }
 
     addMessage(text) {
-        this.messages.push(text);
+        const length = +(window.localStorage.getItem('length') || 64);
+        const messages = text.match(new RegExp(`.{1,${length}}`, "g"));
+        for (let message of messages) this.messages.push(message);
+
         if (this.messages.length > this.maxMsgs) this.messages.shift();
+        this.msgSplit = messages.length;
         this.msgFade = 0;
+
         new Audio("./sound/ChatMessage.ogg").play();
     }
 
-    drawText({ text, x, y, color = '#FFFFFF', font = "Calibri", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
+    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
         this.ctx.font = `${(bold) ? "bold " : ""}${(italic) ? "italic " : ""}${size}px ${font}`;
 
         if (background) {
@@ -385,8 +401,10 @@ class Balls {
 
         this.ctx.textAlign = 'left';
 
-        let title = this.drawText({
-            text: "Balls Online", 
+        let t = "Balls Online";
+
+        this.drawText({
+            text: this.t, 
             x: 10,
             y: 24,
             color: "#EEEEEE", 
@@ -395,7 +413,7 @@ class Balls {
 
         this.drawText({
             text: "PLUS", 
-            x: this.ctx.measureText(title).width + 28,
+            x: this.t === "Balls Online" ? this.ctx.measureText(t).width + 15 : this.ctx.measureText(this.t).width + 15,
             y: 24,
             color: "#EEEE00", 
             font: "Guessy",
@@ -501,7 +519,7 @@ class Balls {
         });
 
         this.drawText({
-            text: balls.splash, 
+            text: this.splash, 
             x: 16*12,
             y: 16*9,
             color: "#DDDDDD",
@@ -522,8 +540,8 @@ class Balls {
             text: this.messages[i], 
             x: 16*32,
             y: 16*3+i*16,
-            color: +i === +this.messages.length-1 ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
-            font: 'Lucida Console'
+            color: +i >= +this.messages.length-this.msgSplit ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
+            font: 'LucidaConsole'
         });
 
         this.drawText({
@@ -552,7 +570,7 @@ class Balls {
                 x: 10,
                 y: 16*19+playerIndex*16,
                 color: `#${player.color}`,
-                font: 'Lucida Console'
+                font: 'LucidaConsole'
             });
 
             playerIndex++;
@@ -568,7 +586,7 @@ class Balls {
         this.ctx.fillStyle = "#AAAAAA";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        if (this.canvas.width >= 0 && this.canvas.height >= 0) {
+        if (this.canvas.width >= 960 && this.canvas.height >= 540) {
             this.drawUpdate();
             this.drawPoints();
             this.drawPlayers();
@@ -630,12 +648,25 @@ class Balls {
         
         requestAnimationFrame(this.draw.bind(this));
     }
+
+    init() {
+        clicked = true;
+        requestAnimationFrame(this.draw.bind(this));
+        this.notify({
+            text: "Connecting...",
+            duration: 2000,
+            color: "DDDDDD",
+            sound: false
+        });
+    }
 }
 
 // Init 'em balls!
 let balls = new Balls();
 
 window.onresize = e => { balls.canvas.width = window.innerWidth, balls.canvas.height = window.innerHeight - balls.initCtxPosY, balls.ctx.imageSmoothingEnabled = false; };
+
+// Chat
 
 form.addEventListener('submit', e => {
     e.preventDefault();
@@ -646,6 +677,28 @@ form.addEventListener('submit', e => {
             chat.value = '';
         }
     }
+});
+
+// Info buttons
+
+info.addEventListener('click', e => {
+    e.preventDefault();
+    window.open("./info", "window", "width=854,height=480");
+});
+
+discord.addEventListener('click', e => {
+    e.preventDefault();
+    window.open("https://discord.gg/C2papHntB9", "window", "width=854,height=480");
+});
+
+screenshot.addEventListener('click', e => {
+    e.preventDefault();
+    balls.screenshot();
+});
+
+settings.addEventListener('click', e => {
+    e.preventDefault();
+    window.open("./settings", "window", "width=854,height=480");
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
@@ -667,6 +720,19 @@ right.addEventListener("touchend", e => balls.keyboard[balls.keys.right] = false
 shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false);
 
 setInterval(() => {
+    if (balls.t === "") balls.t = Math.floor(Math.random() * 100) === 0 ?
+    'atob'['KeyboardEvent'.substring(0,3).length]+
+    'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
+    'atob'['KeyboardEvent'.substring(0,3).length]+
+    (typeof 'atob')[0]+"typeof 'string'"[6]+
+    (typeof !1)[Math.floor(Math.PI / 2)]+
+    (!1+'')[2]+
+    (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
+    (typeof Math.PI)[Math.sin(0 / Math.PI)]
+    : "Balls Online";
+
+    if (clicked && !initialised && balls.ws.readyState === 1) balls.ws.send(JSON.stringify([{ t: 'i', r: {} }])), initialised = true;
+
     balls.notifTransparency = balls.clamp(balls.notifTransparency - 10, 0, Math.min());
     balls.msgFade = balls.clamp(balls.msgFade + 17, 0, 221);
 
@@ -693,8 +759,33 @@ const splashing = setInterval(() => {
     balls.splash = balls.splashes[Math.floor(Math.random() * balls.splashes.length)];
 }, 1000 * 5);
 
+document.addEventListener('click', () => {
+    if (!clicked) {
+        document.getElementById("p").remove();
+        form.removeAttribute("hidden");
+        info.removeAttribute("hidden");
+        discord.removeAttribute("hidden");
+        screenshot.removeAttribute("hidden");
+        settings.removeAttribute("hidden");
+        //settings.removeAttribute("hidden");
+        if (
+            window.navigator.userAgent.indexOf("Android") >= 0 ||
+            window.navigator.userAgent.indexOf("iOS") >= 0 ||
+            window.navigator.userAgent.indexOf("iPhone") >= 0 ||
+            window.navigator.userAgent.indexOf("iPad") >= 0
+        ) {
+            up.removeAttribute("hidden");
+            left.removeAttribute("hidden");
+            down.removeAttribute("hidden");
+            right.removeAttribute("hidden");
+            shift.removeAttribute("hidden");
+        }
+        balls.init();
+    }
+});
+
 balls.ws.addEventListener('open', () => {
-    console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
+    //balls.ws.send(JSON.stringify([{ t: 'i', r: {} }]));
 });
 
 balls.ws.addEventListener('message', msg => {
@@ -717,6 +808,13 @@ balls.ws.addEventListener('message', msg => {
         
         case 'c':
             balls.cid = data.r.id;
+            balls.notify({
+                text: "Loading...",
+                duration: 2000,
+                color: "DDDDDD",
+                sound: false
+            });
+            console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
             console.log(`%cGot client ID! >>> ${balls.cid}`, "font-size: 8px;");
 
             if (window.localStorage.getItem('name')) balls.ws.send(JSON.stringify([{ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } }]));
@@ -756,6 +854,7 @@ balls.ws.addEventListener('message', msg => {
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("info")) return;
             balls.players.set(data.r.id, data.r.info);
             balls.players.get(data.r.id).moved = Date.now();
+            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} joined the game`);
 
             if (data.r.id === balls.cid) {
                 balls.cx = balls.players.get(balls.cid).x;
@@ -769,6 +868,7 @@ balls.ws.addEventListener('message', msg => {
         case 'bl':
             if (!data.r.hasOwnProperty("id")) return;
             balls.players.delete(data.r.id);
+            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} left the game`);
             break;
 
         case 'bm':

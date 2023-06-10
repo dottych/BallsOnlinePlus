@@ -1,7 +1,5 @@
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
-// finish the IDOS buttons (info, discord, screenshot, settings)
-// in settings include chat characters split modes: 48, 64, 80
 // collision check on server?
 
 const 
@@ -9,6 +7,7 @@ const
     info,
     discord,
     screenshot,
+    settings,
     form,
     chat,
     up,
@@ -16,10 +15,12 @@ const
     down,
     right,
     shift,
+    title,
 ] = [
     document.getElementById("info"),
     document.getElementById("discord"),
     document.getElementById("screenshot"),
+    document.getElementById("settings"),
     document.getElementById("form"),
     document.getElementById("chat"),
     document.getElementById("up"),
@@ -27,6 +28,7 @@ const
     document.getElementById("down"),
     document.getElementById("right"),
     document.getElementById("shift"),
+    document.getElementById("title"),
 ]
 
 let
@@ -144,6 +146,8 @@ class Balls {
 
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
+
+        title.innerHTML = this.dev ? "Balls Online DEV" : "Balls Online";
     }
 
     wait(ms) {
@@ -188,7 +192,8 @@ class Balls {
     }
 
     addMessage(text) {
-        const messages = text.match(/.{1,64}/g);
+        const length = +(window.localStorage.getItem('length') || 64);
+        const messages = text.match(new RegExp(`.{1,${length}}`, "g"));
         for (let message of messages) this.messages.push(message);
 
         if (this.messages.length > this.maxMsgs) this.messages.shift();
@@ -540,7 +545,7 @@ class Balls {
             x: 16*32,
             y: 16*3+i*16,
             color: +i >= +this.messages.length-this.msgSplit ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
-            font: 'Consolas'
+            font: 'LucidaConsole'
         });
 
         this.drawText({
@@ -569,7 +574,7 @@ class Balls {
                 x: 10,
                 y: 16*19+playerIndex*16,
                 color: `#${player.color}`,
-                font: 'Consolas'
+                font: 'LucidaConsole'
             });
 
             playerIndex++;
@@ -681,17 +686,23 @@ form.addEventListener('submit', e => {
 // Info buttons
 
 info.addEventListener('click', e => {
-    balls.addMessage("Info coming soon!");
+    e.preventDefault();
+    window.open("./info", "window", "width=854,height=480");
 });
 
 discord.addEventListener('click', e => {
     e.preventDefault();
-    balls.screenshot();
+    window.open("https://discord.gg/C2papHntB9", "window", "width=854,height=480");
 });
 
 screenshot.addEventListener('click', e => {
     e.preventDefault();
     balls.screenshot();
+});
+
+settings.addEventListener('click', e => {
+    e.preventDefault();
+    window.open("./settings", "window", "width=854,height=480");
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
@@ -759,6 +770,7 @@ document.addEventListener('click', () => {
         info.removeAttribute("hidden");
         discord.removeAttribute("hidden");
         screenshot.removeAttribute("hidden");
+        settings.removeAttribute("hidden");
         //settings.removeAttribute("hidden");
         if (
             window.navigator.userAgent.indexOf("Android") >= 0 ||
@@ -846,6 +858,7 @@ balls.ws.addEventListener('message', msg => {
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("info")) return;
             balls.players.set(data.r.id, data.r.info);
             balls.players.get(data.r.id).moved = Date.now();
+            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} joined the game`);
 
             if (data.r.id === balls.cid) {
                 balls.cx = balls.players.get(balls.cid).x;
@@ -859,6 +872,7 @@ balls.ws.addEventListener('message', msg => {
         case 'bl':
             if (!data.r.hasOwnProperty("id")) return;
             balls.players.delete(data.r.id);
+            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} left the game`);
             break;
 
         case 'bm':

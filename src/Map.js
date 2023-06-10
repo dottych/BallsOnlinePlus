@@ -11,8 +11,10 @@ for (let i of mapsInDir) {
     let mapFileID = Number(i.substring(0, i.length - 4));
 
     let mapFile = fs.readFileSync(`./maps/${i}`, { encoding: 'ascii' });
+    let mapTitle = fs.readFileSync(`./mapstitle/${i}`, { encoding: 'ascii' });
     let mapData = mapFile.match(/.{1,32}/g);
-    maps.set(mapFileID, mapData);
+
+    maps.set(mapFileID, [mapTitle, mapData]);
 }
 
 class Map {
@@ -41,7 +43,7 @@ class Map {
         tick.requests.push({
             r: {
                 t: 'map',
-                r: { map: maps.get(this.mapID) }
+                r: { map: maps.get(this.mapID)[1] }
             },
 
             c: utils.getAllPlayerClients()
@@ -51,7 +53,7 @@ class Map {
             r: {
                 t: 'n',
                 r: {
-                    n: `Map has changed!`,
+                    n: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
                     d: 1000,
                     color: "00DD00"
                 }

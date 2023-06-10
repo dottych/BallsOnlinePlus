@@ -126,6 +126,24 @@ const m_Message = ({ c, data }) => {
                     else utils.msgClient(c, `You are not an admin!`);
                     break;
 
+                case 'notify':
+                    if (players.get(c.id).admin) {
+                        tick.requests.push({
+                            r: {
+                                t: 'n',
+                                r: {
+                                    n: input,
+                                    d: 2000,
+                                    color: "DDDD00"
+                                }
+                            },
+                    
+                            c: utils.getAllPlayerClients()
+                        });
+                    }
+                    else utils.msgClient(c, `You are not an admin!`);
+                    break;
+
                 case 'admin':
                     if (input === "SafestPassw0rd_TrustM3!") {
                         players.get(c.id).admin = true;
