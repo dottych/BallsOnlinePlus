@@ -24,7 +24,7 @@ const m_Message = ({ c, data }) => {
                 case 'help':
                 case 'cmds':
                 case 'commands':
-                    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, respawn, newmap, admin`);
+                    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, respawn, newmap, notify, admin`);
                     else switch (input.trim()) {
                         default:
                             utils.msgClient(c, `This command does not exist.`);
@@ -53,6 +53,10 @@ const m_Message = ({ c, data }) => {
 
                         case 'newmap':
                             utils.msgClient(c, `Changes the map. Admin only.`);
+                            break;
+
+                        case 'newmap':
+                            utils.msgClient(c, `Notifies everyone. Admin only.`);
                             break;
                         
                         case 'admin':
