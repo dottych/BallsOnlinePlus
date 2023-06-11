@@ -1,11 +1,8 @@
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
 // collision check on server?
-<<<<<<< Updated upstream
-=======
 // disconnected notification
 // improve collision by actually moving the ball back by a certain amount
->>>>>>> Stashed changes
 
 const 
 [
