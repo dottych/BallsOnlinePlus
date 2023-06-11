@@ -1,6 +1,11 @@
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
 // collision check on server?
+<<<<<<< Updated upstream
+=======
+// disconnected notification
+// improve collision by actually moving the ball back by a certain amount
+>>>>>>> Stashed changes
 
 const 
 [
@@ -45,7 +50,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.1"
+        this.version = "0.1.2"
         this.dev = true;
         this.exhausted = false;
 
@@ -96,6 +101,8 @@ class Balls {
 
         this.cax = this.cx;
         this.cay = this.cy;
+        this.icax = this.cax;
+        this.icay = this.cay;
 
         this.maxAfk = 60000;
 
@@ -118,7 +125,7 @@ class Balls {
             CC: new Audio("./sound/ColorChange.ogg"),
             NC: new Audio("./sound/NameChange.ogg"),
             N: new Audio("./sound/Notification.ogg"),
-        }
+        };
 
         // because closure compiler will probably hold a grudge here
         this.JLTS.CM.pause();
@@ -258,10 +265,10 @@ class Balls {
 
             let speed = !chat.matches(':focus') ? (1/4) * this.elapsed : 0;
 
-            if (this.keyboard[balls.keys.left] || this.keyboard[balls.keys.a]) newX = -speed;
-            if (this.keyboard[balls.keys.right] || this.keyboard[balls.keys.d]) newX = speed;
-            if (this.keyboard[balls.keys.up] || this.keyboard[balls.keys.w]) newY = -speed;
-            if (this.keyboard[balls.keys.down] || this.keyboard[balls.keys.s]) newY = speed;
+            if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
+            if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
+            if (this.keyboard[this.keys.up] || this.keyboard[this.keys.w]) newY = -speed;
+            if (this.keyboard[this.keys.down] || this.keyboard[this.keys.s]) newY = speed;
 
             newX = (newY !== 0) ? newX / Math.sqrt(2) : newX;
             newY = (newX !== 0) ? newY / Math.sqrt(2) : newY;
@@ -313,7 +320,10 @@ class Balls {
         //this.acax = this.cax+this.canvas.width/2;
         //this.acay = this.cay+this.canvas.height/2;
 
-        this.ctx.drawImage(this.canvas.map, 0, 0, 32, 32, 0-this.cax+this.canvas.width/2, 0-this.cay+this.canvas.height/2, 4096, 4096);
+        this.icax = this.lerp(this.icax, this.cax, 0.1);
+        this.icay = this.lerp(this.icay, this.cay, 0.1);
+
+        this.ctx.drawImage(this.canvas.map, 0, 0, 32, 32, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
     }
 
     drawPoints() {
@@ -321,8 +331,8 @@ class Balls {
             let point = this.points[i];
             this.ctx.fillStyle = `#${point[2]}${this.maxHex(point[3])}`;
             this.ctx.fillRect(
-                point[0]-this.cax+(this.canvas.width/2)-5.5,
-                point[1]-this.cay+(this.canvas.height/2)-5.5,
+                point[0]-this.icax+(this.canvas.width/2)-5.5,
+                point[1]-this.icay+(this.canvas.height/2)-5.5,
                 10, 10
             );
         }
@@ -340,15 +350,15 @@ class Balls {
 
                 this.ctx.beginPath();
                 this.ctx.fillStyle = `#${player.color}`;
-                this.ctx.arc(Math.round(player.lx)-this.cax+(this.canvas.width/2), Math.round(player.ly)-this.cay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+                this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
 
                 this.ctx.textAlign = 'center';
                 this.drawText({
                     text: player.name, 
-                    x: Math.round(player.lx)-this.cax+this.canvas.width/2,
-                    y: Math.round(player.ly)-this.cay+this.canvas.height/2-25,
+                    x: Math.round(player.lx)-this.icax+this.canvas.width/2,
+                    y: Math.round(player.ly)-this.icay+this.canvas.height/2-25,
                     color: player.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
                     font: "Guessy",
                     size: 20,
@@ -363,22 +373,22 @@ class Balls {
             // Outline
             this.ctx.beginPath();
             this.ctx.fillStyle = `#AAAAAA`;
-            this.ctx.arc(Math.round(self.x)-this.cax+(this.canvas.width/2), Math.round(self.y)-this.cay+this.canvas.height/2, 11, 0, 2 * Math.PI);
+            this.ctx.arc(Math.round(self.x)-this.icax+(this.canvas.width/2), Math.round(self.y)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
             // Actual
             this.ctx.beginPath();
             this.ctx.fillStyle = `#${self.color}`;
-            this.ctx.arc(Math.round(self.x)-this.cax+(this.canvas.width/2), Math.round(self.y)-this.cay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+            this.ctx.arc(Math.round(self.x)-this.icax+(this.canvas.width/2), Math.round(self.y)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
             this.ctx.textAlign = 'center';
             this.drawText({
                 text: self.name, 
-                x: Math.round(self.x)-this.cax+this.canvas.width/2,
-                y: Math.round(self.y)-this.cay+this.canvas.height/2-25,
+                x: Math.round(self.x)-this.icax+this.canvas.width/2,
+                y: Math.round(self.y)-this.icay+this.canvas.height/2-25,
                 color: self.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
                 font: "Guessy",
                 size: 20,
@@ -666,7 +676,7 @@ class Balls {
 }
 
 // Init 'em balls!
-let balls = new Balls();
+const balls = new Balls();
 
 window.onresize = e => { balls.canvas.width = window.innerWidth, balls.canvas.height = window.innerHeight - balls.initCtxPosY, balls.ctx.imageSmoothingEnabled = false; };
 
@@ -790,6 +800,15 @@ document.addEventListener('click', () => {
 
 balls.ws.addEventListener('open', () => {
     //balls.ws.send(JSON.stringify([{ t: 'i', r: {} }]));
+});
+
+balls.ws.addEventListener('close', () => {
+    balls.notify({
+        text: "You got disconnected! Please refresh.",
+        duration: 5000,
+        color: 'FF4040',
+        sound: true
+    });
 });
 
 balls.ws.addEventListener('message', msg => {

@@ -14,6 +14,10 @@ app.get("/settings", (req, res) => {
     res.sendFile(__dirname + "/settings.html");
 });
 
+app.get("/editor", (req, res) => {
+    res.sendFile(__dirname + "/editor.html");
+});
+
 app.use(express.static(path.join(__dirname, "include")));
 
 module.exports = app;
