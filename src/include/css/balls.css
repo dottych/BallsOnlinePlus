@@ -66,6 +66,13 @@ canvas {
     position: absolute;
     width: 25px;
     height: 20px;
+    user-select: none;
+}
+
+.n2 {
+    position: absolute;
+    height: 20px;
+    user-select: none;
 }
 
 #info {
@@ -122,4 +129,34 @@ canvas {
 
 input {
     max-width: 140px;
+}
+
+#map {
+    left: 5px;
+    top: 200px;
+}
+
+#air {
+    left: 5px;
+    top: 225px;
+}
+
+#door {
+    left: 5px;
+    top: 250px;
+}
+
+#glass {
+    left: 5px;
+    top: 275px;
+}
+
+#wall {
+    left: 5px;
+    top: 300px;
+}
+
+#dummy {
+    left: 5px;
+    top: 325px;
 }
