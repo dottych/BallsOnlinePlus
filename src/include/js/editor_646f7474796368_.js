@@ -22,7 +22,7 @@ class BallsEditor {
         this.now = 0;
 
         this.version = "0.1.2"
-        this.dev = true;
+        this.dev = false;
         this.exhausted = false;
 
         this.canvas = document.getElementById("ctx")

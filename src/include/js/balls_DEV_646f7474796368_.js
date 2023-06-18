@@ -1,7 +1,6 @@
 // try doing the small boundary loop again
 // hide far away players and draw like a darker area
 // collision check on server?
-// disconnected notification
 // improve collision by actually moving the ball back by a certain amount
 
 const 
@@ -134,7 +133,7 @@ class Balls {
             "Made by dottych",
             "GitHub: dottych",
             "YouTube: dottych",
-            "Discord: dotty#7939",
+            "Discord: dottych",
             "Pinto: .ch"
         ];
 
