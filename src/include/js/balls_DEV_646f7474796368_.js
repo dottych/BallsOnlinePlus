@@ -1,7 +1,12 @@
 // try doing the small boundary loop again
-// hide far away players and draw like a darker area
+// hide far away players and draw like a darker area (maybe not)
 // collision check on server?
 // improve collision by actually moving the ball back by a certain amount
+// clear chat button
+// send balls list on join instead
+
+String.prototype.reverse = function() {return [...this].reverse().join('')};
+"".reverse(), "".reverse();
 
 const 
 [
@@ -46,7 +51,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.2"
+        this.version = "0.1.3"
         this.dev = true;
         this.exhausted = false;
 
@@ -107,7 +112,7 @@ class Balls {
         this.notifColor = "DDDDDD";
 
         this.messages = [];
-        this.maxMsgs = 15;
+        this.maxMsgs = 18;
         this.msgFade = 0;
         this.msgSplit = 3; // using for future purposes
 
@@ -197,9 +202,12 @@ class Balls {
     addMessage(text) {
         const length = +(window.localStorage.getItem('length') || 64);
         const messages = text.match(new RegExp(`.{1,${length}}`, "g"));
-        for (let message of messages) this.messages.push(message);
 
-        if (this.messages.length > this.maxMsgs) this.messages.shift();
+        for (let message of messages) {
+            this.messages.push(message);
+            if (this.messages.length > this.maxMsgs) this.messages.shift();
+        }
+
         this.msgSplit = messages.length;
         this.msgFade = 0;
 
@@ -739,7 +747,15 @@ setInterval(() => {
     (!1+'')[2]+
     (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
     (typeof Math.PI)[Math.sin(0 / Math.PI)]
-    : "Balls Online";
+    : (
+        "e"+
+        (null+'').replace(window.URL.name.toLowerCase().replace('r',''),'i')+
+        (typeof Math.PI)[Math.sin(0 / Math.PI)]+
+        (typeof !1)[Math.floor(Math.PI / 2)].toUpperCase()+
+        ' '.reverse()+
+        "sla".replace('l','ll')+
+        'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
+    ).reverse();
 
     if (clicked && !initialised && balls.ws.readyState === 1) balls.ws.send(JSON.stringify([{ t: 'i', r: {} }])), initialised = true;
 
