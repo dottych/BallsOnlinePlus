@@ -3,6 +3,7 @@
 // improve collision by actually moving the ball back by a certain amount
 // sounds toggle settings
 // more 404 images
+// wall shadows
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -71,15 +72,16 @@ class Balls {
         this.ctx = this.canvas.getContext("2d");
 
         this.map = [];
+        this.mapScale = 8;
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
 
-        this.canvas.map.width = 32;
-        this.canvas.map.height = 32;
+        this.canvas.map.width = 32 * this.mapScale;
+        this.canvas.map.height = 32 * this.mapScale;
 
         this.canvasMap.fillStyle = "#808080";
-        this.canvasMap.fillRect(0, 0, 32, 32);
+        this.canvasMap.fillRect(0, 0, 32 * this.mapScale, 32 * this.mapScale);
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -258,23 +260,32 @@ class Balls {
     }
 
     drawMap() {
+        this.canvasMap.fillStyle = "#808080";
+        this.canvasMap.fillRect(0, 0, 32*this.mapScale, 32*this.mapScale);
+
+        this.canvasMap.fillStyle = "#00000010";
+        this.canvasMap.fillRect(0, 0, 32*this.mapScale, 1);
+        this.canvasMap.fillRect(0, 1, 1, 32*this.mapScale-1);
+
         for (let i in this.map) for (let j in this.map[i]) {
             switch (+this.map[i][j]) {
                 case 0:
-                    this.canvasMap.fillStyle = '#808080';
-                    this.canvasMap.fillRect(j, i, 1, 1);
+                    //this.canvasMap.fillStyle = '#808080';
+                    //this.canvasMap.fillRect(j, i, 2, 2);
                     break;
                 case 1:
-                    this.canvasMap.fillStyle = '#858585';
-                    this.canvasMap.fillRect(j, i, 1, 1);
+                    this.canvasMap.fillStyle = '#FFFFFF10';
+                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
                 case 2:
-                    this.canvasMap.fillStyle = '#909090';
-                    this.canvasMap.fillRect(j, i, 1, 1);
+                    this.canvasMap.fillStyle = '#FFFFFF25';
+                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
                 case 3:
+                    this.canvasMap.fillStyle = '#00000010';
+                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
                     this.canvasMap.fillStyle = '#AAAAAA';
-                    this.canvasMap.fillRect(j, i, 1, 1);
+                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
             }
         }
@@ -344,7 +355,7 @@ class Balls {
         this.icax = this.lerp(this.icax, this.cax, 0.1);
         this.icay = this.lerp(this.icay, this.cay, 0.1);
 
-        this.ctx.drawImage(this.canvas.map, 0, 0, 32, 32, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
+        this.ctx.drawImage(this.canvas.map, 0, 0, 32*this.mapScale, 32*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
     }
 
     drawPoints() {
@@ -900,7 +911,9 @@ balls.ws.addEventListener('message', msg => {
 
         case 'm':
             if (!data.r.hasOwnProperty("m") || !data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("show")) return;
-            balls.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${data.r.id === "server" ? "/" : balls.players.get(data.r.id).name}: ${data.r["m"]}`);
+            balls.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${
+                data.r.id === "server" ? "/" : data.r.id === "discrd" ? "D" : balls.players.get(data.r.id).name
+            }: ${data.r["m"]}`);
             break;
 
         case 'map':
