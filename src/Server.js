@@ -12,6 +12,8 @@ const server = new WSServer({ server: http });
 
 const app = require('./App');
 
+const bridge = require('./Bridge');
+
 const event = require('./Event').e;
 
 const tick = require('./Tick');

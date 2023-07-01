@@ -432,7 +432,7 @@ class Balls {
         });
 
         this.drawText({
-            text: "PLUS", 
+            text: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
             x: this.t === "Balls Online" ? this.ctx.measureText(t).width + 15 : this.ctx.measureText(this.t).width + 15,
             y: 24,
             color: "#EEEE00", 
@@ -879,7 +879,7 @@ balls.ws.addEventListener('message', msg => {
 
         case 'm':
             if (!data.r.hasOwnProperty("m") || !data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("show")) return;
-            balls.addMessage(`${data.r.show ? "(" + data.r.id.slice(0, 4) + ") " : ""}${data.r.id === "server" ? "/" : balls.players.get(data.r.id).name}: ${data.r["m"]}`);
+            balls.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${data.r.id === "server" ? "/" : balls.players.get(data.r.id).name}: ${data.r["m"]}`);
             break;
 
         case 'map':

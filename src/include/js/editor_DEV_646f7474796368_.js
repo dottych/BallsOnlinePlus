@@ -21,7 +21,7 @@ class BallsEditor {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.2"
+        this.version = "0.1.3"
         this.dev = true;
         this.exhausted = false;
 
@@ -565,7 +565,15 @@ setInterval(() => {
     (!1+'')[2]+
     (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
     (typeof Math.PI)[Math.sin(0 / Math.PI)]
-    : "Balls Online";
+    : (
+        "e"+
+        (null+'').replace(window.URL.name.toLowerCase().replace('r',''),'i')+
+        (typeof Math.PI)[Math.sin(0 / Math.PI)]+
+        (typeof !1)[Math.floor(Math.PI / 2)].toUpperCase()+
+        ' '.reverse()+
+        "sla".replace('l','ll')+
+        'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
+    ).reverse();
 
     editor.notifTransparency = editor.clamp(editor.notifTransparency - 10, 0, Math.min());
 
