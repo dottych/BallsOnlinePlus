@@ -2,8 +2,8 @@
 // hide far away players and draw like a darker area (maybe not)
 // collision check on server?
 // improve collision by actually moving the ball back by a certain amount
-// clear chat button
-// send balls list on join instead
+// sounds toggle settings
+// more 404 images
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 "".reverse(), "".reverse();
@@ -14,6 +14,7 @@ const
     discord,
     screenshot,
     settings,
+    clear,
     form,
     chat,
     up,
@@ -27,6 +28,7 @@ const
     document.getElementById("discord"),
     document.getElementById("screenshot"),
     document.getElementById("settings"),
+    document.getElementById("clear"),
     document.getElementById("form"),
     document.getElementById("chat"),
     document.getElementById("up"),
@@ -95,8 +97,8 @@ class Balls {
         this.players = new Map();
 
         this.cid = "";
-        this.cx = 0;
-        this.cy = 0;
+        this.cx = 2048;
+        this.cy = 2048;
         this.pcx = this.cx;
         this.pcy = this.cy;
 
@@ -719,6 +721,12 @@ settings.addEventListener('click', e => {
     window.open("./settings", "window", "width=854,height=480");
 });
 
+clear.addEventListener('click', e => {
+    e.preventDefault();
+    balls.messages = [];
+    balls.addMessage("Cleared chat.");
+});
+
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
 window.addEventListener("keyup", e => balls.keyboard[e.keyCode] = false);
 
@@ -793,7 +801,7 @@ document.addEventListener('click', () => {
         discord.removeAttribute("hidden");
         screenshot.removeAttribute("hidden");
         settings.removeAttribute("hidden");
-        //settings.removeAttribute("hidden");
+        clear.removeAttribute("hidden");
         if (
             window.navigator.userAgent.indexOf("Android") >= 0 ||
             window.navigator.userAgent.indexOf("iOS") >= 0 ||
@@ -885,19 +893,23 @@ balls.ws.addEventListener('message', msg => {
             if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, 255]);
             break;
 
+        case 'l':
+            if (!data.r.hasOwnProperty("balls")) return;
+            for (let ball of data.r.balls) {
+                if (!ball.hasOwnProperty("id") || !ball.hasOwnProperty("info")) return;
+                balls.players.set(ball.id, ball.info);
+                balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
+                balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
+            }
+            break;
+
         case 'b':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("info")) return;
             balls.players.set(data.r.id, data.r.info);
-            balls.players.get(data.r.id).moved = Date.now();
             if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} joined the game`);
 
-            if (data.r.id === balls.cid) {
-                balls.cx = balls.players.get(balls.cid).x;
-                balls.cy = balls.players.get(balls.cid).y;
-            } else {
-                balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
-                balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
-            }
+            balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
+            balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
             break;
 
         case 'bl':

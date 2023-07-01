@@ -19,6 +19,7 @@ class Player {
         this.py = this.y;
 
         this.joined = Date.now();
+        this.moved = Date.now();
 
         this.drew = false;
 
@@ -30,6 +31,7 @@ class Player {
             if (this.x !== this.px || this.y !== this.py) {
                 this.px = this.x;
                 this.py = this.y;
+                this.moved = Date.now();
 
                 tick.requests.push({
                     r: {
@@ -59,7 +61,8 @@ class Player {
             color: this.color,
             x: this.x,
             y: this.y,
-            joined: this.joined
+            joined: this.joined,
+            moved: this.moved
         };
     }
 }

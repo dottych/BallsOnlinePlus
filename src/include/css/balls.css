@@ -67,6 +67,12 @@ canvas {
     width: 25px;
     height: 20px;
     user-select: none;
+    background-color: gray;
+    color: white;
+    border-color: lightgray;
+    border-width: 1px;
+    border-style: solid;
+    font-family: 'LucidaConsole';
 }
 
 .n2 {
@@ -92,6 +98,11 @@ canvas {
 
 #settings {
     left: 300px;
+    top: 7px;
+}
+
+#clear {
+    left: 325px;
     top: 7px;
 }
 

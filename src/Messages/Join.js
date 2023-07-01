@@ -40,24 +40,23 @@ const m_Join = ({ c, data }) => {
         c: [c]
     });
 
-    for (let i of players) {
-        if (i[1].c !== c) tick.requests.push({
-            r: {
-                t: 'b',
-                r: { id: i[1].id, info: i[1].getPublicInfo() }
-            },
-    
-            c: [c]
-        });
-    }
-
     tick.requests.push({
         r: {
             t: 'b',
             r: { id: NewPlayer.id, info: NewPlayer.getPublicInfo() }
         },
-
         c: utils.getAllPlayerClients()
+    });
+
+    tick.requests.push({
+        r: {
+            t: 'l',
+            r: {
+                balls: utils.getBalls()
+            }
+        },
+
+        c: [c]
     });
 
     let plrs = players.size;
