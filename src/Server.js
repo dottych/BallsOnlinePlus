@@ -48,12 +48,7 @@ server.on('connection', c => {
         event.emit("msg", {c, data});
     });
 
-    c.on('close', () => {
-        if (c.id !== "0") {
-            //console.log("we lost a real one, he was " + c.id);
-            m_Leave({ c });
-        }
-    }); 
+    c.on('close', () => { if (c.id !== "0") m_Leave({ c }); }); 
 });
 
 

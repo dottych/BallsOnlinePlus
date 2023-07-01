@@ -6,9 +6,16 @@
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
+    let text = [...this];
 
-    return
+    for (let letter in text) {
+        const random = Math.floor(Math.random() * 2);
+        text[letter] = random === 0 ? text[letter].toUpperCase() : text[letter].toLowerCase();
+    }
+
+    return text.join('');
 }
+
 "".reverse(), "".reverse(), "".wobbleCase(), "".wobbleCase();
 
 const 
@@ -157,6 +164,9 @@ class Balls {
             "font-size: 32px; font-family: 'Carlito'; color: #DDDD00; font-style: italic", ""
         );
 
+        this.frameDone = false;
+        this.limitFPS = false;
+
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
 
@@ -219,7 +229,7 @@ class Balls {
         new Audio("./sound/ChatMessage.ogg").play();
     }
 
-    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
+    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1, wobble = false }) {
         this.ctx.font = `${(bold) ? "bold " : ""}${(italic) ? "italic " : ""}${size}px ${font}`;
 
         if (background) {
@@ -233,6 +243,8 @@ class Balls {
 
         let opacity = "FF";
         if (hexColor[6] !== undefined && hexColor[7] !== undefined) opacity = hexColor[6] + hexColor[7];
+
+        text = wobble ? text.wobbleCase() : text;
 
         // shadow
         if (shadow) {
@@ -431,7 +443,7 @@ class Balls {
             x: 10,
             y: 24,
             color: "#EEEEEE", 
-            size: 20
+            size: 20,
         });
 
         this.drawText({
@@ -441,7 +453,8 @@ class Balls {
             color: "#EEEE00", 
             font: "Guessy",
             size: 20,
-            italic: true
+            italic: true,
+            wobble: Math.floor(Math.random() * 100) === 0 ? true : false
         });
 
         this.ctx.fillStyle = "#BBBBBB";
@@ -669,12 +682,17 @@ class Balls {
             });
         }
         
-        requestAnimationFrame(this.draw.bind(this));
+        if (this.limitFPS) this.frameDone = true; else requestAnimationFrame(this.draw.bind(this));
     }
 
     init() {
         clicked = true;
-        requestAnimationFrame(this.draw.bind(this));
+
+        if (this.limitFPS) setInterval(() => {
+            if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));
+        }, 1000/30);
+        else requestAnimationFrame(this.draw.bind(this));
+        
         this.notify({
             text: "Connecting...",
             duration: 2000,
