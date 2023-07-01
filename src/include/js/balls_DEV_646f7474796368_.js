@@ -6,6 +6,7 @@
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
+
     return
 }
 "".reverse(), "".reverse(), "".wobbleCase(), "".wobbleCase();
@@ -285,8 +286,8 @@ class Balls {
             let gy = Math.round((this.cy + newY) / 128);
 
             if (newX !== 0 || newY !== 0) {
-                for (let i = this.clamp(gy-2, 0, 32); i < this.clamp(gy+2, 0, 32); i++) {
-                    for (let j = this.clamp(gx-2, 0, 32); j < this.clamp(gx+2, 0, 32); j++) {
+                for (let i = this.clamp(gy-1, 0, 32); i < this.clamp(gy+1, 0, 32); i++) {
+                    for (let j = this.clamp(gx-1, 0, 32); j < this.clamp(gx+1, 0, 32); j++) {
                         if (+this.map[i][j] >= 2) {
                             if (!touchedX) {
                                 touchedX = 
