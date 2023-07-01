@@ -75,6 +75,14 @@ canvas {
     font-family: 'LucidaConsole';
 }
 
+.n:hover {
+    background-color: lightgray;
+}
+
+.n:active {
+    background-color: #404040;
+}
+
 .n2 {
     position: absolute;
     height: 20px;

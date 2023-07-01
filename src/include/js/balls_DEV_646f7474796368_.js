@@ -1,4 +1,3 @@
-// try doing the small boundary loop again
 // hide far away players and draw like a darker area (maybe not)
 // collision check on server?
 // improve collision by actually moving the ball back by a certain amount
@@ -6,7 +5,10 @@
 // more 404 images
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
-"".reverse(), "".reverse();
+String.prototype.wobbleCase = function() {
+    return
+}
+"".reverse(), "".reverse(), "".wobbleCase(), "".wobbleCase();
 
 const 
 [
@@ -279,12 +281,12 @@ class Balls {
             newX = (newY !== 0) ? newX / Math.sqrt(2) : newX;
             newY = (newX !== 0) ? newY / Math.sqrt(2) : newY;
 
-            //let gx = Math.round(this.cx / 128);
-            //let gy = Math.round(this.cy / 128);
+            let gx = Math.round((this.cx + newX) / 128);
+            let gy = Math.round((this.cy + newY) / 128);
 
             if (newX !== 0 || newY !== 0) {
-                for (let i = 0; i < 32; i++) {
-                    for (let j = 0; j < 32; j++) {
+                for (let i = this.clamp(gy-2, 0, 32); i < this.clamp(gy+2, 0, 32); i++) {
+                    for (let j = this.clamp(gx-2, 0, 32); j < this.clamp(gx+2, 0, 32); j++) {
                         if (+this.map[i][j] >= 2) {
                             if (!touchedX) {
                                 touchedX = 
@@ -432,7 +434,7 @@ class Balls {
         });
 
         this.drawText({
-            text: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 
+            text: "PLUS", 
             x: this.t === "Balls Online" ? this.ctx.measureText(t).width + 15 : this.ctx.measureText(this.t).width + 15,
             y: 24,
             color: "#EEEE00", 
