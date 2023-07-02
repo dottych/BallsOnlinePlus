@@ -3,7 +3,9 @@
 // improve collision by actually moving the ball back by a certain amount
 // sounds toggle settings
 // more 404 images
-// wall shadows
+// outer walls become darker
+// prevention from shadow ball - keep pinging
+// line points
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -131,6 +133,7 @@ class Balls {
         this.msgSplit = 3; // using for future purposes
 
         this.points = [];
+        this.ctx.lineWidth = 10;
 
         this.serverStarted = 0;
 
@@ -274,11 +277,11 @@ class Balls {
                     //this.canvasMap.fillRect(j, i, 2, 2);
                     break;
                 case 1:
-                    this.canvasMap.fillStyle = '#FFFFFF10';
+                    this.canvasMap.fillStyle = '#FFFFFF0A';
                     this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
                 case 2:
-                    this.canvasMap.fillStyle = '#FFFFFF25';
+                    this.canvasMap.fillStyle = '#FFFFFF20';
                     this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
                 case 3:
@@ -295,7 +298,7 @@ class Balls {
         if (this.players.get(this.cid)) {
             let [newX, newY, touchedX, touchedY] = [0, 0, false, false];
 
-            let speed = !chat.matches(':focus') ? (1/4) * this.elapsed : 0;
+            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/4) * this.elapsed : 0;
 
             if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
             if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
@@ -359,14 +362,19 @@ class Balls {
     }
 
     drawPoints() {
-        for (let i in this.points) {
-            let point = this.points[i];
-            this.ctx.fillStyle = `#${point[2]}${this.maxHex(point[3])}`;
-            this.ctx.fillRect(
-                point[0]-this.icax+(this.canvas.width/2)-5.5,
-                point[1]-this.icay+(this.canvas.height/2)-5.5,
-                10, 10
+        this.ctx.lineWidth = 10;
+        for (let point of this.points) {
+            this.ctx.strokeStyle = `#${point[2]}${this.maxHex(point[3])}`;
+            this.ctx.beginPath();
+            this.ctx.moveTo(
+                point[0][0]-this.icax+(this.canvas.width/2),
+                point[1][0]-this.icay+(this.canvas.height/2)
             );
+            this.ctx.lineTo(
+                point[0][1]-this.icax+(this.canvas.width/2),
+                point[1][1]-this.icay+(this.canvas.height/2)
+            );
+            this.ctx.stroke();
         }
     }
 

@@ -29,8 +29,6 @@ class Player {
     tick() {
         setInterval(() => {
             if (this.x !== this.px || this.y !== this.py) {
-                this.px = this.x;
-                this.py = this.y;
                 this.moved = Date.now();
 
                 tick.requests.push({
@@ -41,16 +39,21 @@ class Player {
                     
                     c: utils.getOtherPlayerClients(this.c)
                 });
+
+                if (this.drew) tick.requests.push({
+                    r: {
+                        t: 'd',
+                        r: { x: [this.px, this.x], y: [this.py, this.y], color: this.color }
+                    },
+    
+                    c: utils.getAllPlayerClients()
+                }), this.drew = false;
+
+                this.px = this.x;
+                this.py = this.y;
             }
 
-            if (this.drew) tick.requests.push({
-                r: {
-                    t: 'd',
-                    r: { x: this.x, y: this.y, color: this.color }
-                },
-
-                c: utils.getAllPlayerClients()
-            }), this.drew = false;
+            
         }, 50);
     }
 
