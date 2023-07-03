@@ -993,14 +993,14 @@ balls.ws.addEventListener('message', msg => {
         case 'bn':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("name")) return;
             balls.players.get(data.r.id).name = data.r.name;
-            new Audio("./sound/NameChange.ogg").play();
+            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/NameChange.ogg").play();
             if (data.r.id === balls.cid) window.localStorage.setItem('name', data.r.name);
             break;
 
         case 'bc':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("color")) return;
             balls.players.get(data.r.id).color = data.r.color;
-            new Audio("./sound/ColorChange.ogg").play();
+            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/ColorChange.ogg").play();
             if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
             break;
     }
