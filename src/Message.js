@@ -7,6 +7,7 @@ const m_Join = require('./Messages/Join');
 const m_Message = require('./Messages/Message');
 const m_Move = require('./Messages/Move');
 const m_Draw = require('./Messages/Draw');
+const m_Ping = require('./Messages/Ping');
 
 // finally, the class
 
@@ -34,6 +35,10 @@ class Message {
                 )
                 m_Join({ c, data }); else c.close();
 
+                break;
+
+            case 'p':
+                m_Ping({ c, data });
                 break;
 
             case 'm':

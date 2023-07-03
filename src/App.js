@@ -20,4 +20,8 @@ app.get("/editor", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "include")));
 
+app.use((req, res) => {
+    res.status(404).sendFile(__dirname + "/404/" + (Math.floor(Math.random() * 5)+1) + ".png");
+});
+
 module.exports = app;

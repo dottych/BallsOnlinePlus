@@ -64,6 +64,16 @@ class Utils {
         this.motd = fs.readFileSync("./src/motd.txt", { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
     }
 
+    getBalls() {
+        let balls = [];
+
+        for (let i of players) {
+            balls.push({ id: i[1].id, info: i[1].getPublicInfo() });
+        }
+
+        return balls;
+    }
+
     isColor(color) {
         return typeof color === "string" && color.length === 6 && !isNaN(Number("0x" + color));
     }

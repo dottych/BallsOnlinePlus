@@ -5,22 +5,20 @@
         <title id="title">Balls Online</title>
         <link rel="icon" type="image/x-icon" href="./favicon.ico">
     </head>
-    <body>
-        <h2>Message length</h2>
-        <button id="48">48</button>
-        <button id="64">64</button>
-        <button id="80">80</button>
-
-        <h2>Join/leave messages</h2>
-        <input type="checkbox" id="jlMsgs">
+    <body style="padding-left: 14px;">
+        <p>Message length <button id="48">48</button><button id="64">64</button><button id="80">80</button></p>
+        <p>Join/leave messages <input type="checkbox" id="jlMsgs"></p>
+        <p>Ball-change sounds <input type="checkbox" id="bcSnds"></p>
 
         <script defer>
             const $48 = document.getElementById("48");
             const $64 = document.getElementById("64");
             const $80 = document.getElementById("80");
             const jlMsgs = document.getElementById("jlMsgs");
+            const bcSnds = document.getElementById("bcSnds");
 
             jlMsgs.checked = window.localStorage.getItem('jlMsgs') === "true";
+            bcSnds.checked = window.localStorage.getItem('bcSnds') === "true";
 
             $48.addEventListener('click', e => {
                 e.preventDefault();
@@ -35,6 +33,11 @@
             jlMsgs.addEventListener('change', e => {
                 e.preventDefault();
                 window.localStorage.setItem('jlMsgs', e.target.checked);
+            });
+
+            bcSnds.addEventListener('change', e => {
+                e.preventDefault();
+                window.localStorage.setItem('bcSnds', e.target.checked);
             });
         </script>
     </body>

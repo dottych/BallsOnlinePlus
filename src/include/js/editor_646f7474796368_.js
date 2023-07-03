@@ -1,3 +1,15 @@
+String.prototype.reverse = function() {return [...this].reverse().join('')};
+String.prototype.wobbleCase = function() {
+    let text = [...this];
+
+    for (let letter in text) {
+        const random = Math.floor(Math.random() * 2);
+        text[letter] = random === 0 ? text[letter].toUpperCase() : text[letter].toLowerCase();
+    }
+
+    return text.join('');
+}
+
 const map = document.getElementById("map");
 const air = document.getElementById("air");
 const door = document.getElementById("door");
@@ -21,7 +33,7 @@ class BallsEditor {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.2"
+        this.version = "0.1.3"
         this.dev = false;
         this.exhausted = false;
 
@@ -183,7 +195,7 @@ class BallsEditor {
         if (sound) new Audio("./sound/Notification.ogg").play();
     }
 
-    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1 }) {
+    drawText({ text, x, y, color = '#FFFFFF', font = "Carlito", background = false, size = 16, bold = true, italic = false, shadow = true, shadowSize = 1, wobble = false }) {
         this.ctx.font = `${(bold) ? "bold " : ""}${(italic) ? "italic " : ""}${size}px ${font}`;
 
         if (background) {
@@ -197,6 +209,8 @@ class BallsEditor {
 
         let opacity = "FF";
         if (hexColor[6] !== undefined && hexColor[7] !== undefined) opacity = hexColor[6] + hexColor[7];
+
+        text = wobble ? text.wobbleCase() : text;
 
         // shadow
         if (shadow) {
@@ -330,7 +344,8 @@ class BallsEditor {
             color: "#EEEE00", 
             font: "Guessy",
             size: 20,
-            italic: true
+            italic: true,
+            wobble: Math.floor(Math.random() * 100) === 0 ? true : false
         });
 
         this.ctx.fillStyle = "#BBBBBB";
@@ -500,6 +515,36 @@ class BallsEditor {
     init() {
         clicked = true;
 
+        setInterval(() => {
+            if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
+            'atob'['KeyboardEvent'.substring(0,3).length]+
+            'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
+            'atob'['KeyboardEvent'.substring(0,3).length]+
+            (typeof 'atob')[0]+"typeof 'string'"[6]+
+            (typeof !1)[Math.floor(Math.PI / 2)]+
+            (!1+'')[2]+
+            (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
+            (typeof Math.PI)[Math.sin(0 / Math.PI)]
+            : (
+                "e"+
+                (null+'').replace(window.URL.name.toLowerCase().replace('r',''),'i')+
+                (typeof Math.PI)[Math.sin(0 / Math.PI)]+
+                (typeof !1)[Math.floor(Math.PI / 2)].toUpperCase()+
+                ' '.reverse()+
+                "sla".replace('l','ll')+
+                'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
+            ).reverse();
+        
+            this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
+        
+            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--;
+        }, 50);
+        
+        this.splash = this.splashes[0];
+        const splashing = setInterval(() => {
+            this.splash = this.splashes[Math.floor(Math.random() * this.splashes.length)];
+        }, 1000 * 5);
+
         for (let i = 0; i < 32; i++) {
             this.map.push(["00000000000000000000000000000000"]);
         }
@@ -554,28 +599,6 @@ dummy.addEventListener('click', e => {
 
 window.addEventListener("keydown", e => editor.keyboard[e.keyCode] = true);
 window.addEventListener("keyup", e => editor.keyboard[e.keyCode] = false);
-
-setInterval(() => {
-    if (editor.t === "") editor.t = Math.floor(Math.random() * 100) === 0 ?
-    'atob'['KeyboardEvent'.substring(0,3).length]+
-    'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
-    'atob'['KeyboardEvent'.substring(0,3).length]+
-    (typeof 'atob')[0]+"typeof 'string'"[6]+
-    (typeof !1)[Math.floor(Math.PI / 2)]+
-    (!1+'')[2]+
-    (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
-    (typeof Math.PI)[Math.sin(0 / Math.PI)]
-    : "Balls Online";
-
-    editor.notifTransparency = editor.clamp(editor.notifTransparency - 10, 0, Math.min());
-
-    for (let i in editor.points) if (editor.points[i][3] < 1) editor.points.splice(i, 1); else editor.points[i][3]--;
-}, 50);
-
-editor.splash = editor.splashes[0];
-const splashing = setInterval(() => {
-    editor.splash = editor.splashes[Math.floor(Math.random() * editor.splashes.length)];
-}, 1000 * 5);
 
 document.addEventListener('click', () => {
     if (!clicked) {

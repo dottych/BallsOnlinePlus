@@ -2,6 +2,7 @@ const players = require('../Lists').players;
 const tick = require('../Tick');
 const utils = require('../Utils');
 const map = require('../Map');
+const bridge = require('../Bridge');
 
 // for server msgs use id: 'server', show: false
 
@@ -158,14 +159,19 @@ const m_Message = ({ c, data }) => {
 
             }
 
-        } else tick.requests.push({
-            r: {
-                t: 'm',
-                r: { id: c.id, show: true, m: data.r.m.trim().slice(0, 128).toString() }
-            },
+        } else {
+            tick.requests.push({
+                r: {
+                    t: 'm',
+                    r: { id: c.id, show: true, m: data.r.m.trim().slice(0, 128).toString() }
+                },
 
-            c: utils.getAllPlayerClients()
-        });
+                c: utils.getAllPlayerClients()
+            
+            });
+
+            bridge.pile(`(${c.id}) ${players.get(c.id).name}: ${data.r.m.trim().slice(0, 128).toString()}`);
+        }
     }
 
 }
