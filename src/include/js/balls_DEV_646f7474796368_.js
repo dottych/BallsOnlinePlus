@@ -875,6 +875,10 @@ document.addEventListener('click', () => {
     }
 });
 
+document.addEventListener('visibilitychange', e => {
+    if (document.visibilityState !== "visible") balls.keyboard = [];
+});
+
 balls.ws.addEventListener('open', () => {
     //balls.send({ t: 'i', r: {} }]));
 });
