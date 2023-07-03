@@ -1,5 +1,6 @@
 const utils = require('./Utils');
 const tick = require('./Tick');
+const m_Leave = require('./Messages/Leave');
 
 class Player {
     constructor(c) {
@@ -22,6 +23,9 @@ class Player {
         this.moved = Date.now();
 
         this.drew = false;
+
+        this.pinged = false;
+        this.pingAttempts = 0;
 
         this.tick();
     }
@@ -55,6 +59,11 @@ class Player {
 
             
         }, 50);
+
+        setInterval(() => {
+            if (!this.pinged) this.pingAttempts++; else this.pingAttempts = 0;
+            if (this.pingAttempts >= 2) m_Leave({ c: this.c });
+        }, 15000);
     }
 
     getPublicInfo() {

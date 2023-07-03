@@ -4,8 +4,12 @@
 // sounds toggle settings
 // more 404 images
 // outer walls become darker
-// prevention from shadow ball - keep pinging
-// line points
+// prevention from shadow ball - keep pinging every 10 secs
+// if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
+// editor shadows
+// commands for bot such as player count
+// interpolation independent on fps
+// balls.send instead of balls.ws.send
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -84,6 +88,8 @@ class Balls {
 
         this.canvasMap.fillStyle = "#808080";
         this.canvasMap.fillRect(0, 0, 32 * this.mapScale, 32 * this.mapScale);
+
+        this.shadows = true;
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -266,9 +272,11 @@ class Balls {
         this.canvasMap.fillStyle = "#808080";
         this.canvasMap.fillRect(0, 0, 32*this.mapScale, 32*this.mapScale);
 
-        this.canvasMap.fillStyle = "#00000010";
-        this.canvasMap.fillRect(0, 0, 32*this.mapScale, 1);
-        this.canvasMap.fillRect(0, 1, 1, 32*this.mapScale-1);
+        if (this.shadows) {
+            this.canvasMap.fillStyle = "#00000010";
+            this.canvasMap.fillRect(0, 0, 32*this.mapScale, 1);
+            this.canvasMap.fillRect(0, 1, 1, 32*this.mapScale-1);
+        }
 
         for (let i in this.map) for (let j in this.map[i]) {
             switch (+this.map[i][j]) {
@@ -285,8 +293,10 @@ class Balls {
                     this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
                 case 3:
-                    this.canvasMap.fillStyle = '#00000010';
-                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                    if (this.shadows) {
+                        this.canvasMap.fillStyle = '#00000010';
+                        this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                    }
                     this.canvasMap.fillStyle = '#AAAAAA';
                     this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
                     break;
@@ -827,6 +837,12 @@ setInterval(() => {
 
     for (let i in balls.points) if (balls.points[i][3] < 1) balls.points.splice(i, 1); else balls.points[i][3]--;
 }, 50);
+
+setInterval(() => {
+    balls.ws.send(JSON.stringify([{
+        t: 'p', r: {}
+    }]));
+}, 10000);
 
 balls.splash = balls.splashes[0];
 const splashing = setInterval(() => {
