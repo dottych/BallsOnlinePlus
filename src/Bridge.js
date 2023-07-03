@@ -6,6 +6,8 @@ const utils = require('./Utils');
 
 class Bridge {
     constructor() {
+        this.msgs = [];
+
         this.bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
         this.bot.once(Events.ClientReady, e => {
@@ -38,6 +40,14 @@ class Bridge {
         });*/
 
         this.bot.login(process.env.BOT_TOKEN);
+
+        setInterval(() => {
+            if (this.msgs.length > 0) this.send(this.msgs.join('\n')), this.msgs = [];
+        }, 2500);
+    }
+
+    pile(msg) {
+        this.msgs.push(msg);
     }
     
     send(msg) {

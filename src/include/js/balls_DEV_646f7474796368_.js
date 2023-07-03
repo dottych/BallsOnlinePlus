@@ -1,13 +1,10 @@
-// hide far away players and draw like a darker area (maybe not)
 // collision check on server?
 // improve collision by actually moving the ball back by a certain amount
 // sounds toggle settings
 // more 404 images
 // outer walls become darker
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
-// editor shadows
 // commands for bot such as player count
-// interpolation independent on fps
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -175,7 +172,7 @@ class Balls {
             "font-size: 32px; font-family: 'Carlito'; color: #DDDD00; font-style: italic", ""
         );
 
-        this.frameDone = false;
+        this.frameDone = true;
         this.limitFPS = false;
 
         this.url = window.location.host;
@@ -369,8 +366,8 @@ class Balls {
         //this.acax = this.cax+this.canvas.width/2;
         //this.acay = this.cay+this.canvas.height/2;
 
-        this.icax = this.lerp(this.icax, this.cax, 0.1);
-        this.icay = this.lerp(this.icay, this.cay, 0.1);
+        this.icax = this.lerp(this.icax, this.cax, 0.005 * this.elapsed);
+        this.icay = this.lerp(this.icay, this.cay, 0.005 * this.elapsed);
 
         this.ctx.drawImage(this.canvas.map, 0, 0, 32*this.mapScale, 32*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
     }
@@ -398,10 +395,10 @@ class Balls {
         for (let i of this.players) {
             let player = i[1];
 
-            if (player.id !== this.cid) {
-                player.lx = this.lerp(player.lx, player.x, 0.5);
-                player.ly = this.lerp(player.ly, player.y, 0.5);
+            player.lx = this.lerp(player.lx, player.x, 0.025 * this.elapsed);
+            player.ly = this.lerp(player.ly, player.y, 0.025 * this.elapsed);
 
+            if (player.id !== this.cid) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = `#${player.color}`;
                 this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
@@ -427,22 +424,22 @@ class Balls {
             // Outline
             this.ctx.beginPath();
             this.ctx.fillStyle = `#AAAAAA`;
-            this.ctx.arc(Math.round(self.x)-this.icax+(this.canvas.width/2), Math.round(self.y)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
+            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
             // Actual
             this.ctx.beginPath();
             this.ctx.fillStyle = `#${self.color}`;
-            this.ctx.arc(Math.round(self.x)-this.icax+(this.canvas.width/2), Math.round(self.y)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
             this.ctx.textAlign = 'center';
             this.drawText({
                 text: self.name, 
-                x: Math.round(self.x)-this.icax+this.canvas.width/2,
-                y: Math.round(self.y)-this.icay+this.canvas.height/2-25,
+                x: Math.round(self.lx)-this.icax+this.canvas.width/2,
+                y: Math.round(self.ly)-this.icay+this.canvas.height/2-25,
                 color: self.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
                 font: "Guessy",
                 size: 20,
@@ -777,7 +774,7 @@ class Balls {
 
         if (this.limitFPS) setInterval(() => {
             if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));
-        }, 1000/30);
+        }, 1000/10);
         else requestAnimationFrame(this.draw.bind(this));
         
         this.notify({

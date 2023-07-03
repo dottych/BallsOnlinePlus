@@ -166,7 +166,7 @@ const m_Message = ({ c, data }) => {
             
             });
 
-            bridge.send(`(${c.id}) ${players.get(c.id).name}: ${data.r.m.trim().slice(0, 128).toString()}`);
+            bridge.pile(`(${c.id}) ${players.get(c.id).name}: ${data.r.m.trim().slice(0, 128).toString()}`);
         }
     }
 
