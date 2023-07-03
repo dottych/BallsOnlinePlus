@@ -4,12 +4,10 @@
 // sounds toggle settings
 // more 404 images
 // outer walls become darker
-// prevention from shadow ball - keep pinging every 10 secs
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // editor shadows
 // commands for bot such as player count
 // interpolation independent on fps
-// balls.send instead of balls.ws.send
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -116,6 +114,8 @@ class Balls {
 
         this.players = new Map();
 
+        this.initialised = false;
+
         this.cid = "";
         this.cx = 2048;
         this.cy = 2048;
@@ -212,6 +212,10 @@ class Balls {
         screenshot.download = `${this.cid.replace(/[^A-Za-z0-9_]+$/,"").replaceAll(" ","").substr(0,6)}${Date.now().toString(16)}.png`;
         screenshot.click();
         screenshot.remove();
+    }
+
+    send(packet) {
+        this.ws.send(JSON.stringify([packet]));
     }
 
     player(id) {
@@ -717,6 +721,60 @@ class Balls {
     init() {
         clicked = true;
 
+        setInterval(() => {
+            if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
+            'atob'['KeyboardEvent'.substring(0,3).length]+
+            'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
+            'atob'['KeyboardEvent'.substring(0,3).length]+
+            (typeof 'atob')[0]+"typeof 'string'"[6]+
+            (typeof !1)[Math.floor(Math.PI / 2)]+
+            (!1+'')[2]+
+            (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
+            (typeof Math.PI)[Math.sin(0 / Math.PI)]
+            : (
+                "e"+
+                (null+'').replace(window.URL.name.toLowerCase().replace('r',''),'i')+
+                (typeof Math.PI)[Math.sin(0 / Math.PI)]+
+                (typeof !1)[Math.floor(Math.PI / 2)].toUpperCase()+
+                ' '.reverse()+
+                "sla".replace('l','ll')+
+                'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
+            ).reverse();
+        
+            if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
+        
+            this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
+            this.msgFade = this.clamp(this.msgFade + 17, 0, 221);
+        
+            if (this.players.get(this.cid) && (this.cx !== this.pcx || this.cy !== this.pcy)) {
+                this.pcx = this.cx;
+                this.pcy = this.cy;
+        
+                this.send({
+                    t: 'bm',
+                    r: {
+                        x: this.cx,
+                        y: this.cy
+                    }
+                });
+        
+                if (this.keyboard[this.keys.shift]) this.send({ t: 'd', r: {} });
+            }
+        
+            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--;
+        }, 50);
+        
+        setInterval(() => {
+            if (this.initialised && this.ws.readyState === 1) this.send({
+                t: 'p', r: {}
+            });
+        }, 10000);
+        
+        this.splash = this.splashes[0];
+        const splashing = setInterval(() => {
+            this.splash = this.splashes[Math.floor(Math.random() * this.splashes.length)];
+        }, 1000 * 5);
+
         if (this.limitFPS) setInterval(() => {
             if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));
         }, 1000/30);
@@ -743,7 +801,7 @@ form.addEventListener('submit', e => {
     if (chat.value) {
         let message = chat.value;
         if (message !== null || message.trim() !== "") {
-            balls.ws.send(JSON.stringify([{ t: 'm', r: { "m": message.trim().slice(0, 128).toString() } }]));
+            balls.send({ t: 'm', r: { "m": message.trim().slice(0, 128).toString() } });
             chat.value = '';
         }
     }
@@ -795,60 +853,6 @@ down.addEventListener("touchend", e => balls.keyboard[balls.keys.down] = false);
 right.addEventListener("touchend", e => balls.keyboard[balls.keys.right] = false);
 shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false);
 
-setInterval(() => {
-    if (balls.t === "") balls.t = Math.floor(Math.random() * 100) === 0 ?
-    'atob'['KeyboardEvent'.substring(0,3).length]+
-    'KeyboardEvent'[(Math.tan(Math.PI/2)+'')[9]]+
-    'atob'['KeyboardEvent'.substring(0,3).length]+
-    (typeof 'atob')[0]+"typeof 'string'"[6]+
-    (typeof !1)[Math.floor(Math.PI / 2)]+
-    (!1+'')[2]+
-    (typeof KeyboardEvent)[4+Math.sin(Math.PI/2)]+
-    (typeof Math.PI)[Math.sin(0 / Math.PI)]
-    : (
-        "e"+
-        (null+'').replace(window.URL.name.toLowerCase().replace('r',''),'i')+
-        (typeof Math.PI)[Math.sin(0 / Math.PI)]+
-        (typeof !1)[Math.floor(Math.PI / 2)].toUpperCase()+
-        ' '.reverse()+
-        "sla".replace('l','ll')+
-        'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
-    ).reverse();
-
-    if (clicked && !initialised && balls.ws.readyState === 1) balls.ws.send(JSON.stringify([{ t: 'i', r: {} }])), initialised = true;
-
-    balls.notifTransparency = balls.clamp(balls.notifTransparency - 10, 0, Math.min());
-    balls.msgFade = balls.clamp(balls.msgFade + 17, 0, 221);
-
-    if (balls.players.get(balls.cid) && (balls.cx !== balls.pcx || balls.cy !== balls.pcy)) {
-        balls.pcx = balls.cx;
-        balls.pcy = balls.cy;
-
-        balls.ws.send(JSON.stringify([{
-            t: 'bm',
-            r: {
-                x: balls.cx,
-                y: balls.cy
-            }
-        }]));
-
-        if (balls.keyboard[balls.keys.shift]) balls.ws.send(JSON.stringify([{ t: 'd', r: {} }]));
-    }
-
-    for (let i in balls.points) if (balls.points[i][3] < 1) balls.points.splice(i, 1); else balls.points[i][3]--;
-}, 50);
-
-setInterval(() => {
-    balls.ws.send(JSON.stringify([{
-        t: 'p', r: {}
-    }]));
-}, 10000);
-
-balls.splash = balls.splashes[0];
-const splashing = setInterval(() => {
-    balls.splash = balls.splashes[Math.floor(Math.random() * balls.splashes.length)];
-}, 1000 * 5);
-
 document.addEventListener('click', () => {
     if (!clicked) {
         document.getElementById("p").remove();
@@ -875,7 +879,7 @@ document.addEventListener('click', () => {
 });
 
 balls.ws.addEventListener('open', () => {
-    //balls.ws.send(JSON.stringify([{ t: 'i', r: {} }]));
+    //balls.send({ t: 'i', r: {} }]));
 });
 
 balls.ws.addEventListener('close', () => {
@@ -894,18 +898,24 @@ balls.ws.addEventListener('message', msg => {
         data = JSON.parse(msg.data)[0];
         if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
     } catch (e) {
-        data = { t: "none" };
+        data = { t: "none", r: { e: e.toString() } };
     }
 
     if (balls.exhausted) console.log(`%cGot request type ${data.t}`, "font-size: 8px;");
 
     switch (data.t) {
+        case 'none':
+            if (!data.r.hasOwnProperty("e")) return;
+            balls.addMessage(data.r.e);
+            break;
+
         case 'j':
             if (!data.r.hasOwnProperty("a") || !data.r.hasOwnProperty("c")) return;
-            balls.ws.send(eval(data.r.c));
+            balls.send(eval(data.r.c));
             break;
         
         case 'c':
+            balls.initialised = true;
             balls.cid = data.r.id;
             balls.notify({
                 text: "Loading...",
@@ -916,8 +926,8 @@ balls.ws.addEventListener('message', msg => {
             console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
             console.log(`%cGot client ID! >>> ${balls.cid}`, "font-size: 8px;");
 
-            if (window.localStorage.getItem('name')) balls.ws.send(JSON.stringify([{ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } }]));
-            if (window.localStorage.getItem('color')) balls.ws.send(JSON.stringify([{ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } }]));
+            if (window.localStorage.getItem('name')) balls.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
+            if (window.localStorage.getItem('color')) balls.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
             break;
 
         case 'ss':

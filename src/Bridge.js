@@ -26,6 +26,17 @@ class Bridge {
             }
         });
 
+        /*this.bot.on(Events.InteractionCreate, async e => {
+            if (!e.isChatInputCommand()) return;
+
+            switch (e.commandName) {
+                case 'players':
+                    e.reply('There are yes players.');
+                    break;
+
+            }
+        });*/
+
         this.bot.login(process.env.BOT_TOKEN);
     }
     

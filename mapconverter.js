@@ -1,7 +1,7 @@
 const jimp = require('jimp');
 const fs = require('fs');
 
-let mapID = 6;
+let mapID = 8;
 let file = `./mapspng/${mapID}.png`;
 
 let data = "";
