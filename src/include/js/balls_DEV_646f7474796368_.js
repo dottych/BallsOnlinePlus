@@ -1,10 +1,10 @@
 // collision check on server?
 // improve collision by actually moving the ball back by a certain amount
-// sounds toggle settings
 // more 404 images
 // outer walls become darker
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
+// demos (server-side, admin-only), custom client for watching demos (local commands such as spectate, freecam etc)
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -900,16 +900,12 @@ balls.ws.addEventListener('message', msg => {
         if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
     } catch (e) {
         data = { t: "none", r: { e: e.toString() } };
+        balls.addMessage(e.toString());
     }
 
     if (balls.exhausted) console.log(`%cGot request type ${data.t}`, "font-size: 8px;");
 
     switch (data.t) {
-        case 'none':
-            if (!data.r.hasOwnProperty("e")) return;
-            balls.addMessage(data.r.e);
-            break;
-
         case 'j':
             if (!data.r.hasOwnProperty("a") || !data.r.hasOwnProperty("c")) return;
             balls.send(eval(data.r.c));
@@ -964,7 +960,7 @@ balls.ws.addEventListener('message', msg => {
 
         case 'l':
             if (!data.r.hasOwnProperty("balls")) return;
-            for (let ball of data.r.balls) {
+            for (let ball of data.r["balls"]) {
                 if (!ball.hasOwnProperty("id") || !ball.hasOwnProperty("info")) return;
                 balls.players.set(ball.id, ball.info);
                 balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
