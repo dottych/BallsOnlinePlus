@@ -29,6 +29,8 @@ class Map {
         for (let i of players) {
             i[1].x = 1930 + Math.round(Math.random() * 235);
             i[1].y = 1930 + Math.round(Math.random() * 235);
+            i[1].px = i[1].x;
+            i[1].py = i[1].y;
 
             tick.requests.push({
                 r: {

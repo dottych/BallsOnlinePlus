@@ -7,6 +7,7 @@ class Player {
         this.id = utils.createId(String(Date.now())).substring(0, 6);
         this.name = `Ball ${Number("0x" + this.id.substring(0, 4))}`;
         this.color = this.id.toUpperCase();
+        this.cosmetic = "blacktophat";
         this.c = c;
 
         c.id = this.id;
@@ -71,6 +72,7 @@ class Player {
             id: this.id,
             name: this.name,
             color: this.color,
+            cosmetic: this.cosmetic,
             x: this.x,
             y: this.y,
             joined: this.joined,

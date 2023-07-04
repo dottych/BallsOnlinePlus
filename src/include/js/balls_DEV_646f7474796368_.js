@@ -5,6 +5,8 @@
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
 // demos (server-side, admin-only), custom client for watching demos (local commands such as spectate, freecam etc)
+// auto reconnect
+// tp command
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -65,7 +67,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.3"
+        this.version = "0.1.4"
         this.dev = true;
         this.exhausted = false;
 
@@ -398,49 +400,32 @@ class Balls {
             player.lx = this.lerp(player.lx, player.x, 0.025 * this.elapsed);
             player.ly = this.lerp(player.ly, player.y, 0.025 * this.elapsed);
 
-            if (player.id !== this.cid) {
+            if (player.id === this.cid) {
+                // Outline
                 this.ctx.beginPath();
-                this.ctx.fillStyle = `#${player.color}`;
-                this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+                this.ctx.fillStyle = `#AAAAAA`;
+                this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
-
-                this.ctx.textAlign = 'center';
-                this.drawText({
-                    text: player.name, 
-                    x: Math.round(player.lx)-this.icax+this.canvas.width/2,
-                    y: Math.round(player.ly)-this.icay+this.canvas.height/2-25,
-                    color: player.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
-                    font: "Guessy",
-                    size: 20,
-                    shadowSize: 2
-                });
-            } else {
-                self = player;
             }
-        }
-
-        if (self !== {}) {
-            // Outline
-            this.ctx.beginPath();
-            this.ctx.fillStyle = `#AAAAAA`;
-            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
-            this.ctx.fill();
-            this.ctx.closePath();
 
             // Actual
             this.ctx.beginPath();
-            this.ctx.fillStyle = `#${self.color}`;
-            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+            this.ctx.fillStyle = `#${player.color}`;
+            this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
+            // Cosmetic
+            this.ctx.drawImage(player.curl, Math.round(player.lx)-this.icax+(this.canvas.width/2)-20, Math.round(player.ly)-this.icay+this.canvas.height/2-20);
+
+            // Nametag
             this.ctx.textAlign = 'center';
             this.drawText({
-                text: self.name, 
-                x: Math.round(self.lx)-this.icax+this.canvas.width/2,
-                y: Math.round(self.ly)-this.icay+this.canvas.height/2-25,
-                color: self.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
+                text: player.name, 
+                x: Math.round(player.lx)-this.icax+this.canvas.width/2,
+                y: Math.round(player.ly)-this.icay+this.canvas.height/2-25,
+                color: player.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
                 font: "Guessy",
                 size: 20,
                 shadowSize: 2
@@ -884,6 +869,10 @@ balls.ws.addEventListener('open', () => {
 });
 
 balls.ws.addEventListener('close', () => {
+    balls.players.clear();
+    balls.cx = 2048;
+    balls.cy = 2048;
+    balls.messages = [];
     balls.notify({
         text: "You got disconnected! Please refresh.",
         duration: 5000,
@@ -925,6 +914,7 @@ balls.ws.addEventListener('message', msg => {
 
             if (window.localStorage.getItem('name')) balls.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
             if (window.localStorage.getItem('color')) balls.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
+            if (window.localStorage.getItem('cosmetic')) balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
             break;
 
         case 'ss':
@@ -965,7 +955,9 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.set(ball.id, ball.info);
                 balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
                 balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
-            }
+                balls.players.get(ball.id).curl = new Image();
+                balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id).cosmetic}.png`;
+            } 
             break;
 
         case 'b':
@@ -975,6 +967,8 @@ balls.ws.addEventListener('message', msg => {
 
             balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
             balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
+            balls.players.get(data.r.id).curl = new Image();
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info.cosmetic}.png`;
             break;
 
         case 'bl':
@@ -1003,5 +997,14 @@ balls.ws.addEventListener('message', msg => {
             if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/ColorChange.ogg").play();
             if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
             break;
+
+        case 'bco':
+            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
+            balls.players.get(data.r.id).cosmetic = data.r.cosmetic;
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.cosmetic}.png`;
+            // [MAKE SOUND] if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/CosmeticChange.ogg").play();
+            if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r.cosmetic);
+            break;
+
     }
 });

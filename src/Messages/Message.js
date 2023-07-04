@@ -1,4 +1,5 @@
 const players = require('../Lists').players;
+const cosmetics = require('../Lists').cosmetics;
 const tick = require('../Tick');
 const utils = require('../Utils');
 const map = require('../Map');
@@ -46,6 +47,10 @@ const m_Message = ({ c, data }) => {
                         case 'color':
                         case 'colour':
                             utils.msgClient(c, `Sets your color to the specified hexadecimal color.`);
+                            break;
+
+                        case 'cosmetic':
+                            utils.msgClient(c, `Gives you the specified cosmetic. List: ${cosmetics.join(', ')}`);
                             break;
 
                         case 'respawn':
@@ -103,6 +108,26 @@ const m_Message = ({ c, data }) => {
 
                             utils.msgClient(c, `You have changed your color to ${players.get(c.id).color}.`);
                         } else utils.msgClient(c, `This color is invalid!`);
+                    }
+                    break;
+
+                case 'cosmetic':
+                    if (input.trim !== "") {
+                        if (input.trim().toLowerCase() === players.get(c.id).cosmetic) utils.msgClient(c, `You already have this cosmetic!`);
+                        else if (cosmetics.indexOf(input.trim()) >= 0) {
+                            players.get(c.id).cosmetic = input.trim().toLowerCase();
+
+                            tick.requests.push({
+                                r: {
+                                    t: 'bco',
+                                    r: { id: c.id, cosmetic: input.trim().toLowerCase() }
+                                },
+                    
+                                c: utils.getAllPlayerClients()
+                            });
+
+                            utils.msgClient(c, `You have changed your cosmetic to ${players.get(c.id).cosmetic}.`);
+                        } else utils.msgClient(c, `This cosmetic is invalid!`);
                     }
                     break;
 
