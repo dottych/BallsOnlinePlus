@@ -914,7 +914,8 @@ balls.ws.addEventListener('message', msg => {
 
             if (window.localStorage.getItem('name')) balls.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
             if (window.localStorage.getItem('color')) balls.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
-            if (window.localStorage.getItem('cosmetic')) balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
+            if (window.localStorage.getItem('cosmetic') &&
+                window.localStorage.getItem('cosmetic') !== "none") balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
             break;
 
         case 'ss':
