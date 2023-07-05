@@ -56,7 +56,7 @@ class BallsEditor {
             1: new Block('Door', 'FFFFFF0A', false, false),
             2: new Block('Glass', 'FFFFFF20', true, false),
             3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'CDCDCDFF', false, false)
+            4: new Block('Liquid', 'FFFFFF9A', false, false)
         }
 
         this.canvas.map = document.createElement("canvas");
@@ -593,6 +593,11 @@ wall.addEventListener('click', e => {
     editor.block = 3;
 });
 
+liquid.addEventListener('click', e => {
+    e.preventDefault();
+    editor.block = 4;
+});
+
 dummy.addEventListener('click', e => {
     e.preventDefault();
     editor.block = -1;
@@ -609,6 +614,7 @@ document.addEventListener('click', () => {
         door.removeAttribute("hidden");
         glass.removeAttribute("hidden");
         wall.removeAttribute("hidden");
+        liquid.removeAttribute("hidden");
         dummy.removeAttribute("hidden");
         editor.init();
     }

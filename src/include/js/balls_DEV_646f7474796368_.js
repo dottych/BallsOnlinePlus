@@ -7,8 +7,8 @@
 // demos (server-side, admin-only), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
 // tp command
-// completely white block that kills you
 // check speed of player server-side
+// cosmetic change sound
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -92,7 +92,7 @@ class Balls {
             1: new Block('Door', 'FFFFFF0A', false, false),
             2: new Block('Glass', 'FFFFFF20', true, false),
             3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'FFFFFFFF', false, false)
+            4: new Block('Liquid', 'FFFFFF9A', false, false)
         }
 
         this.canvas.map = document.createElement("canvas");
@@ -617,7 +617,7 @@ class Balls {
         });*/
 
         this.drawText({
-            text: "Chat",
+            text: `Cha${this.dev ? 'd' : 't'}`,
             x: 16*32,
             y: 24,
             color: "#EEEEEE", 

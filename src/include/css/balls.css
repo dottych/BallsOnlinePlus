@@ -181,7 +181,12 @@ input {
     top: 300px;
 }
 
-#dummy {
+#liquid {
     left: 5px;
     top: 325px;
+}
+
+#dummy {
+    left: 5px;
+    top: 350px;
 }
