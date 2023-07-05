@@ -30,6 +30,11 @@
                 window.localStorage.setItem('length', 64);
             });
 
+            $80.addEventListener('click', e => {
+                e.preventDefault();
+                window.localStorage.setItem('length', 80);
+            });
+
             jlMsgs.addEventListener('change', e => {
                 e.preventDefault();
                 window.localStorage.setItem('jlMsgs', e.target.checked);

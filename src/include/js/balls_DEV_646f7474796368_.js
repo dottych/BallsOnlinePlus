@@ -7,6 +7,8 @@
 // demos (server-side, admin-only), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
 // tp command
+// completely white block that kills you
+// check speed of player server-side
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -62,6 +64,15 @@ let
     false,
 ]
 
+class Block {
+    constructor(name, color, solid, shadow) {
+        this.name = name;
+        this.color = color;
+        this.solid = solid;
+        this.shadow = shadow;
+    }
+}
+
 class Balls {
     constructor() {
         this.fps = 0;
@@ -76,6 +87,13 @@ class Balls {
 
         this.map = [];
         this.mapScale = 8;
+        this.blocks = {
+            0: new Block('Air', '808080FF', false, false),
+            1: new Block('Door', 'FFFFFF0A', false, false),
+            2: new Block('Glass', 'FFFFFF20', true, false),
+            3: new Block('Wall', 'AAAAAAFF', true, true),
+            4: new Block('Liquid', 'FFFFFFFF', false, false)
+        }
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
@@ -282,27 +300,16 @@ class Balls {
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
-            switch (+this.map[i][j]) {
-                case 0:
-                    //this.canvasMap.fillStyle = '#808080';
-                    //this.canvasMap.fillRect(j, i, 2, 2);
-                    break;
-                case 1:
-                    this.canvasMap.fillStyle = '#FFFFFF0A';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
-                case 2:
-                    this.canvasMap.fillStyle = '#FFFFFF20';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
-                case 3:
-                    if (this.shadows) {
-                        this.canvasMap.fillStyle = '#00000010';
-                        this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
-                    }
-                    this.canvasMap.fillStyle = '#AAAAAA';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
+            let block = this.blocks[+this.map[i][j]]
+
+            if (!isNaN(+j) && +this.map[i][j] !== 0) {
+                if (block.shadow && this.shadows) {
+                    this.canvasMap.fillStyle = '#00000010';
+                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                }
+    
+                this.canvasMap.fillStyle = `#${block.color}`;
+                this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
             }
         }
     }
@@ -327,7 +334,7 @@ class Balls {
             if (newX !== 0 || newY !== 0) {
                 for (let i = this.clamp(gy-1, 0, 32); i < this.clamp(gy+1, 0, 32); i++) {
                     for (let j = this.clamp(gx-1, 0, 32); j < this.clamp(gx+1, 0, 32); j++) {
-                        if (+this.map[i][j] >= 2) {
+                        if (this.blocks[+this.map[i][j]].solid) {
                             if (!touchedX) {
                                 touchedX = 
                                 this.cx + newX < j * 128 + 138 &&
@@ -392,45 +399,75 @@ class Balls {
     }
 
     drawPlayers() {
-        let self = {};
+        let self = undefined;
 
         for (let i of this.players) {
             let player = i[1];
 
             player.lx = this.lerp(player.lx, player.x, 0.025 * this.elapsed);
             player.ly = this.lerp(player.ly, player.y, 0.025 * this.elapsed);
+            
 
-            if (player.id === this.cid) {
-                // Outline
+            if (player.id === this.cid) self = player; else {
+                // Actual
                 this.ctx.beginPath();
-                this.ctx.fillStyle = `#AAAAAA`;
-                this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
+                this.ctx.fillStyle = `#${player.color}`;
+                this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
+
+                // Cosmetic
+                this.ctx.drawImage(player.curl, Math.round(player.lx)-this.icax+(this.canvas.width/2)-20, Math.round(player.ly)-this.icay+this.canvas.height/2-20);
+
+                // Nametag
+                this.ctx.textAlign = 'center';
+                this.drawText({
+                    text: player.name, 
+                    x: Math.round(player.lx)-this.icax+this.canvas.width/2,
+                    y: Math.round(player.ly)-this.icay+this.canvas.height/2-25,
+                    color: player.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
+                    font: "Guessy",
+                    size: 20,
+                    shadowSize: 2
+                });
             }
+        }
+
+        // Self player (to always draw on top)
+        if (typeof self === 'object') {
+            self.lx = this.lerp(self.lx, self.x, 0.025 * this.elapsed);
+            self.ly = this.lerp(self.ly, self.y, 0.025 * this.elapsed);
+
+            // Outline
+            this.ctx.beginPath();
+            this.ctx.fillStyle = `#AAAAAA`;
+            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 11, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.closePath();
 
             // Actual
             this.ctx.beginPath();
-            this.ctx.fillStyle = `#${player.color}`;
-            this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
+            this.ctx.fillStyle = `#${self.color}`;
+            this.ctx.arc(Math.round(self.lx)-this.icax+(this.canvas.width/2), Math.round(self.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
             this.ctx.fill();
             this.ctx.closePath();
 
             // Cosmetic
-            this.ctx.drawImage(player.curl, Math.round(player.lx)-this.icax+(this.canvas.width/2)-20, Math.round(player.ly)-this.icay+this.canvas.height/2-20);
+            this.ctx.drawImage(self.curl, Math.round(self.lx)-this.icax+(this.canvas.width/2)-20, Math.round(self.ly)-this.icay+this.canvas.height/2-20);
 
             // Nametag
             this.ctx.textAlign = 'center';
             this.drawText({
-                text: player.name, 
-                x: Math.round(player.lx)-this.icax+this.canvas.width/2,
-                y: Math.round(player.ly)-this.icay+this.canvas.height/2-25,
-                color: player.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
+                text: self.name, 
+                x: Math.round(self.lx)-this.icax+this.canvas.width/2,
+                y: Math.round(self.ly)-this.icay+this.canvas.height/2-25,
+                color: self.moved + this.maxAfk > Date.now() ? "#FFFFFF" : "#AAAAAA",
                 font: "Guessy",
                 size: 20,
                 shadowSize: 2
             });
         }
+        
     }
 
     drawUI() {

@@ -28,12 +28,21 @@ let
     document.getElementById("title"),
 ]
 
+class Block {
+    constructor(name, color, solid, shadow) {
+        this.name = name;
+        this.color = color;
+        this.solid = solid;
+        this.shadow = shadow;
+    }
+}
+
 class BallsEditor {
     constructor() {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.3"
+        this.version = "0.1.4"
         this.dev = true;
         this.exhausted = false;
 
@@ -41,6 +50,13 @@ class BallsEditor {
         this.ctx = this.canvas.getContext("2d");
 
         this.map = [];
+        this.blocks = {
+            0: new Block('Air', '808080FF', false, false),
+            1: new Block('Door', 'FFFFFF0A', false, false),
+            2: new Block('Glass', 'FFFFFF20', true, false),
+            3: new Block('Wall', 'AAAAAAFF', true, true),
+            4: new Block('Liquid', 'CDCDCDFF', false, false)
+        }
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
@@ -93,14 +109,7 @@ class BallsEditor {
 
         this.points = [];
 
-        this.element = 3;
-        this.elements = {
-            "-1": "Dummy",
-            0: "Air",
-            1: "Door",
-            2: "Glass",
-            3: "Wall"
-        };
+        this.block = 3;
 
         // JUST LOAD THE SOUNDS
         this.JLTS = {
@@ -171,17 +180,17 @@ class BallsEditor {
         screenshot.remove();
     }
 
-    placeElement(element, x, y) {
+    placeBlock(block, x, y) {
         const gridX = this.toGrid(x);
         const gridY = this.toGrid(y);
 
-        if (element >= 0 && element <= 3)
+        if (block >= 0 && block <= 4)
         if (gridX >= 0 && gridX <= 31 && gridY >= 0 && gridY <= 31) {
-            this.map[gridY][gridX] = element;
+            this.map[gridY][gridX] = block;
             this.drawMap();
         }
 
-        if (element === -1)
+        if (block === -1)
         if (x >= 10 && x <= 4086 && y >= 10 && y <= 4086) {
             this.dummyX = x;
             this.dummyY = y;
@@ -224,29 +233,20 @@ class BallsEditor {
     }
 
     drawMap() {
-        for (let i in this.map) for (let j in this.map[i]) {
-            switch (+this.map[i][j]) {
-                case 0:
-                    this.canvasMap.fillStyle = '#808080';
-                    this.canvasMap.fillRect(j, i, 1, 1);
-                    break;
-                case 1:
-                    this.canvasMap.fillStyle = '#858585';
-                    this.canvasMap.fillRect(j, i, 1, 1);
-                    break;
-                case 2:
-                    this.canvasMap.fillStyle = '#909090';
-                    this.canvasMap.fillRect(j, i, 1, 1);
-                    break;
-                case 3:
-                    this.canvasMap.fillStyle = '#AAAAAA';
-                    this.canvasMap.fillRect(j, i, 1, 1);
-                    break;
-            }
+        this.canvasMap.fillStyle = "#808080";
+        this.canvasMap.fillRect(0, 0, 32, 32);
 
-            this.canvasMap.fillStyle = '#AA8080';
-            this.canvasMap.fillRect(15, 15, 2, 2);
+        for (let i in this.map) for (let j in this.map[i]) {
+            let block = this.blocks[+this.map[i][j]]
+
+            if (!isNaN(+j) && +this.map[i][j] !== 0) {
+                this.canvasMap.fillStyle = `#${block.color}`;
+                this.canvasMap.fillRect(j, i, 1, 1);
+            }
         }
+
+        this.canvasMap.fillStyle = '#AA8080';
+        this.canvasMap.fillRect(15, 15, 2, 2);
     }
 
     drawUpdate() {
@@ -425,7 +425,7 @@ class BallsEditor {
         });
 
         this.drawText({
-            text: `Element: ${this.elements[this.element]}`, 
+            text: `Block: ${this.blocks[this.block].name}`, 
             x: 16*12,
             y: 16*9,
             color: "#DDDDDD",
@@ -574,27 +574,27 @@ map.addEventListener('click', e => {
 
 air.addEventListener('click', e => {
     e.preventDefault();
-    editor.element = 0;
+    editor.block = 0;
 });
 
 door.addEventListener('click', e => {
     e.preventDefault();
-    editor.element = 1;
+    editor.block = 1;
 });
 
 glass.addEventListener('click', e => {
     e.preventDefault();
-    editor.element = 2;
+    editor.block = 2;
 });
 
 wall.addEventListener('click', e => {
     e.preventDefault();
-    editor.element = 3;
+    editor.block = 3;
 });
 
 dummy.addEventListener('click', e => {
     e.preventDefault();
-    editor.element = -1;
+    editor.block = -1;
 });
 
 window.addEventListener("keydown", e => editor.keyboard[e.keyCode] = true);
@@ -619,5 +619,5 @@ editor.canvas.addEventListener('click', e => {
     let clickX = Math.floor(e.clientX - space.left + (editor.cax-editor.canvas.width/2));
     let clickY = Math.floor(e.clientY - space.top + (editor.cay-editor.canvas.height/2));
 
-    editor.placeElement(editor.element, clickX, clickY);
+    editor.placeBlock(editor.block, clickX, clickY);
 });
