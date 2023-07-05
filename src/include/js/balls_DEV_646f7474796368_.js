@@ -144,6 +144,8 @@ class Balls {
         this.icax = this.cax;
         this.icay = this.cay;
 
+        this.sonic = true;
+
         this.maxAfk = 60000;
 
         this.notifText = "Lorem ipsum dolor sit amet, and I don't remember the next thing.";
@@ -318,7 +320,7 @@ class Balls {
         if (this.players.get(this.cid)) {
             let [newX, newY, touchedX, touchedY] = [0, 0, false, false];
 
-            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/4) * this.elapsed : 0;
+            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/this.sonic ? 1 : 4) * this.elapsed : 0;
 
             if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
             if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
@@ -606,13 +608,13 @@ class Balls {
             color: "#DDDDDD",
         });
 
-        this.drawText({
+        /*this.drawText({
             text: this.splash, 
             x: 16*12,
             y: 16*9,
             color: "#DDDDDD",
             italic: true,
-        });
+        });*/
 
         this.drawText({
             text: "Chat",

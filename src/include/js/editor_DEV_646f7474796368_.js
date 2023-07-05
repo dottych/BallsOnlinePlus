@@ -51,6 +51,7 @@ class BallsEditor {
 
         this.map = [];
         this.blocks = {
+            "-1": { name: 'Dummy' },
             0: new Block('Air', '808080FF', false, false),
             1: new Block('Door', 'FFFFFF0A', false, false),
             2: new Block('Glass', 'FFFFFF20', true, false),
@@ -431,13 +432,13 @@ class BallsEditor {
             color: "#DDDDDD",
         });
 
-        this.drawText({
+        /*this.drawText({
             text: this.splash, 
             x: 16*12,
             y: 16*11,
             color: "#DDDDDD",
             italic: true,
-        });
+        });*/
     }
 
     draw(time) {
