@@ -740,7 +740,7 @@ class Balls {
     }
 
     init() {
-        clicked = true;
+        if (window.location === window.parent.location) clicked = true;
 
         setInterval(() => {
             if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
@@ -762,7 +762,7 @@ class Balls {
                 'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
             ).reverse();
         
-            if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
+            if (window.location === window.parent.location) if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
         
             this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
             this.msgFade = this.clamp(this.msgFade + 17, 0, 221);
@@ -895,7 +895,7 @@ document.addEventListener('click', () => {
             right.removeAttribute("hidden");
             shift.removeAttribute("hidden");
         }
-        balls.init();
+        if (window.location === window.parent.location) balls.init();
     }
 });
 
