@@ -17,9 +17,26 @@ for (let i of mapsInDir) {
     maps.set(mapFileID, [mapTitle, mapData]);
 }
 
+class Block {
+    constructor(name, color, cannot, shadow) {
+        this.name = name;
+        this.color = color;
+        this.cannot = cannot;
+        this.shadow = shadow;
+    }
+}
+
 class Map {
     constructor() {
-        this.mapID = Math.floor(Math.random() * maps.size);
+        this.mapID = 12; //Math.floor(Math.random() * maps.size);
+
+        this.blocks = {
+            0: new Block('Air', '808080FF', false, false),
+            1: new Block('Door', 'FFFFFF0A', false, false),
+            2: new Block('Glass', 'FFFFFF20', true, false),
+            3: new Block('Wall', 'AAAAAAFF', true, true),
+            4: new Block('Liquid', 'FFFFFF9A', true, false)
+        }
     }
 
     changeMap() {

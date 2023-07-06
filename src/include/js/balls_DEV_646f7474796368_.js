@@ -4,7 +4,7 @@
 // outer walls become darker
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
-// demos (server-side, admin-only), custom client for watching demos (local commands such as spectate, freecam etc)
+// demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
 // tp command
 // check speed of player server-side
@@ -144,7 +144,7 @@ class Balls {
         this.icax = this.cax;
         this.icay = this.cay;
 
-        this.sonic = true;
+        this.sonic = false;
 
         this.maxAfk = 60000;
 
@@ -320,7 +320,7 @@ class Balls {
         if (this.players.get(this.cid)) {
             let [newX, newY, touchedX, touchedY] = [0, 0, false, false];
 
-            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/this.sonic ? 1 : 4) * this.elapsed : 0;
+            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/(this.sonic ? 1 : 4)) * this.elapsed : 0;
 
             if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
             if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
@@ -408,7 +408,6 @@ class Balls {
 
             player.lx = this.lerp(player.lx, player.x, 0.025 * this.elapsed);
             player.ly = this.lerp(player.ly, player.y, 0.025 * this.elapsed);
-            
 
             if (player.id === this.cid) self = player; else {
                 // Actual
