@@ -6,6 +6,8 @@
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
 // check speed of player server-side (partially done?)
+// make teleport function in player class (so no more manual px setting etc)
+// fix beginning error in editor
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {

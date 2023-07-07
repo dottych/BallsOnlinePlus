@@ -10,6 +10,11 @@ const c_tp = (c, input) => {
         if (!players.get(ids[0])) { utils.msgClient(c, `First ID does not exist!`); return; }
         if (!players.get(ids[1])) { utils.msgClient(c, `Second ID does not exist!`); return; }
 
+        players.get(ids[0]).x = players.get(ids[1]).x;
+        players.get(ids[0]).y = players.get(ids[1]).y;
+        players.get(ids[0]).px = players.get(ids[0]).x;
+        players.get(ids[0]).py = players.get(ids[0]).y;
+
         tick.requests.push({
             r: {
                 t: 'bm',
