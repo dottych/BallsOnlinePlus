@@ -39,9 +39,10 @@ class Map {
         }
     }
 
-    changeMap() {
+    changeMap(id) {
         let prevMapID = this.mapID;
-        while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
+        console.log(id, Math.abs(+id));
+        if (id && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
 
         for (let i of players) {
             i[1].x = 1930 + Math.round(Math.random() * 235);

@@ -148,7 +148,7 @@ const m_Message = ({ c, data }) => {
                     break;
 
                 case 'newmap':
-                    if (players.get(c.id).admin) map.changeMap();
+                    if (players.get(c.id).admin) map.changeMap(+input);
                     else utils.msgClient(c, `You are not an admin!`);
                     break;
 
