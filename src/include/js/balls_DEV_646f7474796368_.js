@@ -168,6 +168,7 @@ class Balls {
             CC: new Audio("./sound/ColorChange.ogg"),
             NC: new Audio("./sound/NameChange.ogg"),
             N: new Audio("./sound/Notification.ogg"),
+            COC: new Audio("./sound/CosmeticChange.ogg"),
         };
 
         // because closure compiler will probably hold a grudge here
@@ -175,6 +176,7 @@ class Balls {
         this.JLTS.CC.pause();
         this.JLTS.NC.pause();
         this.JLTS.N.pause();
+        this.JLTS.COC.pause();
 
         this.splashes = [
             "Made by dottych",
@@ -996,7 +998,7 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
                 balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
                 balls.players.get(ball.id).curl = new Image();
-                balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id).cosmetic}.png`;
+                balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id)["cosmetic"]}.png`;
             } 
             break;
 
@@ -1008,7 +1010,7 @@ balls.ws.addEventListener('message', msg => {
             balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
             balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
             balls.players.get(data.r.id).curl = new Image();
-            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info.cosmetic}.png`;
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
             break;
 
         case 'bl':
@@ -1048,14 +1050,14 @@ balls.ws.addEventListener('message', msg => {
 
         case 'bco':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
-            balls.players.get(data.r.id).cosmetic = data.r.cosmetic;
-            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.cosmetic}.png`;
+            balls.players.get(data.r.id).cosmetic = data.r["cosmetic"];
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r["cosmetic"]}.png`;
 
             if (window.localStorage.getItem('bcSnds') === "true" &&
-                balls.players.get(data.r.id).joined + 1000 < Date.now()
+                balls.players.get(data.r.id)["joined"] + 1000 < Date.now()
             ) new Audio("./sound/CosmeticChange.ogg").play();
 
-            if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r.cosmetic);
+            if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r["cosmetic"]);
             break;
 
     }
