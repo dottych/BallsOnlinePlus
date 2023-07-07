@@ -28,7 +28,7 @@ class Block {
 
 class Map {
     constructor() {
-        this.mapID = 12; //Math.floor(Math.random() * maps.size);
+        this.mapID = Math.floor(Math.random() * maps.size);
 
         this.blocks = {
             0: new Block('Air', '808080FF', false, false),

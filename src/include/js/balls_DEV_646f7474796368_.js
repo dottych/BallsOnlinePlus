@@ -1,4 +1,3 @@
-// collision check on server?
 // improve collision by actually moving the ball back by a certain amount
 // more 404 images
 // outer walls become darker
@@ -84,6 +83,9 @@ class Balls {
 
         this.canvas = document.getElementById("ctx")
         this.ctx = this.canvas.getContext("2d");
+
+        this.emptyMap = [];
+        for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
 
         this.map = [];
         this.mapScale = 8;
@@ -781,7 +783,7 @@ class Balls {
                 if (this.keyboard[this.keys.shift]) this.send({ t: 'd', r: {} });
             }
         
-            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--;
+            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--, console.log(this.points[i][3]);
         }, 50);
         
         setInterval(() => {
@@ -978,13 +980,14 @@ balls.ws.addEventListener('message', msg => {
 
         case 'map':
             if (!data.r.hasOwnProperty("map") || data.r.map.length !== 32) return;
+            balls.points = [];
             balls.map = data.r.map;
             balls.drawMap();
             break;
 
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, 255]);
+            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
             break;
 
         case 'l':
