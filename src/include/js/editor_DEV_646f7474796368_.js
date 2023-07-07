@@ -15,6 +15,7 @@ const air = document.getElementById("air");
 const door = document.getElementById("door");
 const glass = document.getElementById("glass");
 const wall = document.getElementById("wall");
+const liquid = document.getElementById("liquid");
 const dummy = document.getElementById("dummy");
 
 let
