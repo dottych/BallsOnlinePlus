@@ -1,7 +1,7 @@
 const jimp = require('jimp');
 const fs = require('fs');
 
-let mapID = 9;
+let mapID = 15;
 let file = `./mapspng/${mapID}.png`;
 
 let data = "";
@@ -28,6 +28,10 @@ jimp.read(file, (e,i) => {
 
                 case 'AAAAAA':
                     data += "3";
+                    break;
+
+                case 'CDCDCD':
+                    data += "4";
                     break;
 
             }

@@ -6,7 +6,7 @@
         <link rel="icon" type="image/x-icon" href="./favicon.ico">
     </head>
     <body style="padding-left: 14px;">
-        <p>Message length <button id="48">48</button><button id="64">64</button><button id="80">80</button></p>
+        <p>Message length <button id="48">48</button><button id="64">64</button><button id="80">80</button><button id="96">96</button></p>
         <p>Join/leave messages <input type="checkbox" id="jlMsgs"></p>
         <p>Ball-change sounds <input type="checkbox" id="bcSnds"></p>
 
@@ -14,6 +14,7 @@
             const $48 = document.getElementById("48");
             const $64 = document.getElementById("64");
             const $80 = document.getElementById("80");
+            const $96 = document.getElementById("96");
             const jlMsgs = document.getElementById("jlMsgs");
             const bcSnds = document.getElementById("bcSnds");
 
@@ -28,6 +29,16 @@
             $64.addEventListener('click', e => {
                 e.preventDefault();
                 window.localStorage.setItem('length', 64);
+            });
+
+            $80.addEventListener('click', e => {
+                e.preventDefault();
+                window.localStorage.setItem('length', 80);
+            });
+
+            $96.addEventListener('click', e => {
+                e.preventDefault();
+                window.localStorage.setItem('length', 96);
             });
 
             jlMsgs.addEventListener('change', e => {

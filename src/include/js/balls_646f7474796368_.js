@@ -52,20 +52,39 @@ let
     false,
 ]
 
+class Block {
+    constructor(name, color, solid, shadow) {
+        this.name = name;
+        this.color = color;
+        this.solid = solid;
+        this.shadow = shadow;
+    }
+}
+
 class Balls {
     constructor() {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.3"
+        this.version = "0.1.4"
         this.dev = false;
         this.exhausted = false;
 
         this.canvas = document.getElementById("ctx")
         this.ctx = this.canvas.getContext("2d");
 
+        this.emptyMap = [];
+        for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
+
         this.map = [];
         this.mapScale = 8;
+        this.blocks = {
+            0: new Block('Air', '808080FF', false, false),
+            1: new Block('Door', 'FFFFFF0A', false, false),
+            2: new Block('Glass', 'FFFFFF20', true, false),
+            3: new Block('Wall', 'AAAAAAFF', true, true),
+            4: new Block('Liquid', 'FFFFFF9A', false, false)
+        };
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
@@ -116,6 +135,8 @@ class Balls {
         this.icax = this.cax;
         this.icay = this.cay;
 
+        this.sonic = false;
+
         this.maxAfk = 60000;
 
         this.notifText = "Lorem ipsum dolor sit amet, and I don't remember the next thing.";
@@ -138,6 +159,7 @@ class Balls {
             CC: new Audio("./sound/ColorChange.ogg"),
             NC: new Audio("./sound/NameChange.ogg"),
             N: new Audio("./sound/Notification.ogg"),
+            COC: new Audio("./sound/CosmeticChange.ogg"),
         };
 
         // because closure compiler will probably hold a grudge here
@@ -145,6 +167,7 @@ class Balls {
         this.JLTS.CC.pause();
         this.JLTS.NC.pause();
         this.JLTS.N.pause();
+        this.JLTS.COC.pause();
 
         this.splashes = [
             "Made by dottych",
@@ -272,27 +295,16 @@ class Balls {
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
-            switch (+this.map[i][j]) {
-                case 0:
-                    //this.canvasMap.fillStyle = '#808080';
-                    //this.canvasMap.fillRect(j, i, 2, 2);
-                    break;
-                case 1:
-                    this.canvasMap.fillStyle = '#FFFFFF0A';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
-                case 2:
-                    this.canvasMap.fillStyle = '#FFFFFF20';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
-                case 3:
-                    if (this.shadows) {
-                        this.canvasMap.fillStyle = '#00000010';
-                        this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
-                    }
-                    this.canvasMap.fillStyle = '#AAAAAA';
-                    this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
-                    break;
+            let block = this.blocks[+this.map[i][j]]
+
+            if (!isNaN(+j) && +this.map[i][j] !== 0) {
+                if (block.shadow && this.shadows) {
+                    this.canvasMap.fillStyle = '#00000010';
+                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                }
+    
+                this.canvasMap.fillStyle = `#${block.color}`;
+                this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
             }
         }
     }
@@ -301,7 +313,7 @@ class Balls {
         if (this.players.get(this.cid)) {
             let [newX, newY, touchedX, touchedY] = [0, 0, false, false];
 
-            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/4) * this.elapsed : 0;
+            let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/(this.sonic ? 1 : 4)) * this.elapsed : 0;
 
             if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
             if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
@@ -317,7 +329,7 @@ class Balls {
             if (newX !== 0 || newY !== 0) {
                 for (let i = this.clamp(gy-1, 0, 32); i < this.clamp(gy+1, 0, 32); i++) {
                     for (let j = this.clamp(gx-1, 0, 32); j < this.clamp(gx+1, 0, 32); j++) {
-                        if (+this.map[i][j] >= 2) {
+                        if (this.blocks[+this.map[i][j]].solid) {
                             if (!touchedX) {
                                 touchedX = 
                                 this.cx + newX < j * 128 + 138 &&
@@ -382,7 +394,7 @@ class Balls {
     }
 
     drawPlayers() {
-        let self = {};
+        let self = undefined;
 
         for (let i of this.players) {
             let player = i[1];
@@ -390,13 +402,18 @@ class Balls {
             player.lx = this.lerp(player.lx, player.x, 0.025 * this.elapsed);
             player.ly = this.lerp(player.ly, player.y, 0.025 * this.elapsed);
 
-            if (player.id !== this.cid) {
+            if (player.id === this.cid) self = player; else {
+                // Actual
                 this.ctx.beginPath();
                 this.ctx.fillStyle = `#${player.color}`;
                 this.ctx.arc(Math.round(player.lx)-this.icax+(this.canvas.width/2), Math.round(player.ly)-this.icay+this.canvas.height/2, 10, 0, 2 * Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
 
+                // Cosmetic
+                this.ctx.drawImage(player.curl, Math.round(player.lx)-this.icax+(this.canvas.width/2)-20, Math.round(player.ly)-this.icay+this.canvas.height/2-20);
+
+                // Nametag
                 this.ctx.textAlign = 'center';
                 this.drawText({
                     text: player.name, 
@@ -407,12 +424,14 @@ class Balls {
                     size: 20,
                     shadowSize: 2
                 });
-            } else {
-                self = player;
             }
         }
 
-        if (self !== {}) {
+        // Self player (to always draw on top)
+        if (typeof self === 'object') {
+            self.lx = this.lerp(self.lx, self.x, 0.025 * this.elapsed);
+            self.ly = this.lerp(self.ly, self.y, 0.025 * this.elapsed);
+
             // Outline
             this.ctx.beginPath();
             this.ctx.fillStyle = `#AAAAAA`;
@@ -427,6 +446,10 @@ class Balls {
             this.ctx.fill();
             this.ctx.closePath();
 
+            // Cosmetic
+            this.ctx.drawImage(self.curl, Math.round(self.lx)-this.icax+(this.canvas.width/2)-20, Math.round(self.ly)-this.icay+this.canvas.height/2-20);
+
+            // Nametag
             this.ctx.textAlign = 'center';
             this.drawText({
                 text: self.name, 
@@ -438,6 +461,7 @@ class Balls {
                 shadowSize: 2
             });
         }
+        
     }
 
     drawUI() {
@@ -576,16 +600,16 @@ class Balls {
             color: "#DDDDDD",
         });
 
-        this.drawText({
+        /*this.drawText({
             text: this.splash, 
             x: 16*12,
             y: 16*9,
             color: "#DDDDDD",
             italic: true,
-        });
+        });*/
 
         this.drawText({
-            text: "Chat",
+            text: `Cha${this.dev ? 'd' : 't'}`,
             x: 16*32,
             y: 24,
             color: "#EEEEEE", 
@@ -708,7 +732,7 @@ class Balls {
     }
 
     init() {
-        clicked = true;
+        if (window.location === window.parent.location) clicked = true;
 
         setInterval(() => {
             if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
@@ -730,7 +754,7 @@ class Balls {
                 'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
             ).reverse();
         
-            if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
+            if (window.location === window.parent.location) if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
         
             this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
             this.msgFade = this.clamp(this.msgFade + 17, 0, 221);
@@ -863,7 +887,7 @@ document.addEventListener('click', () => {
             right.removeAttribute("hidden");
             shift.removeAttribute("hidden");
         }
-        balls.init();
+        if (window.location === window.parent.location) balls.init();
     }
 });
 
@@ -876,6 +900,10 @@ balls.ws.addEventListener('open', () => {
 });
 
 balls.ws.addEventListener('close', () => {
+    balls.players.clear();
+    balls.cx = 2048;
+    balls.cy = 2048;
+    balls.messages = [];
     balls.notify({
         text: "You got disconnected! Please refresh.",
         duration: 5000,
@@ -917,6 +945,8 @@ balls.ws.addEventListener('message', msg => {
 
             if (window.localStorage.getItem('name')) balls.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
             if (window.localStorage.getItem('color')) balls.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
+            if (window.localStorage.getItem('cosmetic') &&
+                window.localStorage.getItem('cosmetic') !== "none") balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
             break;
 
         case 'ss':
@@ -941,13 +971,14 @@ balls.ws.addEventListener('message', msg => {
 
         case 'map':
             if (!data.r.hasOwnProperty("map") || data.r.map.length !== 32) return;
+            balls.points = [];
             balls.map = data.r.map;
             balls.drawMap();
             break;
 
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, 255]);
+            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
             break;
 
         case 'l':
@@ -957,7 +988,9 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.set(ball.id, ball.info);
                 balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
                 balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
-            }
+                balls.players.get(ball.id).curl = new Image();
+                balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id)["cosmetic"]}.png`;
+            } 
             break;
 
         case 'b':
@@ -967,6 +1000,8 @@ balls.ws.addEventListener('message', msg => {
 
             balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
             balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
+            balls.players.get(data.r.id).curl = new Image();
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
             break;
 
         case 'bl':
@@ -985,15 +1020,36 @@ balls.ws.addEventListener('message', msg => {
         case 'bn':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("name")) return;
             balls.players.get(data.r.id).name = data.r.name;
-            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/NameChange.ogg").play();
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id).joined + 1000 < Date.now()
+            ) new Audio("./sound/NameChange.ogg").play();
+
             if (data.r.id === balls.cid) window.localStorage.setItem('name', data.r.name);
             break;
 
         case 'bc':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("color")) return;
             balls.players.get(data.r.id).color = data.r.color;
-            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/ColorChange.ogg").play();
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id).joined + 1000 < Date.now()
+            ) new Audio("./sound/ColorChange.ogg").play();
+
             if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
             break;
+
+        case 'bco':
+            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
+            balls.players.get(data.r.id).cosmetic = data.r["cosmetic"];
+            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r["cosmetic"]}.png`;
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id)["joined"] + 1000 < Date.now()
+            ) new Audio("./sound/CosmeticChange.ogg").play();
+
+            if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r["cosmetic"]);
+            break;
+
     }
 });

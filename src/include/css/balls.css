@@ -75,11 +75,11 @@ canvas {
     font-family: 'LucidaConsole';
 }
 
-.n:hover {
+.n:hover, .n2:hover {
     background-color: lightgray;
 }
 
-.n:active {
+.n:active, .n2:active {
     background-color: #404040;
 }
 
@@ -87,6 +87,12 @@ canvas {
     position: absolute;
     height: 20px;
     user-select: none;
+    background-color: gray;
+    color: white;
+    border-color: lightgray;
+    border-width: 1px;
+    border-style: solid;
+    font-family: 'LucidaConsole';
 }
 
 #info {
@@ -175,7 +181,12 @@ input {
     top: 300px;
 }
 
-#dummy {
+#liquid {
     left: 5px;
     top: 325px;
+}
+
+#dummy {
+    left: 5px;
+    top: 350px;
 }

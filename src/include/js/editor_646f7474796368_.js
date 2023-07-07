@@ -619,5 +619,5 @@ editor.canvas.addEventListener('click', e => {
     let clickX = Math.floor(e.clientX - space.left + (editor.cax-editor.canvas.width/2));
     let clickY = Math.floor(e.clientY - space.top + (editor.cay-editor.canvas.height/2));
 
-    editor.placeElement(editor.element, clickX, clickY);
+    editor.placeBlock(editor.element, clickX, clickY);
 });
