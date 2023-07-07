@@ -6,8 +6,10 @@
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
 // tp command
-// check speed of player server-side
-// cosmetic change sound
+// check speed of player server-side (partially done?)
+// mapinfo command
+// newmap parameter
+// move all commands to their respective files
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -95,7 +97,7 @@ class Balls {
             2: new Block('Glass', 'FFFFFF20', true, false),
             3: new Block('Wall', 'AAAAAAFF', true, true),
             4: new Block('Liquid', 'FFFFFF9A', false, false)
-        }
+        };
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
@@ -783,7 +785,7 @@ class Balls {
                 if (this.keyboard[this.keys.shift]) this.send({ t: 'd', r: {} });
             }
         
-            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--, console.log(this.points[i][3]);
+            for (let i in this.points) if (this.points[i][3] < 1) this.points.splice(i, 1); else this.points[i][3]--;
         }, 50);
         
         setInterval(() => {
@@ -1029,14 +1031,22 @@ balls.ws.addEventListener('message', msg => {
         case 'bn':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("name")) return;
             balls.players.get(data.r.id).name = data.r.name;
-            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/NameChange.ogg").play();
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id).joined + 1000 < Date.now()
+            ) new Audio("./sound/NameChange.ogg").play();
+
             if (data.r.id === balls.cid) window.localStorage.setItem('name', data.r.name);
             break;
 
         case 'bc':
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("color")) return;
             balls.players.get(data.r.id).color = data.r.color;
-            if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/ColorChange.ogg").play();
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id).joined + 1000 < Date.now()
+            ) new Audio("./sound/ColorChange.ogg").play();
+
             if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
             break;
 
@@ -1044,7 +1054,11 @@ balls.ws.addEventListener('message', msg => {
             if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
             balls.players.get(data.r.id).cosmetic = data.r.cosmetic;
             balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.cosmetic}.png`;
-            // [MAKE SOUND] if (window.localStorage.getItem('bcSnds') === "true") new Audio("./sound/CosmeticChange.ogg").play();
+
+            if (window.localStorage.getItem('bcSnds') === "true" &&
+                balls.players.get(data.r.id).joined + 1000 < Date.now()
+            ) new Audio("./sound/CosmeticChange.ogg").play();
+
             if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r.cosmetic);
             break;
 
