@@ -5,11 +5,7 @@
 // commands for bot such as player count
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect
-// tp command
 // check speed of player server-side (partially done?)
-// mapinfo command
-// newmap parameter
-// move all commands to their respective files
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
