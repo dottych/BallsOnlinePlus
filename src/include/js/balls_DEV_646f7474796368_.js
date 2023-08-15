@@ -8,6 +8,8 @@
 // check speed of player server-side (partially done?)
 // make teleport function in player class (so no more manual px setting etc)
 // fix beginning error in editor
+// fix weird antialiasing? or misalignment? issue with cosmetic
+// fix the jumpy smooth camera
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -77,7 +79,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.4"
+        this.version = "0.1.5"
         this.dev = true;
         this.exhausted = false;
 

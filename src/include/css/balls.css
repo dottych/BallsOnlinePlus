@@ -75,24 +75,12 @@ canvas {
     font-family: 'LucidaConsole';
 }
 
-.n:hover, .n2:hover {
-    background-color: lightgray;
-}
-
-.n:active, .n2:active {
-    background-color: #404040;
-}
-
 .n2 {
     position: absolute;
     height: 20px;
-    user-select: none;
-    background-color: gray;
     color: white;
-    border-color: lightgray;
-    border-width: 1px;
-    border-style: solid;
     font-family: 'LucidaConsole';
+    text-decoration: underline;
 }
 
 #info {

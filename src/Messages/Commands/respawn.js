@@ -5,6 +5,8 @@ const tick = require('../../Tick');
 const c_respawn = (c, input) => {
     players.get(c.id).x = 1930 + Math.round(Math.random() * 235);
     players.get(c.id).y = 1930 + Math.round(Math.random() * 235);
+    players.get(ids[0]).px = players.get(ids[0]).x;
+    players.get(ids[0]).py = players.get(ids[0]).y;
 
     tick.requests.push({
         r: {
