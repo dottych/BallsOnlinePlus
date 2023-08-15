@@ -16,7 +16,7 @@ class Bridge {
 
         this.bot.on(Events.MessageCreate, e => {
             if (
-                    (e.channelId === '1124515966634704926') || (e.channelId === '1141078695939948654')
+                    (e.channelId === '1124515966634704926' || e.channelId === '1141078695939948654')
                     && e.author.id !== '1112098088128094309'
                 ) {
                 tick.requests.push({
