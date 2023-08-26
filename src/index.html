@@ -14,18 +14,30 @@
     </head>
     <body>
         <canvas id="ctx" width="1280" height="720"></canvas>
-        <form id="form" style="user-select: none;" hidden>
-            <input type="text" id="chat" maxlength="128" autocomplete="off"> <button class="n" id="chatmark">✔</button>
-        </form>
-
-        <div class="info">
-            <a class="n2" id="info" alt="Info" hidden>Info</a>
-            <a class="n2" id="discord" alt="Discord" hidden>Discord</a>
-            <a class="n2" id="screenshot" alt="Screenshot" hidden>Screenshot</a>
-            <a class="n2" id="settings" alt="Settings" hidden>Settings</a>
-            <a class="n2" id="clear" alt="Clear Chat" hidden>Clear</a>
-        </div>
         
+        <div class="ui">
+            <div class="uimenus">
+                <a>Chat</a>
+                <a>Players</a>
+                <a>Settings</a>
+                <a>Info</a>
+            </div>
+
+            <div class="uichat">
+                <form id="form" style="user-select: none;">
+                    <input type="text" id="chat" maxlength="128" autocomplete="off"> <button class="n" id="chatmark">✔</button>
+                </form>
+            </div>
+            
+    
+            <div class="info" hidden>
+                <a class="n2" id="info" alt="Info">Info</a>
+                <a class="n2" id="discord" alt="Discord">Discord</a>
+                <a class="n2" id="screenshot" alt="Screenshot">Screenshot</a>
+                <a class="n2" id="settings" alt="Settings">Settings</a>
+                <a class="n2" id="clear" alt="Clear Chat">Clear</a>
+            </div>
+        </div>
 
         <button class="m" id="up" hidden></button>
         <button class="m" id="left" hidden></button>

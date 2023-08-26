@@ -83,7 +83,7 @@ const m_Message = ({ c, data }) => {
 
             }
 
-        } else {
+        } else if (data.r.m.indexOf(process.env.ADMIN_PASS) < 0) {
             tick.requests.push({
                 r: {
                     t: 'm',

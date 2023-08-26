@@ -178,3 +178,24 @@ input {
     left: 5px;
     top: 350px;
 }
+
+.ui {
+    transition: opacity 100ms ease-in-out;
+    background-color: #40404080;
+    position: absolute;
+    left: 10px;
+    top: 35px;
+    width: 512px;
+    height: 512px;
+    opacity: 10%;
+}
+
+.ui:hover { 
+    opacity: 100%;
+}
+
+.uimenus {
+    background-color: #20202040;
+    width: 100%;
+    height: 48px;
+}
