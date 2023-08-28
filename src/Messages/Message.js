@@ -18,6 +18,7 @@ const c_mapinfo = require('./Commands/mapinfo');
 const c_newmap = require('./Commands/newmap');
 const c_notify = require('./Commands/notify');
 const c_tp = require('./Commands/tp');
+const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
 
 const m_Message = ({ c, data }) => {
@@ -77,6 +78,10 @@ const m_Message = ({ c, data }) => {
                     c_tp(c, input);
                     break;
 
+                case 'kick':
+                    c_kick(c, input);
+                    break; 
+                
                 case 'admin':
                     c_admin(c, input);
                     break;
