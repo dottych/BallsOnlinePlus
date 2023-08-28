@@ -27,6 +27,7 @@ class Player {
 
         this.drew = false;
         this.moving = false;
+        this.wrongMoves = 0;
 
         this.pinged = false;
         this.pingAttempts = 0;
@@ -52,7 +53,7 @@ class Player {
                             tick.requests.push({
                                 r: {
                                     t: 'bm',
-                                    r: { id: this.id, x: this.x, y: this.y }
+                                    r: { id: this.id, x: this.px, y: this.py }
                                 },
                                 
                                 c: [this.c]
@@ -103,6 +104,8 @@ class Player {
 
                 this.moving = false;
                 this.moved = Date.now();
+                
+                this.wrongMoves = 0;
             }
         }, 50);
 

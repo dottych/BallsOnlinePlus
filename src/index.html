@@ -15,20 +15,50 @@
     <body>
         <canvas id="ctx" width="1280" height="720"></canvas>
         
-        <div class="ui">
+        <div id="ui" class="ui" hidden>
             <div class="uimenus">
-                <a>Chat</a>
-                <a>Players</a>
-                <a>Settings</a>
-                <a>Info</a>
+                <button id="chatbtn" class="selected">Chat</button>
+                <button id="plrsbtn">Players</button>
+                <button id="setsbtn">Settings</button>
+                <button id="infobtn">Info</button>
+                <button id="crdsbtn">Credits</button>
             </div>
 
-            <div class="uichat">
+            <div class="uichat" id="uichat">
+                <div class="chatmsgs" id="chatmsgs"></div>
                 <form id="form" style="user-select: none;">
                     <input type="text" id="chat" maxlength="128" autocomplete="off"> <button class="n" id="chatmark">✔</button>
                 </form>
             </div>
-            
+
+            <div class="uiplayers" id="uiplayers" hidden></div>
+
+            <div class="uisets" id="uisets" hidden>
+                <p>Join/leave messages <input type="checkbox" id="jlMsgs"></p>
+                <p>Ball-change sounds <input type="checkbox" id="bcSnds"></p>
+            </div>
+
+            <div class="uiinfo" id="uiinfo" hidden>
+                <p>
+                    Use WASD or arrow keys to move.<br>
+                    Hold shift to draw.<br>
+                    Use the chat to talk to other people.<br>
+                    Say <b>/help</b> for commands.
+                </p>
+            </div>
+
+            <div class="uiinfo" id="uiinfo" hidden>
+                <p>
+                    Use WASD or arrow keys to move.<br>
+                    Hold shift to draw.<br>
+                    Use the chat to talk to other people.<br>
+                    Say <b>/help</b> for commands.
+                </p>
+            </div>
+
+            <div class="uicrds" id="uicrds" hidden>
+                
+            </div>
     
             <div class="info" hidden>
                 <a class="n2" id="info" alt="Info">Info</a>
@@ -39,13 +69,15 @@
             </div>
         </div>
 
-        <button class="m" id="up" hidden></button>
-        <button class="m" id="left" hidden></button>
-        <button class="m" id="down" hidden></button>
-        <button class="m" id="right" hidden></button>
-        <button class="m" id="shift" hidden></button>
+        <div id="keys" hidden>
+            <button class="m" id="up"></button>
+            <button class="m" id="left"></button>
+            <button class="m" id="down"></button>
+            <button class="m" id="right"></button>
+            <button class="m" id="shift"></button>
+        </div>
 
-        <p id="p" class="p" style="position: absolute; top: 0px; left: 10px;">Interact with the page to begin playing.</p>
+        <p id="p" class="p" style="font-size:20px;position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%);">Click anywhere on the page to begin playing.</p>
         
         <script defer src="/js/balls_DEV_646f7474796368_.js"></script>
     </body>

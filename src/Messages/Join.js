@@ -45,7 +45,7 @@ const m_Join = ({ c, data }) => {
             t: 'b',
             r: { id: NewPlayer.id, info: NewPlayer.getPublicInfo() }
         },
-        c: utils.getAllPlayerClients()
+        c: utils.getOtherPlayerClients(c)
     });
 
     tick.requests.push({

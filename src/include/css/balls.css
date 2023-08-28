@@ -17,6 +17,8 @@
     src: local('LucidaConsole'), url('https://fonts.cdnfonts.com/s/56356/lucon.woff') format('woff');
 }
 
+@keyframes new { 100% { filter: grayscale(1) } }
+
 html, body {
     margin: auto;
     font-family: "Guessy";
@@ -29,24 +31,6 @@ canvas {
     font-smooth: never;
     -webkit-font-smoothing: none;
     height: 100%;
-}
-
-#chat {
-    position: absolute;
-    left: 545px;
-    top: 9px;
-    background-color: gray;
-    border-style: none;
-    outline: none;
-    color: white;
-    font-family: 'Calibri';
-    font-weight: bold;
-}
-
-#chatmark {
-    position: absolute;
-    left: 690px;
-    top: 7px;
 }
 
 .m {
@@ -183,8 +167,10 @@ input {
     transition: opacity 100ms ease-in-out;
     background-color: #40404080;
     position: absolute;
-    left: 10px;
-    top: 35px;
+    /*left: 10px;
+    top: 35px;*/
+    top: 8px;
+    right: 8px;
     width: 512px;
     height: 512px;
     opacity: 10%;
@@ -197,5 +183,113 @@ input {
 .uimenus {
     background-color: #20202040;
     width: 100%;
-    height: 48px;
+    height: 32px;
+    user-select: none;
+}
+
+.uimenus button {
+    background-color: #FFFFFF00;
+    color: white;
+    border: none;
+    margin-left: 8px;
+    font-size: 26px;
+    font-family: 'Guessy';
+    height: 100%;
+}
+
+.uimenus button:hover {
+    background-color: #FFFFFF40;
+}
+
+.uimenus button:active {
+    background-color: #FFFFFF80;
+}
+
+.uimenus button.selected {
+    background-color: #FFFFFF60;
+}
+
+.uichat, .uiplayers, .uisets, .uiinfo {
+    height: 480px;
+}
+
+.uiplayers p {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFFFF;
+    user-select: none;
+}
+
+.uisets p, .uiinfo p {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFFFF;
+}
+
+.uisets, .uiinfo {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.chatmsgs {
+    height: 460px;
+    max-height: 460px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-wrap: normal;
+}
+
+.chatmsgs p {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFF00;
+}
+
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FFFFFF00;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #80808080;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #AAAAAA80;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #90909080;
+}
+
+#chat {
+    min-width: 492px;
+    max-width: 492px;
+    height: 20px;
+    max-height: 20px;
+    background-color: #FFFFFF00;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 0;
+    font-family: "Carlito";
+    font-weight: bold;
+}
+
+#chatmark {
+    width: 20px;
+    height: 20px;
+    background-color: #808080FF;
+    color: white;
+    padding: 0;
+    border: none;
 }
