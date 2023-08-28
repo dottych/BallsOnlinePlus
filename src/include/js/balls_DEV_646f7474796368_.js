@@ -323,8 +323,8 @@ class Balls {
 
         if (this.shadows) {
             this.canvasMap.fillStyle = "#00000010";
-            this.canvasMap.fillRect(0, 0, 32*this.mapScale, 1);
-            this.canvasMap.fillRect(0, 1, 1, 32*this.mapScale-1);
+            this.canvasMap.fillRect(0, 0, 2048, 8);
+            this.canvasMap.fillRect(0, 8, 8, 2048-8);
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
@@ -333,7 +333,25 @@ class Balls {
             if (!isNaN(+j) && +this.map[i][j] !== 0) {
                 if (block.shadow && this.shadows) {
                     this.canvasMap.fillStyle = '#00000010';
-                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                    this.canvasMap.fillRect(j*this.mapScale+8, i*this.mapScale+8, this.mapScale, this.mapScale);
+
+                    if (this.map[i-1] !== undefined && !this.blocks[this.map[i-1][j]].shadow) {
+                        this.canvasMap.beginPath();
+                        this.canvasMap.moveTo(j*this.mapScale+this.mapScale, i*this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale+8, i*this.mapScale+8);
+                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale, i*this.mapScale+8);
+                        this.canvasMap.fill();
+                        this.canvasMap.closePath();
+                    }
+
+                    if (this.map[i][j-1] !== undefined && !this.blocks[this.map[i][j-1]].shadow) {
+                        this.canvasMap.beginPath();
+                        this.canvasMap.moveTo(j*this.mapScale, i*this.mapScale+this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale+8);
+                        this.canvasMap.fill();
+                        this.canvasMap.closePath();
+                    }
                 }
     
                 this.canvasMap.fillStyle = `#${block.color}`;
