@@ -209,8 +209,9 @@ input {
     background-color: #FFFFFF60;
 }
 
-.uichat, .uiplayers, .uisets, .uiinfo {
+.uichat, .uiplayers, .uisets, .uiinfo, .uicrds {
     height: 480px;
+    max-height: 480px;
 }
 
 .uiplayers p {
@@ -230,7 +231,7 @@ input {
     color: #FFFFFF;
 }
 
-.uisets, .uiinfo, .uicrds {
+.uiplayers, .uisets, .uiinfo, .uicrds {
     overflow-x: hidden;
     overflow-y: scroll;
 }

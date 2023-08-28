@@ -37,10 +37,32 @@ class Player {
 
     tick() {
         setInterval(() => {
-            if ((this.x !== this.px || this.y !== this.py) &&
-                !this.moving &&
-                Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2) < 100
-            ) {
+            if ((this.x !== this.px || this.y !== this.py) && !this.moving) {
+                /*console.log(Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2));
+                if (Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2) >= 28 && !this.admin) {
+                    this.wrongMoves++;
+
+                    this.x = this.px;
+                    this.y = this.py;
+
+                    if (this.wrongMoves >= 15) {
+                        this.wrongMoves = 0;
+
+                        tick.requests.push({
+                            r: {
+                                t: 'bm',
+                                r: { id: this.id, x: this.px, y: this.py }
+                            },
+                            
+                            c: [this.c]
+                        });
+                    }
+
+                    return;
+                }
+
+                this.wrongMoves = 0;*/
+
                 let collided = this.checkCollision();
                 this.moving = true;
 
@@ -123,7 +145,7 @@ class Player {
         let gy = Math.round(this.y / 128);
         let _map = maps.get(map.mapID)[1];
 
-        for (let i = utils.clamp(gy-1, 0, 32); i < utils.clamp(gy+1, 0, 32); i++) {
+        if (!this.admin) for (let i = utils.clamp(gy-1, 0, 32); i < utils.clamp(gy+1, 0, 32); i++) {
             for (let j = utils.clamp(gx-1, 0, 32); j < utils.clamp(gx+1, 0, 32); j++) {
                 if (map.blocks[+_map[i][j]].cannot) {
                     if (!touchedX) {

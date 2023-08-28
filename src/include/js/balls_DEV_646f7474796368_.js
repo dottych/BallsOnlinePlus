@@ -14,14 +14,10 @@
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // kick command
 // just draw all the tiles on a big res canvas instead... this will also allow for nice textures, and shadows
-// after x failed attempts of trying to move (illegally) send move packet to where the ball is
 // show average fps instead
 // move welcomes to txt file
 // client and server run commands
 // dm command
-// motd command (for this player)
-// status square or circle after plus text
-// liquid maze map
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -65,9 +61,6 @@ const shift = document.getElementById("shift");
 const title = document.getElementById("title");
 const jlMsgs = document.getElementById("jlMsgs");
 const bcSnds = document.getElementById("bcSnds");
-
-jlMsgs.checked = window.localStorage.getItem('jlMsgs') === "true";
-bcSnds.checked = window.localStorage.getItem('bcSnds') === "true";
 
 jlMsgs.addEventListener('change', e => {
     e.preventDefault();
@@ -113,7 +106,7 @@ class Balls {
         for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
 
         this.map = [];
-        this.mapScale = 16;
+        this.mapScale = 64;
         this.blocks = {
             0: new Block('Air', '808080FF', false, false),
             1: new Block('Door', 'FFFFFF0A', false, false),
@@ -549,8 +542,8 @@ class Balls {
 
         this.drawText({
             text: `FPS: ${Math.round(this.fps)}`, 
-            x: 16*11,
-            y: 8*3,
+            x: 16*12,
+            y: 23,
             color: (this.fps < 30) ? (this.fps < 15) ? 'red' : 'yellow' : 'lime',
         });
 
@@ -559,14 +552,13 @@ class Balls {
             x: 10,
             y: 16*4,
             color: 'lime',
-        });
-
-        this.drawText({
-            text: `Status: ${(this.ws.readyState == 0 || this.ws.readyState == 3 || this.ws.readyState == 2) ? "offline" : "online"}`,
-            x: 10,
-            y: 16*5,
-            color: (this.ws.readyState == 0 || this.ws.readyState == 3 ||this. ws.readyState == 2) ? "red" : 'lime',
         });*/
+
+        this.ctx.beginPath();
+        this.ctx.fillStyle = (this.ws.readyState == 0 || this.ws.readyState == 3 || this.ws.readyState == 2) ? "red" : "lime";
+        this.ctx.arc(168, 18, 7, 0, Math.PI * 2)
+        this.ctx.fill();
+        this.ctx.closePath();
 
         this.drawText({
             text: `Version: ${this.getVersion()}`, 
@@ -671,6 +663,12 @@ class Balls {
 
     init() {
         if (window.location === window.parent.location) clicked = true;
+
+        if (window.localStorage.getItem('jlMsgs') === null) window.localStorage.setItem('jlMsgs', 'true');
+        if (window.localStorage.getItem('bcSnds') === null) window.localStorage.setItem('bcSnds', 'false');
+
+        jlMsgs.checked = window.localStorage.getItem('jlMsgs') === "true";
+        bcSnds.checked = window.localStorage.getItem('bcSnds') === "true";
 
         setInterval(() => {
             if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
