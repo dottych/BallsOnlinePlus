@@ -37,9 +37,18 @@ class Map {
             3: new Block('Wall', 'AAAAAAFF', true, true),
             4: new Block('Liquid', 'FFFFFF9A', true, false)
         }
+
+        this.interval = setInterval(() => {
+            this.changeMap();
+        }, 60000 * 5);
     }
 
     changeMap(id) {
+        clearInterval(this.interval);
+        this.interval = setInterval(() => {
+            this.changeMap();
+        }, 60000 * 5);
+        
         let prevMapID = this.mapID;
         
         if (id && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
@@ -85,9 +94,5 @@ class Map {
 }
 
 const map = new Map();
-
-setInterval(() => {
-    map.changeMap();
-}, 60000 * 5);
 
 module.exports = map;

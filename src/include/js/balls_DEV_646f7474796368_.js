@@ -16,6 +16,12 @@
 // just draw all the tiles on a big res canvas instead... this will also allow for nice textures, and shadows
 // after x failed attempts of trying to move (illegally) send move packet to where the ball is
 // show average fps instead
+// move welcomes to txt file
+// client and server run commands
+// dm command
+// motd command (for this player)
+// status square or circle after plus text
+// liquid maze map
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -107,7 +113,7 @@ class Balls {
         for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
 
         this.map = [];
-        this.mapScale = 8;
+        this.mapScale = 16;
         this.blocks = {
             0: new Block('Air', '808080FF', false, false),
             1: new Block('Door', 'FFFFFF0A', false, false),
@@ -560,130 +566,35 @@ class Balls {
             x: 10,
             y: 16*5,
             color: (this.ws.readyState == 0 || this.ws.readyState == 3 ||this. ws.readyState == 2) ? "red" : 'lime',
-        });
-
-        this.drawText({
-            text: `Client run: ${Math.floor(performance.now() / 1000)}s`, 
-            x: 10,
-            y: 16*7,
-            color: "#AAAAFF",
-        });
-
-        this.drawText({
-            text: `Server run: ${Math.floor((performance.now() + this.serverStarted) / 1000)}s`, 
-            x: 10,
-            y: 16*8,
-            color: "#AAAAFF",
-        });
+        });*/
 
         this.drawText({
             text: `Version: ${this.getVersion()}`, 
             x: 10,
-            y: 16*10,
+            y: 16*3,
             color: "#AAAAFF",
         });
 
         this.drawText({
             text: `Platform: ${window.navigator.platform}`, 
             x: 10,
-            y: 16*11,
+            y: 16*4,
             color: "#AAAAFF",
         });
-
-        this.drawText({
-            text: `Client res: ${this.canvas.width}x${this.canvas.height}`,
-            x: 10,
-            y: 16*13,
-            color: "#AAAAFF",
-        });
-
-        this.drawText({
-            text: "Info",
-            x: 16*12,
-            y: 24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(190, 30, 152, 1);
 
         this.drawText({
             text: `Client ID: ${this.cid}`, 
-            x: 16*12,
-            y: 16*3,
+            x: 10,
+            y: 16*6,
             color: "#DDDDDD",
         });
 
         this.drawText({
-            text: `Client X: ${Math.round(this.cx)}`, 
-            x: 16*12,
-            y: 16*4,
-            color: "#DDDDDD",
-        });
-
-        this.drawText({
-            text: `Client Y: ${Math.round(this.cy)}`, 
-            x: 16*12,
-            y: 16*5,
-            color: "#DDDDDD",
-        });
-
-        this.drawText({
-            text: `Players: ${this.players.size}`, 
-            x: 16*12,
+            text: `Position: ${Math.round(this.cx)} | ${Math.round(this.cy)}`, 
+            x: 10,
             y: 16*7,
             color: "#DDDDDD",
         });
-
-        this.drawText({
-            text: this.splash, 
-            x: 16*12,
-            y: 16*9,
-            color: "#DDDDDD",
-            italic: true,
-        });
-
-        this.drawText({
-            text: `Cha${this.dev ? 'd' : 't'}`,
-            x: 16*32,
-            y: 24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(510, 30, 152, 1);*/
-
-        /*this.drawText({
-            text: "Player list",
-            x: 10,
-            y: 16*16+24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(8, 256+30, 152, 1);
-
-        let playerIndex = 0;
-        for (let i of this.players) {
-            let player = i[1];
-
-            let playerText = ``;
-            playerText += `${player.id === this.cid ? ">>> " : ""}`;
-            playerText += `${player.id} | ${player.name}`;
-            //playerText += `${Math.round(player.x)}, ${Math.round(player.y)} | `;
-            //playerText += `${Math.floor((Date.now() - player.joined) / 1000)}s`;
-            playerText += `${player.id === this.cid ? " <<<" : ""}`;
-
-            this.drawText({
-                text: playerText, 
-                x: 10,
-                y: 16*19+playerIndex*16,
-                color: `#${player.color}`,
-                font: 'LucidaConsole'
-            });
-
-            playerIndex++;
-        }*/
     }
 
     draw(time) {
