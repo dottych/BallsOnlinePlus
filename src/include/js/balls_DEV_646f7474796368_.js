@@ -12,7 +12,6 @@
 // fix the jumpy smooth camera
 // rewrite map data to hex
 // INIT protocol type accepts an id that sets your user (so a permanent user)
-// kick command
 // just draw all the tiles on a big res canvas instead... this will also allow for nice textures, and shadows
 // show average fps instead
 // move welcomes to txt file
@@ -872,10 +871,15 @@ balls.ws.addEventListener('open', () => {
 });
 
 balls.ws.addEventListener('close', () => {
+    for (let plr of balls.players) document.getElementById(plr[0]).remove();
     balls.players.clear();
+    
+
     balls.cx = 2048;
     balls.cy = 2048;
+
     balls.messages = [];
+
     balls.notify({
         text: "You got disconnected! Please refresh.",
         duration: 5000,
