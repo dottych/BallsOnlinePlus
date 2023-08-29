@@ -37,32 +37,10 @@ class Player {
 
     tick() {
         setInterval(() => {
-            if ((this.x !== this.px || this.y !== this.py) && !this.moving) {
-                /*console.log(Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2));
-                if (Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2) >= 28 && !this.admin) {
-                    this.wrongMoves++;
-
-                    this.x = this.px;
-                    this.y = this.py;
-
-                    if (this.wrongMoves >= 15) {
-                        this.wrongMoves = 0;
-
-                        tick.requests.push({
-                            r: {
-                                t: 'bm',
-                                r: { id: this.id, x: this.px, y: this.py }
-                            },
-                            
-                            c: [this.c]
-                        });
-                    }
-
-                    return;
-                }
-
-                this.wrongMoves = 0;*/
-
+            if ((this.x !== this.px || this.y !== this.py) &&
+                !this.moving &&
+                Math.sqrt(Math.abs(this.x - this.px)**2 + Math.abs(this.y - this.py)**2) < 100
+            ) {
                 let collided = this.checkCollision();
                 this.moving = true;
 

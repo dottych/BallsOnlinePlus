@@ -209,6 +209,10 @@ input {
     background-color: #FFFFFF60;
 }
 
+.uimenus a:link, a:visited {
+    color: white;
+}
+
 .uichat, .uiplayers, .uisets, .uiinfo, .uicrds {
     height: 480px;
     max-height: 480px;
