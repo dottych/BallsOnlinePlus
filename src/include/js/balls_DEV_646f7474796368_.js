@@ -12,7 +12,6 @@
 // fix the jumpy smooth camera
 // rewrite map data to hex
 // INIT protocol type accepts an id that sets your user (so a permanent user)
-// just draw all the tiles on a big res canvas instead... this will also allow for nice textures, and shadows
 // show average fps instead
 // move welcomes to txt file
 // client and server run commands
@@ -81,9 +80,9 @@ let
 ]
 
 class Block {
-    constructor(name, color, solid, shadow) {
+    constructor(name, transparency, solid, shadow) {
         this.name = name;
-        this.color = color;
+        this.transparency = transparency;
         this.solid = solid;
         this.shadow = shadow;
     }
@@ -107,11 +106,11 @@ class Balls {
         this.map = [];
         this.mapScale = 64;
         this.blocks = {
-            0: new Block('Air', '808080FF', false, false),
-            1: new Block('Door', 'FFFFFF0A', false, false),
-            2: new Block('Glass', 'FFFFFF20', true, false),
-            3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'FFFFFF9A', false, false)
+            0: new Block('Air', 0xFF, false, false),
+            1: new Block('Door', 0x0A, false, false),
+            2: new Block('Glass', 0x20, true, false),
+            3: new Block('Wall', 0xFF, true, true),
+            4: new Block('Liquid', 0x9A, false, false)
         };
 
         this.canvas.map = document.createElement("canvas");
@@ -124,6 +123,17 @@ class Balls {
         this.canvasMap.fillRect(0, 0, 32 * this.mapScale, 32 * this.mapScale);
 
         this.shadows = true;
+
+        this.textures = new Image(128, 32);
+        this.textures.src = "./img/textures.png";
+
+        this.canvas.textures = document.createElement("canvas");
+        this.canvasTextures = this.canvas.textures.getContext("2d");
+
+        this.canvas.textures.width = 128;
+        this.canvas.textures.height = 32;
+
+        this.textures.onload = () => this.canvasTextures.drawImage(this.textures, 0, 0);
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -321,6 +331,8 @@ class Balls {
         this.canvasMap.fillStyle = "#808080";
         this.canvasMap.fillRect(0, 0, 32*this.mapScale, 32*this.mapScale);
 
+        this.canvasMap.imageSmoothingEnabled = false;
+
         if (this.shadows) {
             this.canvasMap.fillStyle = "#00000010";
             this.canvasMap.fillRect(0, 0, 2048, 8);
@@ -328,6 +340,7 @@ class Balls {
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
+            this.canvasMap.globalAlpha = 1;
             let block = this.blocks[+this.map[i][j]]
 
             if (!isNaN(+j) && +this.map[i][j] !== 0) {
@@ -354,10 +367,12 @@ class Balls {
                     }
                 }
     
-                this.canvasMap.fillStyle = `#${block.color}`;
-                this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
+                this.canvasMap.globalAlpha = block.transparency / 255;
+                this.canvasMap.drawImage(this.canvas.textures, (+this.map[i][j]-1)*32, 0, 32, 32, j*this.mapScale, i*this.mapScale, 64, 64);
             }
         }
+
+        this.canvasMap.globalAlpha = 1;
     }
 
     drawUpdate() {
