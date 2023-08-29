@@ -23,7 +23,10 @@
 }
 
 @keyframes new { 100% { filter: grayscale(1); } }
-@keyframes gone { 100% { opacity: 0%; transform: rotate(180deg) scale(1%); } }
+@keyframes gone0 { 100% { opacity: 0%; transform: rotate(180deg) scale(1%); } }
+@keyframes gone1 { 100% { opacity: 0%; transform: scale(200%); } }
+@keyframes gone2 { 100% { opacity: 0%; transform: rotate(180deg); } }
+@keyframes gone3 { 100% { opacity: 0%; } }
 
 html, body {
     margin: auto;

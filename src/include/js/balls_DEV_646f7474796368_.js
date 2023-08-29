@@ -888,7 +888,7 @@ shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false
 
 document.addEventListener('click', () => {
     if (!clicked) {
-        document.getElementById("p").style.animation = "gone 0.5s linear forwards";
+        document.getElementById("p").style.animation = `gone${Math.floor(Math.random() * 4)} ${0.5 + Math.floor(Math.random() * 5) / 10}s linear forwards`;
         setTimeout(() => {
             document.getElementById("p").setAttribute("hidden", "");
         }, 1000);
