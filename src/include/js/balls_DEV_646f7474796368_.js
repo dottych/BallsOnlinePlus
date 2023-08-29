@@ -125,7 +125,7 @@ class Balls {
         this.shadows = true;
 
         this.textures = new Image(128, 32);
-        this.textures.src = "./img/textures.png";
+        this.textures.src = "./img/textures/default.png";
 
         this.canvas.textures = document.createElement("canvas");
         this.canvasTextures = this.canvas.textures.getContext("2d");
@@ -611,19 +611,21 @@ class Balls {
             color: "#AAAAFF",
         });
 
-        this.drawText({
-            text: `Client ID: ${this.cid}`, 
-            x: 10,
-            y: 16*6,
-            color: "#DDDDDD",
-        });
-
-        this.drawText({
-            text: `Position: ${Math.round(this.cx)} | ${Math.round(this.cy)}`, 
-            x: 10,
-            y: 16*7,
-            color: "#DDDDDD",
-        });
+        if (this.cid !== "") {
+            this.drawText({
+                text: `Client ID: ${this.cid}`, 
+                x: 10,
+                y: 16*6,
+                color: "#DDDDDD",
+            });
+    
+            this.drawText({
+                text: `Position: ${Math.round(this.cx)} | ${Math.round(this.cy)}`, 
+                x: 10,
+                y: 16*7,
+                color: "#DDDDDD",
+            });
+        }
     }
 
     draw(time) {
