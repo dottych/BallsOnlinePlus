@@ -222,7 +222,7 @@ class Balls {
         );
 
         this.frameDone = true;
-        this.limitFPS = false;
+        this.limitFPS = falsedddddd;
 
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
@@ -434,8 +434,8 @@ class Balls {
         //this.acax = this.cax+this.canvas.width/2;
         //this.acay = this.cay+this.canvas.height/2;
 
-        this.icax = this.lerp(this.icax, this.cax, 0.005 * this.elapsed);
-        this.icay = this.lerp(this.icay, this.cay, 0.005 * this.elapsed);
+        this.icax = this.lerp(this.icax, this.cax, 0.005 * (document.hasFocus() ? this.elapsed : this.clamp(this.elapsed, 0, 100)));
+        this.icay = this.lerp(this.icay, this.cay, 0.005 * (document.hasFocus() ? this.elapsed : this.clamp(this.elapsed, 0, 100)));
 
         this.ricax = Math.round(this.icax);
         this.ricay = Math.round(this.icay);
