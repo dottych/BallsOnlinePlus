@@ -172,6 +172,8 @@ class Balls {
         this.cay = this.cy;
         this.icax = this.cax;
         this.icay = this.cay;
+        this.ricax = this.icax;
+        this.ricay = this.icay;
 
         this.sonic = false;
 
@@ -439,6 +441,9 @@ class Balls {
         this.icax = this.lerp(this.icax, this.cax, 0.005 * this.elapsed);
         this.icay = this.lerp(this.icay, this.cay, 0.005 * this.elapsed);
 
+        this.ricax = Math.round(this.icax);
+        this.ricay = Math.round(this.icay);
+
         this.ctx.drawImage(this.canvas.map, 0, 0, 32*this.mapScale, 32*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
     }
 
@@ -588,7 +593,7 @@ class Balls {
 
         this.ctx.beginPath();
         this.ctx.fillStyle = (this.ws.readyState == 0 || this.ws.readyState == 3 || this.ws.readyState == 2) ? "red" : "lime";
-        this.ctx.arc(168, 18, 7, 0, Math.PI * 2)
+        this.ctx.arc(this.ctx.measureText(t).width + 94, 18, 7, 0, Math.PI * 2)
         this.ctx.fill();
         this.ctx.closePath();
 
