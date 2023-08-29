@@ -18,9 +18,9 @@ for (let i of mapsInDir) {
 }
 
 class Block {
-    constructor(name, color, cannot, shadow) {
+    constructor(name, transparency, cannot, shadow) {
         this.name = name;
-        this.color = color;
+        this.transparency = transparency;
         this.cannot = cannot;
         this.shadow = shadow;
     }
@@ -31,11 +31,11 @@ class Map {
         this.mapID = Math.floor(Math.random() * maps.size);
 
         this.blocks = {
-            0: new Block('Air', '808080FF', false, false),
-            1: new Block('Door', 'FFFFFF0A', false, false),
-            2: new Block('Glass', 'FFFFFF20', true, false),
-            3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'FFFFFF9A', true, false)
+            0: new Block('Air', 0xFF, false, false),
+            1: new Block('Door', 0x0A, false, false),
+            2: new Block('Glass', 0x20, true, false),
+            3: new Block('Wall', 0xFF, true, true),
+            4: new Block('Liquid', 0x9A, true, false)
         }
 
         this.interval = setInterval(() => {
