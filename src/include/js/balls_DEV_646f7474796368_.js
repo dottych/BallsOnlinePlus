@@ -989,7 +989,7 @@ balls.ws.addEventListener('message', msg => {
 
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
+            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
             break;
 
         case 'l':
