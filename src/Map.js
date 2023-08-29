@@ -50,8 +50,8 @@ class Map {
         }, 60000 * 5);
         
         let prevMapID = this.mapID;
-        
-        if (id && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
+
+        if (id !== undefined && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
 
         for (let i of players) {
             i[1].x = 1930 + Math.round(Math.random() * 235);
