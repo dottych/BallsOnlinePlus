@@ -237,7 +237,7 @@ input {
     user-select: none;
 }
 
-.uisets p, .uiinfo p, .uicrds p, .uicrds h3 {
+.uisets p, .uiinfo p, .uicrds p, .uisets h3, .uicrds h3 {
     font-family: 'LucidaConsole';
     margin-left: 4px;
     margin-top: 2px;

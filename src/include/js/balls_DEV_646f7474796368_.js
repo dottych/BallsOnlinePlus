@@ -1,15 +1,14 @@
 // improve collision by actually moving the ball back by a certain amount
 // more 404 images
-// outer walls become darker
+// outer walls become darker (kinda done)
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
-// auto reconnect
+// auto reconnect (or maybe not)
 // check speed of player server-side (partially done?)
-// make teleport function in player class (so no more manual px setting etc)
+// make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor
 // fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
-// fix the jumpy smooth camera
 // rewrite map data to hex
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // show average fps instead
@@ -57,6 +56,8 @@ const shift = document.getElementById("shift");
 const title = document.getElementById("title");
 const jlMsgs = document.getElementById("jlMsgs");
 const bcSnds = document.getElementById("bcSnds");
+const tex0 = document.getElementById("tex0");
+const tex1 = document.getElementById("tex1");
 
 jlMsgs.addEventListener('change', e => {
     e.preventDefault();
@@ -123,7 +124,7 @@ class Balls {
         this.shadows = true;
 
         this.textures = new Image(128, 32);
-        this.textures.src = "./img/textures/marioood.png";
+        this.textures.src = `./img/textures/${window.localStorage.getItem('texture') !== null ? window.localStorage.getItem('texture') : 'marioood'}.png`;
 
         this.canvas.textures = document.createElement("canvas");
         this.canvasTextures = this.canvas.textures.getContext("2d");
@@ -222,7 +223,7 @@ class Balls {
         );
 
         this.frameDone = true;
-        this.limitFPS = falsedddddd;
+        this.limitFPS = false;
 
         this.url = window.location.host;
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
@@ -864,6 +865,24 @@ crdsBtn.addEventListener('click', () => {
     uiSets.setAttribute('hidden', null);
     uiInfo.setAttribute('hidden', null);
     uiCrds.removeAttribute('hidden');
+});
+
+tex0.addEventListener('click', e => {
+    window.localStorage.setItem('texture', 'dottych');
+    balls.textures.src = './img/textures/dottych.png';
+    balls.textures.onload = () => {
+        balls.canvasTextures.drawImage(balls.textures, 0, 0);
+        balls.drawMap();
+    }
+});
+
+tex1.addEventListener('click', e => {
+    window.localStorage.setItem('texture', 'marioood');
+    balls.textures.src = './img/textures/marioood.png';
+    balls.textures.onload = () => {
+        balls.canvasTextures.drawImage(balls.textures, 0, 0);
+        balls.drawMap();
+    }
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
