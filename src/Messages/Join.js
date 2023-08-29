@@ -1,10 +1,10 @@
 const Player = require('../Player');
 const players = require('../Lists').players;
-const welcomings = require('../Lists').welcomings;
 const maps = require('../Lists').maps;
 const map = require('../Map');
 const tick = require('../Tick');
 const utils = require('../Utils');
+const lists = require('../Lists');
 
 const m_Join = ({ c, data }) => {
     let NewPlayer = new Player(c);
@@ -60,13 +60,13 @@ const m_Join = ({ c, data }) => {
     });
 
     let plrs = players.size;
-    let motd = utils.motd[Math.floor(Math.random() * utils.motd.length)];
+    let motd = lists.motds[Math.floor(Math.random() * lists.motds.length)];
 
     utils.msgClient(c, `Welcome to the server! There ${plrs===1?"is":"are"} ${plrs} player${plrs===1?"":"s"} online.`);
     utils.msgClient(c, `Try saying /help.`);
     utils.msgClient(c, `MOTD: ${motd}`);
 
-    let welcoming = welcomings[Math.floor(Math.random() * welcomings.length)];
+    let welcoming = lists.welcomings[Math.floor(Math.random() * lists.welcomings.length)];
 
     tick.requests.push({
         r: {

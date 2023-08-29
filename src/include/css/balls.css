@@ -17,7 +17,13 @@
     src: local('LucidaConsole'), url('https://fonts.cdnfonts.com/s/56356/lucon.woff') format('woff');
 }
 
-@keyframes new { 100% { filter: grayscale(1) } }
+@font-face {
+    font-family: "Haiza6";
+    src: url("/font/haiza6.ttf");
+}
+
+@keyframes new { 100% { filter: grayscale(1); } }
+@keyframes gone { 100% { opacity: 0%; transform: rotate(180deg) scale(1%); } }
 
 html, body {
     margin: auto;
@@ -209,8 +215,9 @@ input {
     background-color: #FFFFFF60;
 }
 
-.uimenus a:link, a:visited {
+.uimenus a, a:link, a:visited {
     color: white;
+    text-shadow: #000000 1px 1px;
 }
 
 .uichat, .uiplayers, .uisets, .uiinfo, .uicrds {

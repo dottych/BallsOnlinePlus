@@ -5,10 +5,7 @@ const players = require('./Lists').players;
 const tick = require('./Tick');
 
 class Utils {
-    constructor() {
-        this.motd = [];
-        this.loadMotd();
-    }
+    constructor() {}
 
     clamp(number, min, max) {
         return Math.min(Math.max(number, min), max);

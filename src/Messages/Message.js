@@ -17,6 +17,7 @@ const c_respawn = require('./Commands/respawn');
 const c_mapinfo = require('./Commands/mapinfo');
 const c_newmap = require('./Commands/newmap');
 const c_notify = require('./Commands/notify');
+const c_uptime = require('./Commands/uptime');
 const c_tp = require('./Commands/tp');
 const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
@@ -72,6 +73,11 @@ const m_Message = ({ c, data }) => {
 
                 case 'notify':
                     c_notify(c, input);
+                    break;
+
+                case 'uptime':
+                case 'serverrun':
+                    c_uptime(c, input);
                     break;
 
                 case 'tp':

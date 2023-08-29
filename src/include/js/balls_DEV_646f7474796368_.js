@@ -8,13 +8,11 @@
 // check speed of player server-side (partially done?)
 // make teleport function in player class (so no more manual px setting etc)
 // fix beginning error in editor
-// fix weird antialiasing? or misalignment? issue with cosmetic
+// fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
 // fix the jumpy smooth camera
 // rewrite map data to hex
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // show average fps instead
-// move welcomes to txt file
-// client and server run commands
 // dm command
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
@@ -125,7 +123,7 @@ class Balls {
         this.shadows = true;
 
         this.textures = new Image(128, 32);
-        this.textures.src = "./img/textures/default.png";
+        this.textures.src = "./img/textures/marioood.png";
 
         this.canvas.textures = document.createElement("canvas");
         this.canvasTextures = this.canvas.textures.getContext("2d");
@@ -796,7 +794,7 @@ form.addEventListener('submit', e => {
     }
 });
 
-// UI buttons
+// UI buttons (the formatting here just sucks... gonna rewrite later somehow)
 
 chatBtn.addEventListener('click', () => {
     chatBtn.setAttribute('class', 'selected');
@@ -890,7 +888,11 @@ shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false
 
 document.addEventListener('click', () => {
     if (!clicked) {
-        document.getElementById("p").remove();
+        document.getElementById("p").style.animation = "gone 0.5s linear forwards";
+        setTimeout(() => {
+            document.getElementById("p").setAttribute("hidden", "");
+        }, 1000);
+
         ui.removeAttribute("hidden");
 
         if (
