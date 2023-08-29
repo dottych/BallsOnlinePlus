@@ -944,7 +944,7 @@ balls.ws.addEventListener('close', () => {
         text: "You got disconnected! Please refresh.",
         duration: 5000,
         color: 'FF4040',
-        sound: true
+        "sound": true
     });
 });
 
@@ -974,7 +974,7 @@ balls.ws.addEventListener('message', msg => {
                 text: "Loading...",
                 duration: 2000,
                 color: "DDDDDD",
-                sound: false
+                "sound": false
             });
             console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
             console.log(`%cGot client ID! >>> ${balls.cid}`, "font-size: 8px;");
@@ -990,7 +990,7 @@ balls.ws.addEventListener('message', msg => {
                 text: data.r.t,
                 duration: data.r.d,
                 color: data.r.color,
-                sound: data.r.s
+                "sound": data.r.s
             });
             break;
 
@@ -1024,10 +1024,10 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.get(ball.id).curl = new Image();
                 balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id)["cosmetic"]}.png`;
 
-                isMe = ball.id === balls.cid;
+                let isMe = ball.id === balls.cid;
 
-                p = document.createElement("p");
-                pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${ball.id} | ${ball.info.name}${isMe ? ' <<<' : ''}`);
+                let p = document.createElement("p");
+                let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${ball.id} | ${ball.info.name}${isMe ? ' <<<' : ''}`);
 
                 p.appendChild(pNode);
                 p.style = `color: #${ball.info.color}; font-weight: bold; text-shadow: #000000 1px 1px`;
@@ -1050,10 +1050,10 @@ balls.ws.addEventListener('message', msg => {
             balls.players.get(data.r.id).curl = new Image();
             balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
 
-            isMe = data.r.id === balls.cid;
+            let isMe = data.r.id === balls.cid;
 
-            p = document.createElement("p");
-            pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${balls.players.get(data.r.id).name}${isMe ? ' <<<' : ''}`);
+            let p = document.createElement("p");
+            let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${balls.players.get(data.r.id).name}${isMe ? ' <<<' : ''}`);
 
             p.appendChild(pNode);
             p.style = `color: #${balls.players.get(data.r.id).color}; font-weight: bold; text-shadow: #000000 1px 1px`;
