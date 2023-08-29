@@ -172,6 +172,23 @@ input {
     top: 350px;
 }
 
+.uisets button {
+    margin-left: 4px;
+    background-color: #808080;
+    color: white;
+    border-style: solid;
+    border-color: #AAAAAA;
+    border-width: 1px;
+}
+
+.uisets button:hover {
+    background-color: #AAAAAA;
+}
+
+.uisets button:active {
+    background-color: #909090;
+}
+
 .ui {
     transition: opacity 100ms ease-in-out;
     background-color: #40404080;

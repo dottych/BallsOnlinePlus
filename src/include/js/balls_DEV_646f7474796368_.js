@@ -1035,6 +1035,8 @@ balls.ws.addEventListener('message', msg => {
                 p.setAttribute("id", ball.id);
 
                 uiPlrs.appendChild(p);
+
+                document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             } 
             break;
 
@@ -1069,6 +1071,8 @@ balls.ws.addEventListener('message', msg => {
             if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} left the game`);
 
             document.getElementById(data.r.id).remove();
+
+            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             break;
 
         case 'bm':
