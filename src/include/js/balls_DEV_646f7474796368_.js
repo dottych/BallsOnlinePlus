@@ -990,7 +990,7 @@ balls.ws.addEventListener('message', msg => {
                 text: data.r.t,
                 duration: data.r.d,
                 color: data.r.color,
-                "sound": data.r.s
+                "sound": data.r["s"]
             });
             break;
 
