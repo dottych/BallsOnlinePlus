@@ -27,6 +27,7 @@ class Player {
 
         this.drew = false;
         this.moving = false;
+        this.wrongMoves = 0;
 
         this.pinged = false;
         this.pingAttempts = 0;
@@ -52,7 +53,7 @@ class Player {
                             tick.requests.push({
                                 r: {
                                     t: 'bm',
-                                    r: { id: this.id, x: this.x, y: this.y }
+                                    r: { id: this.id, x: this.px, y: this.py }
                                 },
                                 
                                 c: [this.c]
@@ -103,6 +104,8 @@ class Player {
 
                 this.moving = false;
                 this.moved = Date.now();
+                
+                this.wrongMoves = 0;
             }
         }, 50);
 
@@ -120,7 +123,7 @@ class Player {
         let gy = Math.round(this.y / 128);
         let _map = maps.get(map.mapID)[1];
 
-        for (let i = utils.clamp(gy-1, 0, 32); i < utils.clamp(gy+1, 0, 32); i++) {
+        if (!this.admin) for (let i = utils.clamp(gy-1, 0, 32); i < utils.clamp(gy+1, 0, 32); i++) {
             for (let j = utils.clamp(gx-1, 0, 32); j < utils.clamp(gx+1, 0, 32); j++) {
                 if (map.blocks[+_map[i][j]].cannot) {
                     if (!touchedX) {

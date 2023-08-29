@@ -18,9 +18,9 @@ for (let i of mapsInDir) {
 }
 
 class Block {
-    constructor(name, color, cannot, shadow) {
+    constructor(name, transparency, cannot, shadow) {
         this.name = name;
-        this.color = color;
+        this.transparency = transparency;
         this.cannot = cannot;
         this.shadow = shadow;
     }
@@ -31,18 +31,27 @@ class Map {
         this.mapID = Math.floor(Math.random() * maps.size);
 
         this.blocks = {
-            0: new Block('Air', '808080FF', false, false),
-            1: new Block('Door', 'FFFFFF0A', false, false),
-            2: new Block('Glass', 'FFFFFF20', true, false),
-            3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'FFFFFF9A', true, false)
+            0: new Block('Air', 0xFF, false, false),
+            1: new Block('Door', 0x0A, false, false),
+            2: new Block('Glass', 0x20, true, false),
+            3: new Block('Wall', 0xFF, true, true),
+            4: new Block('Liquid', 0x9A, true, false)
         }
+
+        this.interval = setInterval(() => {
+            this.changeMap();
+        }, 60000 * 5);
     }
 
     changeMap(id) {
-        let prevMapID = this.mapID;
+        clearInterval(this.interval);
+        this.interval = setInterval(() => {
+            this.changeMap();
+        }, 60000 * 5);
         
-        if (id && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
+        let prevMapID = this.mapID;
+
+        if (id !== undefined && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
 
         for (let i of players) {
             i[1].x = 1930 + Math.round(Math.random() * 235);
@@ -73,7 +82,7 @@ class Map {
             r: {
                 t: 'n',
                 r: {
-                    n: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
+                    t: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
                     d: 1000,
                     color: "00DD00"
                 }
@@ -85,9 +94,5 @@ class Map {
 }
 
 const map = new Map();
-
-setInterval(() => {
-    map.changeMap();
-}, 60000 * 5);
 
 module.exports = map;

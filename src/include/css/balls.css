@@ -17,6 +17,17 @@
     src: local('LucidaConsole'), url('https://fonts.cdnfonts.com/s/56356/lucon.woff') format('woff');
 }
 
+@font-face {
+    font-family: "Haiza6";
+    src: url("/font/haiza6.ttf");
+}
+
+@keyframes new { 100% { filter: grayscale(1); } }
+@keyframes gone0 { 100% { opacity: 0%; transform: rotate(180deg) scale(1%); } }
+@keyframes gone1 { 100% { opacity: 0%; transform: scale(200%); } }
+@keyframes gone2 { 100% { opacity: 0%; transform: rotate(180deg); } }
+@keyframes gone3 { 100% { opacity: 0%; } }
+
 html, body {
     margin: auto;
     font-family: "Guessy";
@@ -29,24 +40,6 @@ canvas {
     font-smooth: never;
     -webkit-font-smoothing: none;
     height: 100%;
-}
-
-#chat {
-    position: absolute;
-    left: 545px;
-    top: 9px;
-    background-color: gray;
-    border-style: none;
-    outline: none;
-    color: white;
-    font-family: 'Calibri';
-    font-weight: bold;
-}
-
-#chatmark {
-    position: absolute;
-    left: 690px;
-    top: 7px;
 }
 
 .m {
@@ -75,24 +68,12 @@ canvas {
     font-family: 'LucidaConsole';
 }
 
-.n:hover, .n2:hover {
-    background-color: lightgray;
-}
-
-.n:active, .n2:active {
-    background-color: #404040;
-}
-
 .n2 {
     position: absolute;
     height: 20px;
-    user-select: none;
-    background-color: gray;
     color: white;
-    border-color: lightgray;
-    border-width: 1px;
-    border-style: solid;
     font-family: 'LucidaConsole';
+    text-decoration: underline;
 }
 
 #info {
@@ -189,4 +170,158 @@ input {
 #dummy {
     left: 5px;
     top: 350px;
+}
+
+.uisets button {
+    margin-left: 4px;
+    background-color: #808080;
+    color: white;
+    border-style: solid;
+    border-color: #AAAAAA;
+    border-width: 1px;
+}
+
+.uisets button:hover {
+    background-color: #AAAAAA;
+}
+
+.uisets button:active {
+    background-color: #909090;
+}
+
+.ui {
+    transition: opacity 100ms ease-in-out;
+    background-color: #40404080;
+    position: absolute;
+    /*left: 10px;
+    top: 35px;*/
+    top: 8px;
+    right: 8px;
+    width: 512px;
+    height: 512px;
+    opacity: 10%;
+}
+
+.ui:hover { 
+    opacity: 100%;
+}
+
+.uimenus {
+    background-color: #20202040;
+    width: 100%;
+    height: 32px;
+    user-select: none;
+}
+
+.uimenus button {
+    background-color: #FFFFFF00;
+    color: white;
+    border: none;
+    margin-left: 8px;
+    font-size: 26px;
+    font-family: 'Guessy';
+    height: 100%;
+}
+
+.uimenus button:hover {
+    background-color: #FFFFFF40;
+}
+
+.uimenus button:active {
+    background-color: #FFFFFF80;
+}
+
+.uimenus button.selected {
+    background-color: #FFFFFF60;
+}
+
+.uimenus a, a:link, a:visited {
+    color: white;
+    text-shadow: #000000 1px 1px;
+}
+
+.uichat, .uiplayers, .uisets, .uiinfo, .uicrds {
+    height: 480px;
+    max-height: 480px;
+}
+
+.uiplayers p {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFFFF;
+    user-select: none;
+}
+
+.uisets p, .uiinfo p, .uicrds p, .uisets h3, .uicrds h3 {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFFFF;
+}
+
+.uiplayers, .uisets, .uiinfo, .uicrds {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.chatmsgs {
+    height: 460px;
+    max-height: 460px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-wrap: normal;
+}
+
+.chatmsgs p {
+    font-family: 'LucidaConsole';
+    margin-left: 4px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    color: #FFFF00;
+}
+
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FFFFFF00;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #80808080;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #AAAAAA80;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #90909080;
+}
+
+#chat {
+    min-width: 492px;
+    max-width: 492px;
+    height: 20px;
+    max-height: 20px;
+    background-color: #FFFFFF00;
+    color: white;
+    border: none;
+    outline: none;
+    padding: 0;
+    font-family: "Carlito";
+    font-weight: bold;
+}
+
+#chatmark {
+    width: 20px;
+    height: 20px;
+    background-color: #808080FF;
+    color: white;
+    padding: 0;
+    border: none;
 }

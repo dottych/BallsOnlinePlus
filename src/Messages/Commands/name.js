@@ -4,14 +4,14 @@ const tick = require('../../Tick');
 
 const c_name = (c, input) => {
     if (input.trim() !== "") {
-        if (input.trim().slice(0, 20) === players.get(c.id).name) utils.msgClient(c, `You already have this name!`);
+        if (input.trim().slice(0, 24) === players.get(c.id).name) utils.msgClient(c, `You already have this name!`);
         else {
-            players.get(c.id).name = input.trim().slice(0, 20);
+            players.get(c.id).name = input.trim().slice(0, 24);
 
             tick.requests.push({
                 r: {
                     t: 'bn',
-                    r: { id: c.id, name: input.trim().slice(0, 20) }
+                    r: { id: c.id, name: input.trim().slice(0, 24) }
                 },
     
                 c: utils.getAllPlayerClients()

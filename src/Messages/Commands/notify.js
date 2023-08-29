@@ -8,9 +8,10 @@ const c_notify = (c, input) => {
             r: {
                 t: 'n',
                 r: {
-                    n: input,
+                    t: input,
                     d: 2000,
-                    color: "DDDD00"
+                    color: "DDDD00",
+                    s: true
                 }
             },
     

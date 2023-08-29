@@ -17,7 +17,9 @@ const c_respawn = require('./Commands/respawn');
 const c_mapinfo = require('./Commands/mapinfo');
 const c_newmap = require('./Commands/newmap');
 const c_notify = require('./Commands/notify');
+const c_uptime = require('./Commands/uptime');
 const c_tp = require('./Commands/tp');
+const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
 
 const m_Message = ({ c, data }) => {
@@ -73,17 +75,26 @@ const m_Message = ({ c, data }) => {
                     c_notify(c, input);
                     break;
 
+                case 'uptime':
+                case 'serverrun':
+                    c_uptime(c, input);
+                    break;
+
                 case 'tp':
                     c_tp(c, input);
                     break;
 
+                case 'kick':
+                    c_kick(c, input);
+                    break; 
+                
                 case 'admin':
                     c_admin(c, input);
                     break;
 
             }
 
-        } else {
+        } else if (data.r.m.indexOf(process.env.ADMIN_PASS) < 0) {
             tick.requests.push({
                 r: {
                     t: 'm',

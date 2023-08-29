@@ -1,13 +1,18 @@
 // improve collision by actually moving the ball back by a certain amount
 // more 404 images
-// outer walls become darker
+// outer walls become darker (kinda done)
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
-// auto reconnect
+// auto reconnect (or maybe not)
 // check speed of player server-side (partially done?)
-// make teleport function in player class (so no more manual px setting etc)
+// make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor
+// fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
+// rewrite map data to hex
+// INIT protocol type accepts an id that sets your user (so a permanent user)
+// show average fps instead
+// dm command
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -23,36 +28,46 @@ String.prototype.wobbleCase = function() {
 
 "".reverse(), "".reverse(), "".wobbleCase(), "".wobbleCase();
 
-const 
-[
-    info,
-    discord,
-    screenshot,
-    settings,
-    clear,
-    form,
-    chat,
-    up,
-    left,
-    down,
-    right,
-    shift,
-    title,
-] = [
-    document.getElementById("info"),
-    document.getElementById("discord"),
-    document.getElementById("screenshot"),
-    document.getElementById("settings"),
-    document.getElementById("clear"),
-    document.getElementById("form"),
-    document.getElementById("chat"),
-    document.getElementById("up"),
-    document.getElementById("left"),
-    document.getElementById("down"),
-    document.getElementById("right"),
-    document.getElementById("shift"),
-    document.getElementById("title"),
-]
+const ui = document.getElementById("ui");
+const info = document.getElementById("info");
+const discord = document.getElementById("discord");
+const screenshot = document.getElementById("screenshot");
+const settings = document.getElementById("settings");
+const clear = document.getElementById("clear");
+const form = document.getElementById("form");
+const chat = document.getElementById("chat");
+const chatMsgs = document.getElementById("chatmsgs");
+const uiChat = document.getElementById("uichat");
+const uiPlrs = document.getElementById("uiplayers");
+const uiSets = document.getElementById("uisets");
+const uiInfo = document.getElementById("uiinfo");
+const uiCrds = document.getElementById("uicrds");
+const chatBtn = document.getElementById("chatbtn");
+const plrsBtn = document.getElementById("plrsbtn");
+const setsBtn = document.getElementById("setsbtn");
+const infoBtn = document.getElementById("infobtn");
+const crdsBtn = document.getElementById("crdsbtn");
+const keys = document.getElementById("keys");
+const up = document.getElementById("up");
+const left = document.getElementById("left");
+const down = document.getElementById("down");
+const right = document.getElementById("right");
+const shift = document.getElementById("shift");
+const title = document.getElementById("title");
+const jlMsgs = document.getElementById("jlMsgs");
+const bcSnds = document.getElementById("bcSnds");
+const tex0 = document.getElementById("tex0");
+const tex1 = document.getElementById("tex1");
+
+jlMsgs.addEventListener('change', e => {
+    e.preventDefault();
+    window.localStorage.setItem('jlMsgs', e.target.checked);
+});
+
+bcSnds.addEventListener('change', e => {
+    e.preventDefault();
+    window.localStorage.setItem('bcSnds', e.target.checked);
+});
 
 let
 [
@@ -64,9 +79,9 @@ let
 ]
 
 class Block {
-    constructor(name, color, solid, shadow) {
+    constructor(name, transparency, solid, shadow) {
         this.name = name;
-        this.color = color;
+        this.transparency = transparency;
         this.solid = solid;
         this.shadow = shadow;
     }
@@ -77,7 +92,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.4"
+        this.version = "0.1.5"
         this.dev = true;
         this.exhausted = false;
 
@@ -88,13 +103,13 @@ class Balls {
         for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
 
         this.map = [];
-        this.mapScale = 8;
+        this.mapScale = 64;
         this.blocks = {
-            0: new Block('Air', '808080FF', false, false),
-            1: new Block('Door', 'FFFFFF0A', false, false),
-            2: new Block('Glass', 'FFFFFF20', true, false),
-            3: new Block('Wall', 'AAAAAAFF', true, true),
-            4: new Block('Liquid', 'FFFFFF9A', false, false)
+            0: new Block('Air', 0xFF, false, false),
+            1: new Block('Door', 0x0A, false, false),
+            2: new Block('Glass', 0x20, true, false),
+            3: new Block('Wall', 0xFF, true, true),
+            4: new Block('Liquid', 0x9A, false, false)
         };
 
         this.canvas.map = document.createElement("canvas");
@@ -107,6 +122,17 @@ class Balls {
         this.canvasMap.fillRect(0, 0, 32 * this.mapScale, 32 * this.mapScale);
 
         this.shadows = true;
+
+        this.textures = new Image(128, 32);
+        this.textures.src = `./img/textures/${window.localStorage.getItem('texture') !== null ? window.localStorage.getItem('texture') : 'marioood'}.png`;
+
+        this.canvas.textures = document.createElement("canvas");
+        this.canvasTextures = this.canvas.textures.getContext("2d");
+
+        this.canvas.textures.width = 128;
+        this.canvas.textures.height = 32;
+
+        this.textures.onload = () => this.canvasTextures.drawImage(this.textures, 0, 0);
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -145,6 +171,8 @@ class Balls {
         this.cay = this.cy;
         this.icax = this.cax;
         this.icay = this.cay;
+        this.ricax = this.icax;
+        this.ricay = this.icay;
 
         this.sonic = false;
 
@@ -156,13 +184,9 @@ class Balls {
 
         this.messages = [];
         this.maxMsgs = 18;
-        this.msgFade = 0;
-        this.msgSplit = 3; // using for future purposes
 
         this.points = [];
         this.ctx.lineWidth = 10;
-
-        this.serverStarted = 0;
 
         // JUST LOAD THE SOUNDS
         this.JLTS = {
@@ -253,16 +277,23 @@ class Balls {
     }
 
     addMessage(text) {
-        const length = +(window.localStorage.getItem('length') || 64);
-        const messages = text.match(new RegExp(`.{1,${length}}`, "g"));
+        let time = Date.now().toString();
+        let firstMsg;
 
-        for (let message of messages) {
-            this.messages.push(message);
-            if (this.messages.length > this.maxMsgs) this.messages.shift();
-        }
+        this.messages.push(time);
+        if (this.messages.length > 64) firstMsg = this.messages.shift(), document.getElementById(firstMsg).remove();
 
-        this.msgSplit = messages.length;
-        this.msgFade = 0;
+        let p = document.createElement("p");
+        let pNode = document.createTextNode(text);
+
+        p.appendChild(pNode);
+
+        p.setAttribute("id", time);
+
+        chatMsgs.appendChild(p);
+        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+
+        p.style.animation = "new 1s linear forwards";
 
         new Audio("./sound/ChatMessage.ogg").play();
     }
@@ -299,25 +330,48 @@ class Balls {
         this.canvasMap.fillStyle = "#808080";
         this.canvasMap.fillRect(0, 0, 32*this.mapScale, 32*this.mapScale);
 
+        this.canvasMap.imageSmoothingEnabled = false;
+
         if (this.shadows) {
             this.canvasMap.fillStyle = "#00000010";
-            this.canvasMap.fillRect(0, 0, 32*this.mapScale, 1);
-            this.canvasMap.fillRect(0, 1, 1, 32*this.mapScale-1);
+            this.canvasMap.fillRect(0, 0, 2048, 8);
+            this.canvasMap.fillRect(0, 8, 8, 2048-8);
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
+            this.canvasMap.globalAlpha = 1;
             let block = this.blocks[+this.map[i][j]]
 
             if (!isNaN(+j) && +this.map[i][j] !== 0) {
                 if (block.shadow && this.shadows) {
                     this.canvasMap.fillStyle = '#00000010';
-                    this.canvasMap.fillRect(j*this.mapScale+1, i*this.mapScale+1, this.mapScale, this.mapScale);
+                    this.canvasMap.fillRect(j*this.mapScale+8, i*this.mapScale+8, this.mapScale, this.mapScale);
+
+                    if (this.map[i-1] !== undefined && !this.blocks[this.map[i-1][j]].shadow) {
+                        this.canvasMap.beginPath();
+                        this.canvasMap.moveTo(j*this.mapScale+this.mapScale, i*this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale+8, i*this.mapScale+8);
+                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale, i*this.mapScale+8);
+                        this.canvasMap.fill();
+                        this.canvasMap.closePath();
+                    }
+
+                    if (this.map[i][j-1] !== undefined && !this.blocks[this.map[i][j-1]].shadow) {
+                        this.canvasMap.beginPath();
+                        this.canvasMap.moveTo(j*this.mapScale, i*this.mapScale+this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale);
+                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale+8);
+                        this.canvasMap.fill();
+                        this.canvasMap.closePath();
+                    }
                 }
     
-                this.canvasMap.fillStyle = `#${block.color}`;
-                this.canvasMap.fillRect(j*this.mapScale, i*this.mapScale, this.mapScale, this.mapScale);
+                this.canvasMap.globalAlpha = block.transparency / 255;
+                this.canvasMap.drawImage(this.canvas.textures, (+this.map[i][j]-1)*32, 0, 32, 32, j*this.mapScale, i*this.mapScale, 64, 64);
             }
         }
+
+        this.canvasMap.globalAlpha = 1;
     }
 
     drawUpdate() {
@@ -381,8 +435,11 @@ class Balls {
         //this.acax = this.cax+this.canvas.width/2;
         //this.acay = this.cay+this.canvas.height/2;
 
-        this.icax = this.lerp(this.icax, this.cax, 0.005 * this.elapsed);
-        this.icay = this.lerp(this.icay, this.cay, 0.005 * this.elapsed);
+        this.icax = this.lerp(this.icax, this.cax, 0.005 * (document.hasFocus() ? this.elapsed : this.clamp(this.elapsed, 0, 100)));
+        this.icay = this.lerp(this.icay, this.cay, 0.005 * (document.hasFocus() ? this.elapsed : this.clamp(this.elapsed, 0, 100)));
+
+        this.ricax = Math.round(this.icax);
+        this.ricay = Math.round(this.icay);
 
         this.ctx.drawImage(this.canvas.map, 0, 0, 32*this.mapScale, 32*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
     }
@@ -519,154 +576,52 @@ class Balls {
 
         this.drawText({
             text: `FPS: ${Math.round(this.fps)}`, 
-            x: 10,
-            y: 16*3,
+            x: 16*12,
+            y: 23,
             color: (this.fps < 30) ? (this.fps < 15) ? 'red' : 'yellow' : 'lime',
         });
 
-        this.drawText({
+        /*this.drawText({
             text: `Ping: you don't need one`, 
             x: 10,
             y: 16*4,
             color: 'lime',
-        });
+        });*/
 
-        this.drawText({
-            text: `Status: ${(this.ws.readyState == 0 || this.ws.readyState == 3 || this.ws.readyState == 2) ? "offline" : "online"}`,
-            x: 10,
-            y: 16*5,
-            color: (this.ws.readyState == 0 || this.ws.readyState == 3 ||this. ws.readyState == 2) ? "red" : 'lime',
-        });
-
-        this.drawText({
-            text: `Client run: ${Math.floor(performance.now() / 1000)}s`, 
-            x: 10,
-            y: 16*7,
-            color: "#AAAAFF",
-        });
-
-        this.drawText({
-            text: `Server run: ${Math.floor((performance.now() + this.serverStarted) / 1000)}s`, 
-            x: 10,
-            y: 16*8,
-            color: "#AAAAFF",
-        });
+        this.ctx.beginPath();
+        this.ctx.fillStyle = (this.ws.readyState == 0 || this.ws.readyState == 3 || this.ws.readyState == 2) ? "red" : "lime";
+        this.ctx.arc(this.ctx.measureText(t).width + 94, 18, 7, 0, Math.PI * 2)
+        this.ctx.fill();
+        this.ctx.closePath();
 
         this.drawText({
             text: `Version: ${this.getVersion()}`, 
             x: 10,
-            y: 16*10,
+            y: 16*3,
             color: "#AAAAFF",
         });
 
         this.drawText({
             text: `Platform: ${window.navigator.platform}`, 
             x: 10,
-            y: 16*11,
-            color: "#AAAAFF",
-        });
-
-        this.drawText({
-            text: `Client res: ${this.canvas.width}x${this.canvas.height}`,
-            x: 10,
-            y: 16*13,
-            color: "#AAAAFF",
-        });
-
-        this.drawText({
-            text: "Info",
-            x: 16*12,
-            y: 24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(190, 30, 152, 1);
-
-        this.drawText({
-            text: `Client ID: ${this.cid}`, 
-            x: 16*12,
-            y: 16*3,
-            color: "#DDDDDD",
-        });
-
-        this.drawText({
-            text: `Client X: ${Math.round(this.cx)}`, 
-            x: 16*12,
             y: 16*4,
-            color: "#DDDDDD",
+            color: "#AAAAFF",
         });
 
-        this.drawText({
-            text: `Client Y: ${Math.round(this.cy)}`, 
-            x: 16*12,
-            y: 16*5,
-            color: "#DDDDDD",
-        });
-
-        this.drawText({
-            text: `Players: ${this.players.size}`, 
-            x: 16*12,
-            y: 16*7,
-            color: "#DDDDDD",
-        });
-
-        /*this.drawText({
-            text: this.splash, 
-            x: 16*12,
-            y: 16*9,
-            color: "#DDDDDD",
-            italic: true,
-        });*/
-
-        this.drawText({
-            text: `Cha${this.dev ? 'd' : 't'}`,
-            x: 16*32,
-            y: 24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(510, 30, 152, 1);
-
-        for (let i in this.messages) this.drawText({
-            text: this.messages[i], 
-            x: 16*32,
-            y: 16*3+i*16,
-            color: +i >= +this.messages.length-this.msgSplit ? "#DDDD" + this.maxHex(this.msgFade) : "#DDDDDD",
-            font: 'LucidaConsole'
-        });
-
-        this.drawText({
-            text: "Player list",
-            x: 10,
-            y: 16*16+24,
-            color: "#EEEEEE", 
-        });
-
-        this.ctx.fillStyle = "#BBBBBB";
-        this.ctx.fillRect(8, 256+30, 152, 1);
-
-        let playerIndex = 0;
-        for (let i of this.players) {
-            let player = i[1];
-
-            let playerText = ``;
-            playerText += `${player.id === this.cid ? ">>> " : ""}`;
-            playerText += `${player.id} | ${player.name}`;
-            //playerText += `${Math.round(player.x)}, ${Math.round(player.y)} | `;
-            //playerText += `${Math.floor((Date.now() - player.joined) / 1000)}s`;
-            playerText += `${player.id === this.cid ? " <<<" : ""}`;
-
+        if (this.cid !== "") {
             this.drawText({
-                text: playerText, 
+                text: `Client ID: ${this.cid}`, 
                 x: 10,
-                y: 16*19+playerIndex*16,
-                color: `#${player.color}`,
-                font: 'LucidaConsole'
+                y: 16*6,
+                color: "#DDDDDD",
             });
-
-            playerIndex++;
+    
+            this.drawText({
+                text: `Position: ${Math.round(this.cx)} | ${Math.round(this.cy)}`, 
+                x: 10,
+                y: 16*7,
+                color: "#DDDDDD",
+            });
         }
     }
 
@@ -676,7 +631,9 @@ class Balls {
         this.now = time;
 
         this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = "#AAAAAA";
+
+        //this.ctx.fillStyle = this.ctx.createPattern(this.canvas.textures, "repeat");
+        this.ctx.fillStyle = "#707070FF";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         if (this.canvas.width >= 960 && this.canvas.height >= 540) {
@@ -745,6 +702,12 @@ class Balls {
     init() {
         if (window.location === window.parent.location) clicked = true;
 
+        if (window.localStorage.getItem('jlMsgs') === null) window.localStorage.setItem('jlMsgs', 'true');
+        if (window.localStorage.getItem('bcSnds') === null) window.localStorage.setItem('bcSnds', 'false');
+
+        jlMsgs.checked = window.localStorage.getItem('jlMsgs') === "true";
+        bcSnds.checked = window.localStorage.getItem('bcSnds') === "true";
+
         setInterval(() => {
             if (this.t === "") this.t = Math.floor(Math.random() * 100) === 0 ?
             'atob'['KeyboardEvent'.substring(0,3).length]+
@@ -768,7 +731,6 @@ class Balls {
             if (window.location === window.parent.location) if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
         
             this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
-            this.msgFade = this.clamp(this.msgFade + 17, 0, 221);
         
             if (this.players.get(this.cid) && (this.cx !== this.pcx || this.cy !== this.pcy)) {
                 this.pcx = this.cx;
@@ -831,32 +793,96 @@ form.addEventListener('submit', e => {
     }
 });
 
-// Info buttons
+// UI buttons (the formatting here just sucks... gonna rewrite later somehow)
 
-info.addEventListener('click', e => {
-    e.preventDefault();
-    window.open("./info", "window", "width=854,height=480");
+chatBtn.addEventListener('click', () => {
+    chatBtn.setAttribute('class', 'selected');
+    plrsBtn.removeAttribute('class');
+    setsBtn.removeAttribute('class');
+    infoBtn.removeAttribute('class');
+    crdsBtn.removeAttribute('class');
+
+    uiChat.removeAttribute('hidden');
+    uiPlrs.setAttribute('hidden', null);
+    uiSets.setAttribute('hidden', null);
+    uiInfo.setAttribute('hidden', null);
+    uiCrds.setAttribute('hidden', null);
+
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
 });
 
-discord.addEventListener('click', e => {
-    e.preventDefault();
-    window.open("https://discord.gg/C2papHntB9", "window", "width=854,height=480");
+plrsBtn.addEventListener('click', () => {
+    chatBtn.removeAttribute('class');
+    plrsBtn.setAttribute('class', 'selected');
+    setsBtn.removeAttribute('class');
+    infoBtn.removeAttribute('class');
+    crdsBtn.removeAttribute('class');
+
+    uiChat.setAttribute('hidden', null);
+    uiPlrs.removeAttribute('hidden');
+    uiSets.setAttribute('hidden', null);
+    uiInfo.setAttribute('hidden', null);
+    uiCrds.setAttribute('hidden', null);
 });
 
-screenshot.addEventListener('click', e => {
-    e.preventDefault();
-    balls.screenshot();
+setsBtn.addEventListener('click', () => {
+    chatBtn.removeAttribute('class');
+    plrsBtn.removeAttribute('class');
+    setsBtn.setAttribute('class', 'selected');
+    infoBtn.removeAttribute('class');
+    crdsBtn.removeAttribute('class');
+
+    uiChat.setAttribute('hidden', null);
+    uiPlrs.setAttribute('hidden', null);
+    uiSets.removeAttribute('hidden');
+    uiInfo.setAttribute('hidden', null);
+    uiCrds.setAttribute('hidden', null);
 });
 
-settings.addEventListener('click', e => {
-    e.preventDefault();
-    window.open("./settings", "window", "width=854,height=480");
+infoBtn.addEventListener('click', () => {
+    chatBtn.removeAttribute('class');
+    plrsBtn.removeAttribute('class');
+    setsBtn.removeAttribute('class');
+    infoBtn.setAttribute('class', 'selected');
+    crdsBtn.removeAttribute('class');
+
+    uiChat.setAttribute('hidden', null);
+    uiPlrs.setAttribute('hidden', null);
+    uiSets.setAttribute('hidden', null);
+    uiInfo.removeAttribute('hidden');
+    uiCrds.setAttribute('hidden', null);
 });
 
-clear.addEventListener('click', e => {
-    e.preventDefault();
-    balls.messages = [];
-    balls.addMessage("Cleared chat.");
+crdsBtn.addEventListener('click', () => {
+    chatBtn.removeAttribute('class');
+    plrsBtn.removeAttribute('class');
+    setsBtn.removeAttribute('class');
+    infoBtn.removeAttribute('class');
+    crdsBtn.setAttribute('class', 'selected');
+
+    uiChat.setAttribute('hidden', null);
+    uiPlrs.setAttribute('hidden', null);
+    uiSets.setAttribute('hidden', null);
+    uiInfo.setAttribute('hidden', null);
+    uiCrds.removeAttribute('hidden');
+});
+
+tex0.addEventListener('click', e => {
+    window.localStorage.setItem('texture', 'dottych');
+    balls.textures.src = './img/textures/dottych.png';
+    balls.textures.onload = () => {
+        balls.canvasTextures.drawImage(balls.textures, 0, 0);
+        balls.drawMap();
+    }
+});
+
+tex1.addEventListener('click', e => {
+    window.localStorage.setItem('texture', 'marioood');
+    balls.textures.src = './img/textures/marioood.png';
+    balls.textures.onload = () => {
+        balls.canvasTextures.drawImage(balls.textures, 0, 0);
+        balls.drawMap();
+    }
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
@@ -879,25 +905,20 @@ shift.addEventListener("touchend", e => balls.keyboard[balls.keys.shift] = false
 
 document.addEventListener('click', () => {
     if (!clicked) {
-        document.getElementById("p").remove();
-        form.removeAttribute("hidden");
-        info.removeAttribute("hidden");
-        discord.removeAttribute("hidden");
-        screenshot.removeAttribute("hidden");
-        settings.removeAttribute("hidden");
-        clear.removeAttribute("hidden");
+        document.getElementById("p").style.animation = `gone${Math.floor(Math.random() * 4)} ${0.1 + Math.floor(Math.random() * 10) / 10}s linear forwards`;
+        setTimeout(() => {
+            document.getElementById("p").setAttribute("hidden", "");
+        }, 1000);
+
+        ui.removeAttribute("hidden");
+
         if (
             window.navigator.userAgent.indexOf("Android") >= 0 ||
             window.navigator.userAgent.indexOf("iOS") >= 0 ||
             window.navigator.userAgent.indexOf("iPhone") >= 0 ||
             window.navigator.userAgent.indexOf("iPad") >= 0
-        ) {
-            up.removeAttribute("hidden");
-            left.removeAttribute("hidden");
-            down.removeAttribute("hidden");
-            right.removeAttribute("hidden");
-            shift.removeAttribute("hidden");
-        }
+        ) keys.removeAttribute("hidden");
+
         if (window.location === window.parent.location) balls.init();
     }
 });
@@ -911,10 +932,14 @@ balls.ws.addEventListener('open', () => {
 });
 
 balls.ws.addEventListener('close', () => {
+    for (let plr of balls.players) document.getElementById(plr[0]).remove();
     balls.players.clear();
+
     balls.cx = 2048;
     balls.cy = 2048;
+
     balls.messages = [];
+
     balls.notify({
         text: "You got disconnected! Please refresh.",
         duration: 5000,
@@ -960,16 +985,12 @@ balls.ws.addEventListener('message', msg => {
                 window.localStorage.getItem('cosmetic') !== "none") balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
             break;
 
-        case 'ss':
-            balls.serverStarted = data.r.time;
-            break;
-
         case 'n':
             balls.notify({
-                text: data.r.n,
+                text: data.r.t,
                 duration: data.r.d,
                 color: data.r.color,
-                sound: true
+                sound: data.r.s
             });
             break;
 
@@ -989,18 +1010,33 @@ balls.ws.addEventListener('message', msg => {
 
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            if (document.hasFocus()) balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
+            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
             break;
 
         case 'l':
             if (!data.r.hasOwnProperty("balls")) return;
             for (let ball of data.r["balls"]) {
                 if (!ball.hasOwnProperty("id") || !ball.hasOwnProperty("info")) return;
+
                 balls.players.set(ball.id, ball.info);
                 balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
                 balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
                 balls.players.get(ball.id).curl = new Image();
                 balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id)["cosmetic"]}.png`;
+
+                isMe = ball.id === balls.cid;
+
+                p = document.createElement("p");
+                pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${ball.id} | ${ball.info.name}${isMe ? ' <<<' : ''}`);
+
+                p.appendChild(pNode);
+                p.style = `color: #${ball.info.color}; font-weight: bold; text-shadow: #000000 1px 1px`;
+
+                p.setAttribute("id", ball.id);
+
+                uiPlrs.appendChild(p);
+
+                document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             } 
             break;
 
@@ -1013,12 +1049,30 @@ balls.ws.addEventListener('message', msg => {
             balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
             balls.players.get(data.r.id).curl = new Image();
             balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
+
+            isMe = data.r.id === balls.cid;
+
+            p = document.createElement("p");
+            pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${balls.players.get(data.r.id).name}${isMe ? ' <<<' : ''}`);
+
+            p.appendChild(pNode);
+            p.style = `color: #${balls.players.get(data.r.id).color}; font-weight: bold; text-shadow: #000000 1px 1px`;
+
+            p.setAttribute("id", data.r.id);
+
+            uiPlrs.appendChild(p);
+
+            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             break;
 
         case 'bl':
             if (!data.r.hasOwnProperty("id")) return;
             balls.players.delete(data.r.id);
             if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} left the game`);
+
+            document.getElementById(data.r.id).remove();
+
+            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             break;
 
         case 'bm':
@@ -1036,7 +1090,12 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.get(data.r.id).joined + 1000 < Date.now()
             ) new Audio("./sound/NameChange.ogg").play();
 
-            if (data.r.id === balls.cid) window.localStorage.setItem('name', data.r.name);
+            isMe = data.r.id === balls.cid;
+            if (isMe) window.localStorage.setItem('name', data.r.name);
+
+            pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${data.r.name}${isMe ? ' <<<' : ''}`);
+            document.getElementById(data.r.id).removeChild(document.getElementById(data.r.id).firstChild);
+            document.getElementById(data.r.id).appendChild(pNode);
             break;
 
         case 'bc':
@@ -1048,6 +1107,8 @@ balls.ws.addEventListener('message', msg => {
             ) new Audio("./sound/ColorChange.ogg").play();
 
             if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
+
+            document.getElementById(data.r.id).style.color = `#${data.r.color}`;
             break;
 
         case 'bco':

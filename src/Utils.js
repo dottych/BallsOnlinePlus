@@ -5,10 +5,7 @@ const players = require('./Lists').players;
 const tick = require('./Tick');
 
 class Utils {
-    constructor() {
-        this.motd = [];
-        this.loadMotd();
-    }
+    constructor() {}
 
     clamp(number, min, max) {
         return Math.min(Math.max(number, min), max);
@@ -45,14 +42,15 @@ class Utils {
         });
     }
 
-    nClient(c, n, d, color) {
+    nClient(c, t, d, color, s = true) {
         tick.requests.push({
             r: {
                 t: 'n',
                 r: {
-                    n: n,
+                    t: t,
                     d: d,
-                    color: color
+                    color: color,
+                    s: s
                 }
             },
     

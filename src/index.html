@@ -14,23 +14,91 @@
     </head>
     <body>
         <canvas id="ctx" width="1280" height="720"></canvas>
-        <form id="form" style="user-select: none;" hidden>
-            <input type="text" id="chat" maxlength="128" autocomplete="off"> <button class="n" id="chatmark">✔</button>
-        </form>
+        
+        <div id="ui" class="ui" hidden>
+            <div class="uimenus">
+                <button id="chatbtn" class="selected">Chat</button>
+                <button id="plrsbtn">Players</button>
+                <button id="setsbtn">Settings</button>
+                <button id="infobtn">Info</button>
+                <button id="crdsbtn">Credits</button>
+            </div>
 
-        <button class="n" id="info" alt="Info" hidden>I</button>
-        <button class="n" id="discord" alt="Discord" hidden>D</button>
-        <button class="n" id="screenshot" alt="Screenshot" hidden>O</button>
-        <button class="n" id="settings" alt="Settings" hidden>S</button>
-        <button class="n" id="clear" alt="Clear Chat" hidden>C</button>
+            <div class="uichat" id="uichat">
+                <div class="chatmsgs" id="chatmsgs"></div>
+                <form id="form" style="user-select: none;">
+                    <input type="text" id="chat" maxlength="128" autocomplete="off"> <button class="n" id="chatmark">✔</button>
+                </form>
+            </div>
 
-        <button class="m" id="up" hidden></button>
-        <button class="m" id="left" hidden></button>
-        <button class="m" id="down" hidden></button>
-        <button class="m" id="right" hidden></button>
-        <button class="m" id="shift" hidden></button>
+            <div class="uiplayers" id="uiplayers" hidden>
+                <p id="playercount">Players: 0</p>
+                <br>
+                <div id="uiplayersreal"></div>
+            </div>
 
-        <p id="p" class="p" style="top: 0px; left: 10px;">Interact with the page to begin playing.</p>
+            <div class="uisets" id="uisets" hidden>
+                <p>Join/leave messages <input type="checkbox" id="jlMsgs"></p>
+                <p>Ball-change sounds <input type="checkbox" id="bcSnds"></p>
+                <br>
+                <h3>Textures</h3>
+                <button id="tex0">Dottych</button><br>
+                <button id="tex1">Marioood (default)</button>
+            </div>
+
+            <div class="uiinfo" id="uiinfo" hidden>
+                <p>
+                    Use WASD or arrow keys to move.<br>
+                    Hold shift to draw.<br>
+                    Use the chat to talk to other people.<br>
+                    Say <b>/help</b> for commands.<br>
+                    <br>
+                    <a href="https://discord.gg/C2papHntB9" target="_blank">Join the Discord!</a>
+                </p>
+            </div>
+
+            <div class="uicrds" id="uicrds" hidden>
+                <h3>Coding</h3>
+                <p>dottych</p>
+                <br>
+                <h3>Maps</h3>
+                <p>dottych</p>
+                <p>Sheer</p>
+                <p>ohmyfajett</p>
+                <p>Bito</p>
+                <p>gnawmon</p>
+                <p>unnatural</p>
+                <p>Vincent</p>
+                <p>palaceswitcher</p>
+                <p>Marioood</p>
+                <br>
+                <h3>Cosmetics</h3>
+                <p>dottych</p>
+                <p>gnawmon</p>
+                <p>Bito</p>
+                <p>sul4</p>
+                <br>
+                <h3>Sounds</h3>
+                <p>dottych</p>
+                <br>
+                <h3>Textures</h3>
+                <p>dottych</p>
+                <p>Marioood</p>
+                <br>
+                <h3>...for playing</h3>
+                <p style="color: #FFFF00">You!</p>
+            </div>
+        </div>
+
+        <div id="keys" hidden>
+            <button class="m" id="up"></button>
+            <button class="m" id="left"></button>
+            <button class="m" id="down"></button>
+            <button class="m" id="right"></button>
+            <button class="m" id="shift"></button>
+        </div>
+
+        <p id="p" class="p" style="font-size:20px;text-align:center;position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%);">Click anywhere on the page to begin playing.</p>
         
         <script defer src="/js/main.js"></script>
     </body>
