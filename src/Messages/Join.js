@@ -24,15 +24,6 @@ const m_Join = ({ c, data }) => {
 
     tick.requests.push({
         r: {
-            t: 'ss',
-            r: { time: Math.floor(performance.now()) }
-        },
-
-        c: [c]
-    });
-
-    tick.requests.push({
-        r: {
             t: 'map',
             r: { map: maps.get(map.mapID)[1] }
         },
@@ -68,18 +59,21 @@ const m_Join = ({ c, data }) => {
 
     let welcoming = lists.welcomings[Math.floor(Math.random() * lists.welcomings.length)];
 
-    tick.requests.push({
-        r: {
-            t: 'n',
-            r: {
-                n: welcoming,
-                d: 1500,
-                color: "DDDD00"
-            }
-        },
+    utils.nClient(c,
+        welcoming,
+        1500,
+        "DDDD00"
+    );
 
-        c: [c]
-    });
+    setTimeout(() => {
+        utils.nClient(c,
+            `You're currently in the map: ${maps.get(map.mapID)[0]}`,
+            1500,
+            "DDDD00",
+            false
+        );
+    }, 5000);
+    
 }
 
 module.exports = m_Join;

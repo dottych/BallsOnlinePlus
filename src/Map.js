@@ -82,7 +82,7 @@ class Map {
             r: {
                 t: 'n',
                 r: {
-                    n: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
+                    t: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
                     d: 1000,
                     color: "00DD00"
                 }

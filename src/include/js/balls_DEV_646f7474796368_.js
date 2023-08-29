@@ -187,8 +187,6 @@ class Balls {
         this.points = [];
         this.ctx.lineWidth = 10;
 
-        this.serverStarted = 0;
-
         // JUST LOAD THE SOUNDS
         this.JLTS = {
             CM: new Audio("./sound/ChatMessage.ogg"),
@@ -917,7 +915,6 @@ balls.ws.addEventListener('open', () => {
 balls.ws.addEventListener('close', () => {
     for (let plr of balls.players) document.getElementById(plr[0]).remove();
     balls.players.clear();
-    
 
     balls.cx = 2048;
     balls.cy = 2048;
@@ -969,16 +966,12 @@ balls.ws.addEventListener('message', msg => {
                 window.localStorage.getItem('cosmetic') !== "none") balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
             break;
 
-        case 'ss':
-            balls.serverStarted = data.r.time;
-            break;
-
         case 'n':
             balls.notify({
-                text: data.r.n,
+                text: data.r.t,
                 duration: data.r.d,
                 color: data.r.color,
-                sound: true
+                sound: data.r.s
             });
             break;
 
@@ -1047,6 +1040,8 @@ balls.ws.addEventListener('message', msg => {
             p.setAttribute("id", data.r.id);
 
             uiPlrs.appendChild(p);
+
+            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
             break;
 
         case 'bl':

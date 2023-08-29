@@ -42,14 +42,15 @@ class Utils {
         });
     }
 
-    nClient(c, n, d, color) {
+    nClient(c, t, d, color, s = true) {
         tick.requests.push({
             r: {
                 t: 'n',
                 r: {
-                    n: n,
+                    t: t,
                     d: d,
-                    color: color
+                    color: color,
+                    s: s
                 }
             },
     
