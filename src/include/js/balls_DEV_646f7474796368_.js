@@ -627,7 +627,9 @@ class Balls {
         this.now = time;
 
         this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = "#AAAAAA";
+
+        //this.ctx.fillStyle = this.ctx.createPattern(this.canvas.textures, "repeat");
+        this.ctx.fillStyle = "#707070FF";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         if (this.canvas.width >= 960 && this.canvas.height >= 540) {
