@@ -3,8 +3,8 @@ const players = require('../../Lists').players;
 const tick = require('../../Tick');
 
 const c_respawn = (c, input) => {
-    players.get(c.id).x = 1930 + Math.round(Math.random() * 235);
-    players.get(c.id).y = 1930 + Math.round(Math.random() * 235);
+    players.get(c.id).x = 3978 + Math.round(Math.random() * 235);
+    players.get(c.id).y = 3978 + Math.round(Math.random() * 235);
     players.get(c.id).px = players.get(c.id).x;
     players.get(c.id).py = players.get(c.id).y;
 

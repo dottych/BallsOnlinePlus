@@ -12,7 +12,7 @@ for (let i of mapsInDir) {
 
     let mapFile = fs.readFileSync(`./maps/${i}`, { encoding: 'ascii' });
     let mapTitle = fs.readFileSync(`./mapstitle/${i}`, { encoding: 'ascii' });
-    let mapData = mapFile.match(/.{1,32}/g);
+    let mapData = mapFile.match(/.{1,64}/g);
 
     maps.set(mapFileID, [mapTitle, mapData]);
 }
@@ -31,11 +31,12 @@ class Map {
         this.mapID = Math.floor(Math.random() * maps.size);
 
         this.blocks = {
-            0: new Block('Air', 0xFF, false, false),
-            1: new Block('Door', 0x0A, false, false),
-            2: new Block('Glass', 0x20, true, false),
-            3: new Block('Wall', 0xFF, true, true),
-            4: new Block('Liquid', 0x9A, true, false)
+            0: new Block('Air', 0, false, false),
+            1: new Block('Path', 1, false, false),
+            2: new Block('Door', 1, false, false),
+            3: new Block('Glass', 1, true, false),
+            4: new Block('Wall', 2, true, true),
+            5: new Block('Liquid', 1, true, false)
         }
 
         this.interval = setInterval(() => {
@@ -54,8 +55,8 @@ class Map {
         if (id !== undefined && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
 
         for (let i of players) {
-            i[1].x = 1930 + Math.round(Math.random() * 235);
-            i[1].y = 1930 + Math.round(Math.random() * 235);
+            i[1].x = 3978 + Math.round(Math.random() * 235);
+            i[1].y = 3978 + Math.round(Math.random() * 235);
             i[1].px = i[1].x;
             i[1].py = i[1].y;
 

@@ -1,4 +1,4 @@
-// improve collision by actually moving the ball back by a certain amount
+// improve collision by actually moving the ball back by a certain amount (maybe clamp position by grid scaled position of tile?)
 // more 404 images
 // outer walls become darker (kinda done)
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
@@ -9,10 +9,11 @@
 // make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor
 // fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
-// rewrite map data to hex
+// rewrite map data to hex (maybe not)
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // show average fps instead
 // dm command
+// emojis, replace :emoji: with an image or something
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -56,8 +57,6 @@ const shift = document.getElementById("shift");
 const title = document.getElementById("title");
 const jlMsgs = document.getElementById("jlMsgs");
 const bcSnds = document.getElementById("bcSnds");
-const tex0 = document.getElementById("tex0");
-const tex1 = document.getElementById("tex1");
 
 jlMsgs.addEventListener('change', e => {
     e.preventDefault();
@@ -79,9 +78,9 @@ let
 ]
 
 class Block {
-    constructor(name, transparency, solid, shadow) {
+    constructor(name, layer, solid, shadow) {
         this.name = name;
-        this.transparency = transparency;
+        this.layer = layer;
         this.solid = solid;
         this.shadow = shadow;
     }
@@ -92,7 +91,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.5"
+        this.version = "0.1.6"
         this.dev = true;
         this.exhausted = false;
 
@@ -100,39 +99,54 @@ class Balls {
         this.ctx = this.canvas.getContext("2d");
 
         this.emptyMap = [];
-        for (let i = 0; i < 32; i++) this.emptyMap.push("00000000000000000000000000000000");
+        for (let i = 0; i < 64; i++) this.emptyMap.push("0000000000000000000000000000000000000000000000000000000000000000");
 
         this.map = [];
         this.mapScale = 64;
         this.blocks = {
-            0: new Block('Air', 0xFF, false, false),
-            1: new Block('Door', 0x0A, false, false),
-            2: new Block('Glass', 0x20, true, false),
-            3: new Block('Wall', 0xFF, true, true),
-            4: new Block('Liquid', 0x9A, false, false)
+            0: new Block('Air', 0, false, false),
+            1: new Block('Path', 1, false, false),
+            2: new Block('Door', 1, false, false),
+            3: new Block('Glass', 1, true, false),
+            4: new Block('Wall', 2, true, true),
+            5: new Block('Liquid', 1, false, false)
         };
 
         this.canvas.map = document.createElement("canvas");
         this.canvasMap = this.canvas.map.getContext("2d");
 
-        this.canvas.map.width = 32 * this.mapScale;
-        this.canvas.map.height = 32 * this.mapScale;
+        this.canvas.map.width = 64 * this.mapScale;
+        this.canvas.map.height = 64 * this.mapScale;
 
         this.canvasMap.fillStyle = "#808080";
-        this.canvasMap.fillRect(0, 0, 32 * this.mapScale, 32 * this.mapScale);
+        this.canvasMap.fillRect(0, 0, 64 * this.mapScale, 64 * this.mapScale);
 
         this.shadows = true;
 
-        this.textures = new Image(128, 32);
+        this.textures = new Image(192, 32);
         this.textures.src = `./img/textures/${window.localStorage.getItem('texture') !== null ? window.localStorage.getItem('texture') : 'marioood'}.png`;
 
         this.canvas.textures = document.createElement("canvas");
         this.canvasTextures = this.canvas.textures.getContext("2d");
 
-        this.canvas.textures.width = 128;
+        this.canvas.textures.width = 192;
         this.canvas.textures.height = 32;
 
-        this.textures.onload = () => this.canvasTextures.drawImage(this.textures, 0, 0);
+        this.canvas.ground = document.createElement("canvas");
+        this.canvasGround = this.canvas.ground.getContext("2d");
+
+        this.canvas.ground.width = 64;
+        this.canvas.ground.height = 64;
+
+        this.canvasGround.imageSmoothingEnabled = false;
+
+        this.textures.onload = () => {
+            this.canvasTextures.clearRect(0, 0, this.canvas.textures.width, this.canvas.textures.height);
+            this.canvasTextures.drawImage(this.textures, 0, 0);
+
+            this.canvasGround.clearRect(0, 0, this.canvas.ground.width, this.canvas.ground.height);
+            this.canvasGround.drawImage(this.textures, 0, 0, 32, 32, 0, 0, 64, 64);
+        }
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -162,8 +176,8 @@ class Balls {
         this.initialised = false;
 
         this.cid = "";
-        this.cx = 2048;
-        this.cy = 2048;
+        this.cx = 4096;
+        this.cy = 4096;
         this.pcx = this.cx;
         this.pcy = this.cy;
 
@@ -203,16 +217,6 @@ class Balls {
         this.JLTS.NC.pause();
         this.JLTS.N.pause();
         this.JLTS.COC.pause();
-
-        this.splashes = [
-            "Made by dottych",
-            "GitHub: dottych",
-            "YouTube: dottych",
-            "Discord: dottych",
-            "Pinto: .ch"
-        ];
-
-        this.splash = "I like rice.";
         
         this.t = "";
 
@@ -327,51 +331,68 @@ class Balls {
     }
 
     drawMap() {
-        this.canvasMap.fillStyle = "#808080";
-        this.canvasMap.fillRect(0, 0, 32*this.mapScale, 32*this.mapScale);
+        this.canvasMap.clearRect(0, 0, 4096, 4096)
+        let layers = {
+            0: [],
+            1: [],
+            2: []
+        };
+
+        //this.canvasMap.fillStyle = "#808080";
+        //this.canvasMap.fillRect(0, 0, 64*this.mapScale, 64*this.mapScale);
 
         this.canvasMap.imageSmoothingEnabled = false;
 
+        let ground = this.canvasMap.createPattern(this.canvas.ground, "repeat");
+        this.canvasMap.fillStyle = ground;
+        this.canvasMap.fillRect(0, 0, 64*this.mapScale, 64*this.mapScale);
+
         if (this.shadows) {
-            this.canvasMap.fillStyle = "#00000010";
-            this.canvasMap.fillRect(0, 0, 2048, 8);
-            this.canvasMap.fillRect(0, 8, 8, 2048-8);
+            this.canvasMap.fillStyle = "#00000080";
+            this.canvasMap.fillRect(0, 0, 4096, 8);
+            this.canvasMap.fillRect(0, 8, 8, 4096-8);
         }
 
         for (let i in this.map) for (let j in this.map[i]) {
-            this.canvasMap.globalAlpha = 1;
-            let block = this.blocks[+this.map[i][j]]
-
             if (!isNaN(+j) && +this.map[i][j] !== 0) {
-                if (block.shadow && this.shadows) {
-                    this.canvasMap.fillStyle = '#00000010';
-                    this.canvasMap.fillRect(j*this.mapScale+8, i*this.mapScale+8, this.mapScale, this.mapScale);
-
-                    if (this.map[i-1] !== undefined && !this.blocks[this.map[i-1][j]].shadow) {
-                        this.canvasMap.beginPath();
-                        this.canvasMap.moveTo(j*this.mapScale+this.mapScale, i*this.mapScale);
-                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale+8, i*this.mapScale+8);
-                        this.canvasMap.lineTo(j*this.mapScale+this.mapScale, i*this.mapScale+8);
-                        this.canvasMap.fill();
-                        this.canvasMap.closePath();
-                    }
-
-                    if (this.map[i][j-1] !== undefined && !this.blocks[this.map[i][j-1]].shadow) {
-                        this.canvasMap.beginPath();
-                        this.canvasMap.moveTo(j*this.mapScale, i*this.mapScale+this.mapScale);
-                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale);
-                        this.canvasMap.lineTo(j*this.mapScale+8, i*this.mapScale+this.mapScale+8);
-                        this.canvasMap.fill();
-                        this.canvasMap.closePath();
-                    }
-                }
-    
-                this.canvasMap.globalAlpha = block.transparency / 255;
-                this.canvasMap.drawImage(this.canvas.textures, (+this.map[i][j]-1)*32, 0, 32, 32, j*this.mapScale, i*this.mapScale, 64, 64);
+                let block = this.blocks[+this.map[i][j]];
+                layers[block.layer].push({
+                    block: +this.map[i][j],
+                    x: j,
+                    y: i,
+                    shadow: block.shadow,
+                    shadowAbove: this.map[i-1] !== undefined && !this.blocks[this.map[i-1][j]].shadow,
+                    shadowLeft: this.map[i][j-1] !== undefined && !this.blocks[this.map[i][j-1]].shadow
+                });
             }
         }
 
-        this.canvasMap.globalAlpha = 1;
+        for (let layer = 0; layer <= 2; layer++) for (let block of layers[layer]) {
+            if (block.shadow && this.shadows) {
+                this.canvasMap.fillStyle = '#00000069';
+                this.canvasMap.fillRect(block.x*this.mapScale+8, block.y*this.mapScale+8, this.mapScale, this.mapScale);
+
+                if (block.shadowAbove) {
+                    this.canvasMap.beginPath();
+                    this.canvasMap.moveTo(block.x*this.mapScale+this.mapScale, block.y*this.mapScale);
+                    this.canvasMap.lineTo(block.x*this.mapScale+this.mapScale+8, block.y*this.mapScale+8);
+                    this.canvasMap.lineTo(block.x*this.mapScale+this.mapScale, block.y*this.mapScale+8);
+                    this.canvasMap.fill();
+                    this.canvasMap.closePath();
+                }
+
+                if (block.shadowLeft) {
+                    this.canvasMap.beginPath();
+                    this.canvasMap.moveTo(block.x*this.mapScale, block.y*this.mapScale+this.mapScale);
+                    this.canvasMap.lineTo(block.x*this.mapScale+8, block.y*this.mapScale+this.mapScale);
+                    this.canvasMap.lineTo(block.x*this.mapScale+8, block.y*this.mapScale+this.mapScale+8);
+                    this.canvasMap.fill();
+                    this.canvasMap.closePath();
+                }
+            }
+
+            this.canvasMap.drawImage(this.canvas.textures, block.block*32, 0, 32, 32, block.x*this.mapScale, block.y*this.mapScale, 64, 64);
+        }
     }
 
     drawUpdate() {
@@ -392,8 +413,8 @@ class Balls {
             let gy = Math.round((this.cy + newY) / 128);
 
             if (newX !== 0 || newY !== 0) {
-                for (let i = this.clamp(gy-1, 0, 32); i < this.clamp(gy+1, 0, 32); i++) {
-                    for (let j = this.clamp(gx-1, 0, 32); j < this.clamp(gx+1, 0, 32); j++) {
+                for (let i = this.clamp(gy-1, 0, 64); i < this.clamp(gy+1, 0, 64); i++) {
+                    for (let j = this.clamp(gx-1, 0, 64); j < this.clamp(gx+1, 0, 64); j++) {
                         if (this.blocks[+this.map[i][j]].solid) {
                             if (!touchedX) {
                                 touchedX = 
@@ -419,12 +440,12 @@ class Balls {
             }
 
             if (!touchedX) {
-                this.players.get(this.cid).x = this.clamp(this.players.get(this.cid).x + newX, 10, 4086);
+                this.players.get(this.cid).x = this.clamp(this.players.get(this.cid).x + newX, 10, 8182);
                 this.cx = Math.round(this.players.get(this.cid).x);
             }
 
             if (!touchedY) {
-                this.players.get(this.cid).y = this.clamp(this.players.get(this.cid).y + newY, 10, 4086);
+                this.players.get(this.cid).y = this.clamp(this.players.get(this.cid).y + newY, 10, 8182);
                 this.cy = Math.round(this.players.get(this.cid).y);
             }
         }
@@ -441,7 +462,7 @@ class Balls {
         this.ricax = Math.round(this.icax);
         this.ricay = Math.round(this.icay);
 
-        this.ctx.drawImage(this.canvas.map, 0, 0, 32*this.mapScale, 32*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 4096, 4096);
+        this.ctx.drawImage(this.canvas.map, 0, 0, 64*this.mapScale, 64*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 8192, 8192);
     }
 
     drawPoints() {
@@ -755,11 +776,6 @@ class Balls {
                 t: 'p', r: {}
             });
         }, 10000);
-        
-        this.splash = this.splashes[0];
-        const splashing = setInterval(() => {
-            this.splash = this.splashes[Math.floor(Math.random() * this.splashes.length)];
-        }, 1000 * 5);
 
         if (this.limitFPS) setInterval(() => {
             if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));
@@ -856,7 +872,7 @@ infoBtn.addEventListener('click', () => {
 crdsBtn.addEventListener('click', () => {
     chatBtn.removeAttribute('class');
     plrsBtn.removeAttribute('class');
-    setsBtn.removeAttribute('class');
+    setsBtn.removeAttribute('class'); 
     infoBtn.removeAttribute('class');
     crdsBtn.setAttribute('class', 'selected');
 
@@ -865,24 +881,6 @@ crdsBtn.addEventListener('click', () => {
     uiSets.setAttribute('hidden', null);
     uiInfo.setAttribute('hidden', null);
     uiCrds.removeAttribute('hidden');
-});
-
-tex0.addEventListener('click', e => {
-    window.localStorage.setItem('texture', 'dottych');
-    balls.textures.src = './img/textures/dottych.png';
-    balls.textures.onload = () => {
-        balls.canvasTextures.drawImage(balls.textures, 0, 0);
-        balls.drawMap();
-    }
-});
-
-tex1.addEventListener('click', e => {
-    window.localStorage.setItem('texture', 'marioood');
-    balls.textures.src = './img/textures/marioood.png';
-    balls.textures.onload = () => {
-        balls.canvasTextures.drawImage(balls.textures, 0, 0);
-        balls.drawMap();
-    }
 });
 
 window.addEventListener("keydown", e => balls.keyboard[e.keyCode] = true);
@@ -935,14 +933,14 @@ balls.ws.addEventListener('close', () => {
     for (let plr of balls.players) document.getElementById(plr[0]).remove();
     balls.players.clear();
 
-    balls.cx = 2048;
-    balls.cy = 2048;
+    balls.cx = 4096;
+    balls.cy = 4096;
 
     balls.messages = [];
 
     balls.notify({
         text: "You got disconnected! Please refresh.",
-        duration: 5000,
+        duration: 60000,
         color: 'FF4040',
         "sound": true
     });
@@ -1002,15 +1000,40 @@ balls.ws.addEventListener('message', msg => {
             break;
 
         case 'map':
-            if (!data.r.hasOwnProperty("map") || data.r.map.length !== 32) return;
+            if (!data.r.hasOwnProperty("map") || data.r.map.length !== 64) return;
             balls.points = [];
             balls.map = data.r.map;
             balls.drawMap();
             break;
 
+        case 'tex':
+            if (!data.r.hasOwnProperty("texs")) return;
+            for (let tex of data.r["texs"]) {
+                let texButton = document.createElement("button");
+                texButton.textContent = tex;
+
+                uiSets.appendChild(texButton);
+                uiSets.appendChild(document.createElement("br"));
+
+                texButton.addEventListener('click', e => {
+                    window.localStorage.setItem('texture', tex);
+                    balls.textures.src = `./img/textures/${tex}.png`;
+                    balls.textures.onload = () => {
+                        balls.canvasTextures.clearRect(0, 0, balls.canvas.textures.width, balls.canvas.textures.height);
+                        balls.canvasTextures.drawImage(balls.textures, 0, 0);
+                        
+                        balls.canvasGround.clearRect(0, 0, balls.canvas.ground.width, balls.canvas.ground.height);
+                        balls.canvasGround.drawImage(balls.textures, 0, 0, 32, 32, 0, 0, 64, 64);
+                
+                        balls.drawMap();
+                    }
+                });
+            }
+            break;
+
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 1000 : 255]);
+            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 10000 : 255]);
             break;
 
         case 'l':
@@ -1090,12 +1113,12 @@ balls.ws.addEventListener('message', msg => {
                 balls.players.get(data.r.id).joined + 1000 < Date.now()
             ) new Audio("./sound/NameChange.ogg").play();
 
-            isMe = data.r.id === balls.cid;
-            if (isMe) window.localStorage.setItem('name', data.r.name);
+            let _isMe = data.r.id === balls.cid;
+            if (_isMe) window.localStorage.setItem('name', data.r.name);
 
-            pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${data.r.name}${isMe ? ' <<<' : ''}`);
+            let _pNode = document.createTextNode(`${_isMe ? '>>> ' : ''}${data.r.id} | ${data.r.name}${_isMe ? ' <<<' : ''}`);
             document.getElementById(data.r.id).removeChild(document.getElementById(data.r.id).firstChild);
-            document.getElementById(data.r.id).appendChild(pNode);
+            document.getElementById(data.r.id).appendChild(_pNode);
             break;
 
         case 'bc':

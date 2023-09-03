@@ -7,6 +7,8 @@ const utils = require('../Utils');
 const lists = require('../Lists');
 
 const m_Join = ({ c, data }) => {
+    if (c.id !== "0") return;
+
     let NewPlayer = new Player(c);
     players.set(NewPlayer.id, NewPlayer);
     c.id = NewPlayer.id;
@@ -17,6 +19,20 @@ const m_Join = ({ c, data }) => {
         r: {
             t: 'c',
             r: { id: NewPlayer.id }
+        },
+
+        c: [c]
+    });
+
+    tick.requests.push({
+        r: {
+            t: 'tex',
+            r: { texs: [
+                "marioood",
+                "natural",
+                "dottych",
+                "flat"
+            ] }
         },
 
         c: [c]

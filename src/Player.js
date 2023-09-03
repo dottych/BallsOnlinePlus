@@ -16,8 +16,8 @@ class Player {
 
         this.admin = false;
 
-        this.x = 1930 + Math.round(Math.random() * 235);
-        this.y = 1930 + Math.round(Math.random() * 235);
+        this.x = 3978 + Math.round(Math.random() * 235);
+        this.y = 3978 + Math.round(Math.random() * 235);
 
         this.px = this.x;
         this.py = this.y;
@@ -61,8 +61,8 @@ class Player {
                             break;
 
                         case "Liquid":
-                            this.x = 1930 + Math.round(Math.random() * 235);
-                            this.y = 1930 + Math.round(Math.random() * 235);
+                            this.x = 3978 + Math.round(Math.random() * 235);
+                            this.y = 3978 + Math.round(Math.random() * 235);
                             //this.px = this.x;
                             //this.py = this.y;
 
@@ -123,8 +123,8 @@ class Player {
         let gy = Math.round(this.y / 128);
         let _map = maps.get(map.mapID)[1];
 
-        if (!this.admin) for (let i = utils.clamp(gy-1, 0, 32); i < utils.clamp(gy+1, 0, 32); i++) {
-            for (let j = utils.clamp(gx-1, 0, 32); j < utils.clamp(gx+1, 0, 32); j++) {
+        if (!this.admin) for (let i = utils.clamp(gy-1, 0, 64); i < utils.clamp(gy+1, 0, 64); i++) {
+            for (let j = utils.clamp(gx-1, 0, 64); j < utils.clamp(gx+1, 0, 64); j++) {
                 if (map.blocks[+_map[i][j]].cannot) {
                     if (!touchedX) {
                         touchedX = 

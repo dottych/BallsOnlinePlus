@@ -199,7 +199,7 @@ input {
     right: 8px;
     width: 512px;
     height: 512px;
-    opacity: 10%;
+    opacity: 25%;
 }
 
 .ui:hover { 
@@ -221,17 +221,21 @@ input {
     font-size: 26px;
     font-family: 'Guessy';
     height: 100%;
+    transition: 0.3s;
 }
 
 .uimenus button:hover {
+    transition: 0s;
     background-color: #FFFFFF40;
 }
 
 .uimenus button:active {
+    transition: 0s;
     background-color: #FFFFFF80;
 }
 
 .uimenus button.selected {
+    transition: 0s;
     background-color: #FFFFFF60;
 }
 
@@ -308,7 +312,7 @@ input {
     max-width: 492px;
     height: 20px;
     max-height: 20px;
-    background-color: #FFFFFF00;
+    background-color: #00000080;
     color: white;
     border: none;
     outline: none;

@@ -21,6 +21,7 @@ const c_uptime = require('./Commands/uptime');
 const c_tp = require('./Commands/tp');
 const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
+const c_rice = require('./Commands/rice');
 
 const m_Message = ({ c, data }) => {
     if (!c.hasOwnProperty("id") || c.id === "0") return;
@@ -92,6 +93,9 @@ const m_Message = ({ c, data }) => {
                     c_admin(c, input);
                     break;
 
+                case 'rice':
+                    c_rice(c, input);
+                    break;
             }
 
         } else if (data.r.m.indexOf(process.env.ADMIN_PASS) < 0) {
