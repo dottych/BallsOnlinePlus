@@ -5,6 +5,7 @@ const map = require('../Map');
 const tick = require('../Tick');
 const utils = require('../Utils');
 const lists = require('../Lists');
+const bridge = require('../Bridge');
 
 const m_Join = ({ c, data }) => {
     if (c.id !== "0") return;
@@ -90,6 +91,8 @@ const m_Join = ({ c, data }) => {
         );
     }, 5000);
     
+    bridge.pile(`**${NewPlayer.id}** joined the game`);
+    bridge.setActivity(`with ${utils.getBalls().length} ball${utils.getBalls().length === 1 ? '' : 's'}`);
 }
 
 module.exports = m_Join;

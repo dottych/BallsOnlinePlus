@@ -6,12 +6,14 @@ const utils = require('./Utils');
 
 class Bridge {
     constructor() {
+        console.log("PSP Go");
         this.msgs = [];
 
         this.bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
         this.bot.once(Events.ClientReady, e => {
             console.log("bridge listening");
+            this.setActivity(`with 0 balls`);
         });
 
         this.bot.on(Events.MessageCreate, e => {
@@ -47,6 +49,10 @@ class Bridge {
         setInterval(() => {
             if (this.msgs.length > 0) this.send(this.msgs.join('\n')), this.msgs = [];
         }, 2500);
+    }
+
+    setActivity(activity) {
+        this.bot.user.setActivity(activity);
     }
 
     pile(msg) {

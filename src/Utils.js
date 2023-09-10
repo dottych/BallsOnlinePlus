@@ -42,6 +42,21 @@ class Utils {
         });
     }
 
+    msgAll(msg) {
+        tick.requests.push({
+            r: {
+                t: 'm',
+                r: {
+                    id: 'server',
+                    show: false,
+                    m: msg,
+                }
+            },
+    
+            c: this.getAllPlayerClients()
+        });
+    }
+
     nClient(c, t, d, color, s = true) {
         tick.requests.push({
             r: {
@@ -55,6 +70,22 @@ class Utils {
             },
     
             c: [c]
+        });
+    }
+
+    nAll(t, d, color, s = true) {
+        tick.requests.push({
+            r: {
+                t: 'n',
+                r: {
+                    t: t,
+                    d: d,
+                    color: color,
+                    s: s
+                }
+            },
+    
+            c: this.getAllPlayerClients()
         });
     }
 

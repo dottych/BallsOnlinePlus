@@ -9,12 +9,7 @@ class Event {
 
 const event = new Event();
 
-
-
 // Event listener
-
 event.e.on('msg', data => message.handle(data.c, data.data));
-
-
 
 module.exports = event;
