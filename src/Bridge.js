@@ -6,7 +6,6 @@ const utils = require('./Utils');
 
 class Bridge {
     constructor() {
-        console.log("PSP Go");
         this.msgs = [];
 
         this.bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
