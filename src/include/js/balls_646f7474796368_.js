@@ -74,7 +74,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.6"
+        this.version = "0.1.7"
         this.dev = false;
         this.exhausted = false;
 
@@ -82,7 +82,7 @@ class Balls {
         this.ctx = this.canvas.getContext("2d");
 
         this.emptyMap = [];
-        for (let i = 0; i < 64; i++) this.emptyMap.push("0000000000000000000000000000000000000000000000000000000000000000");
+        for (let i = 0; i < 64; i++) this.emptyMap.push(this.giveNulls(64));
 
         this.map = [];
         this.mapScale = 64;
@@ -130,6 +130,12 @@ class Balls {
             this.canvasGround.clearRect(0, 0, this.canvas.ground.width, this.canvas.ground.height);
             this.canvasGround.drawImage(this.textures, 0, 0, 32, 32, 0, 0, 64, 64);
         }
+
+        this.canvas.void = document.createElement("canvas");
+        this.canvasVoid = this.canvas.void.getContext("2d");
+
+        this.canvas.void.width = 512;
+        this.canvas.void.height = 512;
 
         this.space = this.canvas.getBoundingClientRect();
         this.initCtxPosY = this.space.top;
@@ -235,6 +241,12 @@ class Balls {
         return hex.length === 1 ? "0" + hex : hex;
     }
 
+    giveNulls(amount) {
+        let nullString = "";
+        for (let i = 0; i < amount; i++) nullString += "0";
+        return nullString;
+    }
+
     getVersion() {
         return this.dev ? this.version + " (DEV)" : this.version;
     }
@@ -314,7 +326,8 @@ class Balls {
     }
 
     drawMap() {
-        this.canvasMap.clearRect(0, 0, 4096, 4096)
+        this.canvasMap.clearRect(0, 0, 4096, 4096);
+
         let layers = {
             0: [],
             1: [],
@@ -330,11 +343,11 @@ class Balls {
         this.canvasMap.fillStyle = ground;
         this.canvasMap.fillRect(0, 0, 64*this.mapScale, 64*this.mapScale);
 
-        if (this.shadows) {
-            this.canvasMap.fillStyle = "#00000080";
+        /*if (this.shadows) {
+            this.canvasMap.fillStyle = "#00000056";
             this.canvasMap.fillRect(0, 0, 4096, 8);
             this.canvasMap.fillRect(0, 8, 8, 4096-8);
-        }
+        }*/
 
         for (let i in this.map) for (let j in this.map[i]) {
             if (!isNaN(+j) && +this.map[i][j] !== 0) {
@@ -352,7 +365,7 @@ class Balls {
 
         for (let layer = 0; layer <= 2; layer++) for (let block of layers[layer]) {
             if (block.shadow && this.shadows) {
-                this.canvasMap.fillStyle = '#00000069';
+                this.canvasMap.fillStyle = '#00000056';
                 this.canvasMap.fillRect(block.x*this.mapScale+8, block.y*this.mapScale+8, this.mapScale, this.mapScale);
 
                 if (block.shadowAbove) {
@@ -444,6 +457,10 @@ class Balls {
 
         this.ricax = Math.round(this.icax);
         this.ricay = Math.round(this.icay);
+
+        let _void = this.ctx.createPattern(this.canvas.void, "repeat");
+        this.ctx.fillStyle = _void;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.drawImage(this.canvas.map, 0, 0, 64*this.mapScale, 64*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 8192, 8192);
     }
@@ -636,10 +653,6 @@ class Balls {
 
         this.ctx.textAlign = 'left';
 
-        //this.ctx.fillStyle = this.ctx.createPattern(this.canvas.textures, "repeat");
-        this.ctx.fillStyle = "#707070FF";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
         if (this.canvas.width >= 960 && this.canvas.height >= 540) {
             this.drawUpdate();
             this.drawPoints();
@@ -759,6 +772,14 @@ class Balls {
                 t: 'p', r: {}
             });
         }, 10000);
+
+        setInterval(() => {
+            for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+                let random = Math.ceil(Math.random() * 2 + 1) * 10;
+                this.canvasVoid.fillStyle = `#${random}${random}${random}`;
+                this.canvasVoid.fillRect(j*128, i*128, 128, 128);
+            }
+        }, 500);
 
         if (this.limitFPS) setInterval(() => {
             if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));

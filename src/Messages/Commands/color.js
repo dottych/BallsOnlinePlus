@@ -19,7 +19,7 @@ const c_color = (c, input) => {
 
             utils.msgClient(c, `You have changed your color to ${players.get(c.id).color}.`);
         } else utils.msgClient(c, `This color is invalid!`);
-    }
+    } else utils.msgClient(c, `Your current color is ${players.get(c.id).color}.`);
 }
 
 module.exports = c_color;

@@ -19,7 +19,7 @@ const c_name = (c, input) => {
 
             utils.msgClient(c, `You have changed your name to ${players.get(c.id).name}.`);
         }
-    } else utils.msgClient(c, `This name is invalid!`);
+    } else utils.msgClient(c, `Your current name is ${players.get(c.id).name}.`);
 }
 
 module.exports = c_name;

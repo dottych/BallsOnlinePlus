@@ -7,12 +7,15 @@ const utils = require('./Utils');
 class Bridge {
     constructor() {
         this.msgs = [];
+        this.activity = `with 0 balls`;
+        this.online = false;
 
         this.bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
         this.bot.once(Events.ClientReady, e => {
+            this.online = true;
             console.log("bridge listening");
-            this.setActivity(`with 0 balls`);
+            this.setActivity(this.activity);
         });
 
         this.bot.on(Events.MessageCreate, e => {
@@ -51,7 +54,7 @@ class Bridge {
     }
 
     setActivity(activity) {
-        this.bot.user.setActivity(activity);
+        this.activity = activity; if (this.online) this.bot.user.setActivity(this.activity);
     }
 
     pile(msg) {
