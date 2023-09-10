@@ -477,7 +477,7 @@ class Balls {
 
         let _void = this.ctx.createPattern(this.canvas.void, "repeat");
         this.ctx.fillStyle = _void;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); //finsih pls tg oo dired
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.drawImage(this.canvas.map, 0, 0, 64*this.mapScale, 64*this.mapScale, 0-this.icax+this.canvas.width/2, 0-this.icay+this.canvas.height/2, 8192, 8192);
     }
