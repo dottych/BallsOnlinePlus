@@ -1,7 +1,9 @@
 const utils = require('../../Utils');
+const fs = require('fs');
 
 const c_secret = (c, input) => {
-    utils.msgClient(c, `The server is running for ${Math.floor(performance.now()/1000)}s.`);
+    fs.appendFileSync('./hi.txt', "e");
+    utils.msgClient(c, fs.readFileSync('./hi.txt').length.toString());
 }
 
 module.exports = c_secret;
