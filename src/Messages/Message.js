@@ -8,7 +8,7 @@ const bridge = require('../Bridge');
 
 // for server msgs use id: 'server', show: false
 
-// importing time
+// importing time (use an auto loader here... someday... somesoon... LMAO SOMESOON)
 const c_help = require('./Commands/help');
 const c_name = require('./Commands/name');
 const c_color = require('./Commands/color');

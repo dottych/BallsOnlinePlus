@@ -1,14 +1,18 @@
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Events, GatewayIntentBits, SlashCommandBuilder, REST, Routes } = require('discord.js');
 require('dotenv').config();
 
 const tick = require('./Tick');
 const utils = require('./Utils');
+
+const rest = new REST().setToken(process.env.BOT_TOKEN);
 
 class Bridge {
     constructor() {
         this.msgs = [];
         this.activity = `with 0 balls`;
         this.online = false;
+
+        this.commands = {};
 
         this.bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
@@ -35,14 +39,21 @@ class Bridge {
             }
         });
 
-        this.bot.on(Events.InteractionCreate, async e => {
-            if (!e.isChatInputCommand()) return;
+        this.bot.on(Events.InteractionCreate, async int => {
+            if (!int.isChatInputCommand()) return;
 
-            switch (e.commandName) {
-                case 'players':
-                    e.reply('There are yes players.');
-                    break;
-
+            let command = this.commands[int.commandName];
+            if (command !== undefined) {
+                try {
+                    await command.execute(int);
+                } catch (e) {
+                    console.log(e);
+                    if (int.replied || int.deferred) {
+                        await int.followUp({ content: `Error... I don't know why, ok?`, ephemeral: true });
+                    } else {
+                        await int.reply({ content: `Error... I don't know why, ok?`, ephemeral: true });
+                    }
+                }
             }
         });
 
@@ -51,6 +62,32 @@ class Bridge {
         setInterval(() => {
             if (this.msgs.length > 0) this.send(this.msgs.join('\n')), this.msgs = [];
         }, 2500);
+
+        this.registerCommands();
+    }
+
+    async registerCommands() {
+        this.commands["players"] = {
+            data: new SlashCommandBuilder()
+                .setName('players')
+                .setDescription('Shows all the players online.'),
+            execute: async function(int) {
+                let length = utils.getBalls().length;
+                let playerString = "";
+
+                for (let ball of utils.getBalls())
+                    playerString += `\n\`${ball.info.id}\` | \`${ball.info.name}\` | \`${ball.info.color}\` | \`${ball.info.cosmetic}\``
+
+                await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
+            }
+        }
+
+        let commands = [];
+        for (let command of Object.entries(this.commands)) commands.push(command[1].data.toJSON());
+
+        await rest.put(
+            Routes.applicationCommands('1112098088128094309'), { body: commands }
+        );
     }
 
     setActivity(activity) {
