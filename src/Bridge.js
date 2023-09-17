@@ -35,7 +35,7 @@ class Bridge {
             }
         });
 
-        /*this.bot.on(Events.InteractionCreate, async e => {
+        this.bot.on(Events.InteractionCreate, async e => {
             if (!e.isChatInputCommand()) return;
 
             switch (e.commandName) {
@@ -44,7 +44,7 @@ class Bridge {
                     break;
 
             }
-        });*/
+        });
 
         this.bot.login(process.env.BOT_TOKEN);
 
