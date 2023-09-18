@@ -92,6 +92,10 @@ class Map {
             c: utils.getAllPlayerClients()
         });
     }
+
+    currentMap() {
+        return { id: this.mapID, name: maps.get(this.mapID)[0] };
+    }
 }
 
 const map = new Map();

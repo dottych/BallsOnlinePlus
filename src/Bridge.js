@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const tick = require('./Tick');
 const utils = require('./Utils');
+const map = require('./Map');
 
 const rest = new REST().setToken(process.env.BOT_TOKEN);
 
@@ -66,21 +67,33 @@ class Bridge {
         this.registerCommands();
     }
 
-    async registerCommands() {
-        this.commands["players"] = {
+    addCommand(name, description, execute) {
+        this.commands[name] = {
             data: new SlashCommandBuilder()
-                .setName('players')
-                .setDescription('Shows all the players online.'),
-            execute: async function(int) {
-                let length = utils.getBalls().length;
-                let playerString = "";
+                .setName(name)
+                .setDescription(description),
+            execute: execute
+        };
+    }
 
-                for (let ball of utils.getBalls())
-                    playerString += `\n\`${ball.info.id}\` | \`${ball.info.name}\` | \`${ball.info.color}\` | \`${ball.info.cosmetic}\``
+    async registerCommands() {
+        this.addCommand("players", "Shows all the players online.", async function(int) {
+            let length = utils.getBalls().length;
+            let playerString = "";
 
-                await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
-            }
-        }
+            for (let ball of utils.getBalls())
+                playerString += `\n\`${ball.info.id}\` | \`${ball.info.name}\` | \`${ball.info.color}\` | \`${ball.info.cosmetic}\``
+
+            await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
+        });
+
+        this.addCommand("currentmap", "Says the current map.", async function(int) {
+            await int.reply({ content: `The current map is ${map.currentMap().name} (ID: ${map.mapID})` });
+        });
+
+        this.addCommand("uptime", "Says the server's uptime.", async function(int) {
+            await int.reply({ content: `The server is running for ${Math.floor(performance.now()/1000)}s.` });
+        });
 
         let commands = [];
         for (let command of Object.entries(this.commands)) commands.push(command[1].data.toJSON());
