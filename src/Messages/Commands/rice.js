@@ -6,7 +6,8 @@ const c_rice = (c, input) => {
         r: {
             t: 'tex',
             r: { texs: [
-                "minecraft"
+                "minecraft",
+                "template"
             ] }
         },
 

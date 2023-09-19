@@ -32,7 +32,7 @@ const m_Message = ({ c, data }) => {
             let args = data.r.m.substring(1, data.r.m.length).split(" ");
             const command = args[0];
             args.shift();
-            const input = args.join(' ')
+            const input = args.join(' ');
 
             switch (command) {
                 default:
