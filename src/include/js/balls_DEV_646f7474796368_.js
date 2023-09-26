@@ -15,6 +15,7 @@
 // dm command
 // emojis, replace :emoji: with an image or something
 // "turn off bridge" command in case people from my school decide to barge in and say mean comments about me
+// texture url input, but check if resolution is valid
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
