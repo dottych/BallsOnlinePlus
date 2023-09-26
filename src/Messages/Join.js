@@ -35,6 +35,7 @@ const m_Join = ({ c, data }) => {
                 "flat",
                 "dcrawl",
                 "spacestation",
+                "petscop",
             ] }
         },
 
