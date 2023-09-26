@@ -38,7 +38,9 @@ const m_Join = ({ c, data }) => {
                 "petscop",
                 "middledave",
                 "chips",
-                "smb1",
+                "nes",
+                "squareface",
+                "nineties",
             ] }
         },
 
