@@ -41,6 +41,7 @@ const m_Join = ({ c, data }) => {
                 "nes",
                 "squareface",
                 "nineties",
+                "reds",
             ] }
         },
 
