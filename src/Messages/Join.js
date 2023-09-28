@@ -42,6 +42,10 @@ const m_Join = ({ c, data }) => {
                 "squareface",
                 "nineties",
                 "reds",
+                "beginnings",
+                "shore",
+                "deadeye",
+                "horror",
             ] }
         },
 
@@ -52,6 +56,15 @@ const m_Join = ({ c, data }) => {
         r: {
             t: 'map',
             r: { map: maps.get(map.mapID)[1] }
+        },
+
+        c: [c]
+    });
+
+    tick.requests.push({
+        r: {
+            t: 'dd',
+            r: { d: maps.get(map.mapID)[0][1] }
         },
 
         c: [c]
@@ -93,7 +106,7 @@ const m_Join = ({ c, data }) => {
 
     setTimeout(() => {
         utils.nClient(c,
-            `You're currently in the map: ${maps.get(map.mapID)[0]}`,
+            `You're currently in the map: ${maps.get(map.mapID)[0][0]}`,
             1500,
             "DDDD00",
             false

@@ -11,10 +11,10 @@ for (let i of mapsInDir) {
     let mapFileID = Number(i.substring(0, i.length - 4));
 
     let mapFile = fs.readFileSync(`./maps/${i}`, { encoding: 'ascii' });
-    let mapTitle = fs.readFileSync(`./mapstitle/${i}`, { encoding: 'ascii' });
+    let mapInfo = fs.readFileSync(`./mapsinfo/${i}`, { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
     let mapData = mapFile.match(/.{1,64}/g);
 
-    maps.set(mapFileID, [mapTitle, mapData]);
+    maps.set(mapFileID, [[mapInfo[0], mapInfo[1]], mapData]);
 }
 
 class Block {
@@ -81,9 +81,18 @@ class Map {
 
         tick.requests.push({
             r: {
+                t: 'dd', // draw duration, not sure if I keep track of packet abbreviations elsewhere
+                r: { d: maps.get(this.mapID)[0][1] }
+            },
+
+            c: utils.getAllPlayerClients()
+        });
+
+        tick.requests.push({
+            r: {
                 t: 'n',
                 r: {
-                    t: `Map has changed to "${maps.get(this.mapID)[0]}"!`,
+                    t: `Map has changed to "${maps.get(this.mapID)[0][0]}"!`,
                     d: 1000,
                     color: "00DD00"
                 }
@@ -94,7 +103,7 @@ class Map {
     }
 
     currentMap() {
-        return { id: this.mapID, name: maps.get(this.mapID)[0] };
+        return { id: this.mapID, name: maps.get(this.mapID)[0][0], duration: maps.get(this.mapID)[0][1] };
     }
 }
 

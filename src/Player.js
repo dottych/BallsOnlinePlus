@@ -106,6 +106,8 @@ class Player {
                 this.moved = Date.now();
                 
                 this.wrongMoves = 0;
+
+                this.riced = false;
             }
         }, 50);
 

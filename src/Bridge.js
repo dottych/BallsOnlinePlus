@@ -61,7 +61,10 @@ class Bridge {
         this.bot.login(process.env.BOT_TOKEN);
 
         setInterval(() => {
-            if (this.msgs.length > 0) this.send(this.msgs.join('\n')), this.msgs = [];
+            if (this.msgs.length > 0) {
+                if (this.msgs.join('\n').length < 2000) this.send(this.msgs.join('\n'));
+                this.msgs = [];
+            }
         }, 2500);
 
         this.registerCommands();
@@ -87,8 +90,8 @@ class Bridge {
             await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
         });
 
-        this.addCommand("currentmap", "Says the current map.", async function(int) {
-            await int.reply({ content: `The current map is ${map.currentMap().name} (ID: ${map.mapID})` });
+        this.addCommand("mapinfo", "Says the current map's info.", async function(int) {
+            await int.reply({ content: `ID: ${map.mapID}, draw duration: ${map.currentMap().duration}, title: ${map.currentMap().name}` });
         });
 
         this.addCommand("uptime", "Says the server's uptime.", async function(int) {

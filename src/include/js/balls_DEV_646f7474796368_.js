@@ -1,6 +1,5 @@
 // improve collision by actually moving the ball back by a certain amount (maybe clamp position by grid scaled position of tile?)
 // more 404 images
-// outer walls become darker (kinda done)
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // commands for bot such as player count
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
@@ -43,6 +42,7 @@ const chatMsgs = document.getElementById("chatmsgs");
 const uiChat = document.getElementById("uichat");
 const uiPlrs = document.getElementById("uiplayers");
 const uiSets = document.getElementById("uisets");
+const uiTexs = document.getElementById("textures");
 const uiInfo = document.getElementById("uiinfo");
 const uiCrds = document.getElementById("uicrds");
 const chatBtn = document.getElementById("chatbtn");
@@ -93,7 +93,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.7"
+        this.version = "0.1.8"
         this.dev = true;
         this.exhausted = false;
 
@@ -206,6 +206,8 @@ class Balls {
 
         this.messages = [];
         this.maxMsgs = 18;
+
+        this.drawDuration = 255;
 
         this.points = [];
         this.ctx.lineWidth = 10;
@@ -1034,9 +1036,18 @@ balls.ws.addEventListener('message', msg => {
             for (let tex of data.r["texs"]) {
                 let texButton = document.createElement("button");
                 texButton.textContent = tex;
+                texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
 
-                uiSets.appendChild(texButton);
-                uiSets.appendChild(document.createElement("br"));
+                uiTexs.appendChild(texButton);
+                //uiTexs.appendChild(document.createElement("br"));
+
+                texButton.addEventListener('mouseover', e => {
+                    texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/img/textures/${tex}.png")`;
+                });
+
+                texButton.addEventListener('mouseout', e => {
+                    texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
+                });
 
                 texButton.addEventListener('click', e => {
                     window.localStorage.setItem('texture', tex);
@@ -1054,9 +1065,14 @@ balls.ws.addEventListener('message', msg => {
             }
             break;
 
+        case 'dd':
+            if (!data.r.hasOwnProperty("d")) return;
+            balls.drawDuration = data.r.d;
+            break;
+
         case 'd':
             if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, JSON.stringify(balls.map) === JSON.stringify(balls.emptyMap) ? 10000 : 255]);
+            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, balls.drawDuration]);
             break;
 
         case 'l':

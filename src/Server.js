@@ -12,7 +12,7 @@ const server = new WSServer({ server: http });
 
 const app = require('./App');
 
-const bridge = process.env.BOT_TOKEN !== "0" ? require('./Bridge') : undefined;
+const bridge = process.env.BOT_TOKEN.toString() !== "0" ? require('./Bridge') : undefined;
 
 const event = require('./Event').e;
 
