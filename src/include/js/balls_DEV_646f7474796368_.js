@@ -1,9 +1,8 @@
 // improve collision by actually moving the ball back by a certain amount (maybe clamp position by grid scaled position of tile?)
 // more 404 images
 // if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
-// commands for bot such as player count
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
-// auto reconnect (or maybe not)
+// auto reconnect (or maybe not) (actually YEAH it would be cool)
 // check speed of player server-side (partially done?)
 // make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor

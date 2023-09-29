@@ -114,8 +114,8 @@ class Player {
         // Check if client is still online
         setInterval(() => {
             if (!this.pinged) this.pingAttempts++; else { this.pingAttempts = 0; this.pinged = false; }
-            if (this.pingAttempts >= 2) m_Leave({ c: this.c });
-        }, 15000);
+            if (this.pingAttempts >= 2) this.c.close(); //m_Leave({ c: this.c });
+        }, 60000);
     }
 
     checkCollision() {
