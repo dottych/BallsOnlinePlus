@@ -239,7 +239,7 @@ class Balls {
         this.limitFPS = false;
 
         this.url = window.location.host;
-        this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
+        this.ws = null;
 
         title.innerHTML = this.dev ? "Balls Online DEV" : "Balls Online";
     }
@@ -736,6 +736,255 @@ class Balls {
         if (this.limitFPS) this.frameDone = true; else requestAnimationFrame(this.draw.bind(this));
     }
 
+    createWebSocket() {
+        if (this.ws !== null) return;
+        this.initialised = false;
+
+        console.log("hi")
+        this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
+
+        this.ws.addEventListener('open', () => {
+            if (window.location === window.parent.location) if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
+        });
+        
+        this.ws.addEventListener('close', () => {
+            for (let plr of this.players) document.getElementById(plr[0]).remove();
+            this.players.clear();
+        
+            this.cx = 4096;
+            this.cy = 4096;
+        
+            this.messages = [];
+        
+            this.notify({
+                text: "You got disconnected! Reconnecting...",
+                duration: 60000,
+                color: 'FF4040',
+                "sound": true
+            });
+
+            this.ws = null;
+            this.createWebSocket();
+        });
+
+        this.ws.addEventListener('message', msg => {
+            let data;
+        
+            try {
+                data = JSON.parse(msg.data)[0];
+                if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
+            } catch (e) {
+                data = { t: "none", r: { e: e.toString() } };
+                this.addMessage(e.toString());
+            }
+        
+            if (this.exhausted) console.log(`%cGot request type ${data.t}`, "font-size: 8px;");
+        
+            switch (data.t) {
+                case 'j':
+                    if (!data.r.hasOwnProperty("a") || !data.r.hasOwnProperty("c")) return;
+                    this.send(eval(data.r.c));
+                    break;
+                
+                case 'c':
+                    this.initialised = true;
+                    this.cid = data.r.id;
+                    this.notify({
+                        text: "Loading...",
+                        duration: 2000,
+                        color: "DDDDDD",
+                        "sound": false
+                    });
+                    console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
+                    console.log(`%cGot client ID! >>> ${this.cid}`, "font-size: 8px;");
+        
+                    if (window.localStorage.getItem('name')) this.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
+                    if (window.localStorage.getItem('color')) this.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
+                    if (window.localStorage.getItem('cosmetic') &&
+                        window.localStorage.getItem('cosmetic') !== "none") this.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
+                    break;
+        
+                case 'n':
+                    this.notify({
+                        text: data.r.t,
+                        duration: data.r.d,
+                        color: data.r.color,
+                        "sound": data.r["s"]
+                    });
+                    break;
+        
+                case 'm':
+                    if (!data.r.hasOwnProperty("m") || !data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("show")) return;
+                    this.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${
+                        data.r.id === "server" ? "/" : data.r.id === "discrd" ? "D" : this.players.get(data.r.id).name
+                    }: ${data.r["m"]}`);
+                    break;
+        
+                case 'map':
+                    if (!data.r.hasOwnProperty("map") || data.r.map.length !== 64) return;
+                    this.points = [];
+                    this.map = data.r.map;
+                    this.drawMap();
+                    break;
+        
+                case 'tex':
+                    if (!data.r.hasOwnProperty("texs")) return;
+                    for (let tex of data.r["texs"]) {
+                        let texButton = document.createElement("button");
+                        texButton.textContent = tex;
+                        texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
+        
+                        uiTexs.appendChild(texButton);
+                        //uiTexs.appendChild(document.createElement("br"));
+        
+                        texButton.addEventListener('mouseover', e => {
+                            texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/img/textures/${tex}.png")`;
+                        });
+        
+                        texButton.addEventListener('mouseout', e => {
+                            texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
+                        });
+        
+                        texButton.addEventListener('click', e => {
+                            window.localStorage.setItem('texture', tex);
+                            this.textures.src = `./img/textures/${tex}.png`;
+                            this.textures.onload = () => {
+                                this.canvasTextures.clearRect(0, 0, this.canvas.textures.width, this.canvas.textures.height);
+                                this.canvasTextures.drawImage(this.textures, 0, 0);
+                                
+                                this.canvasGround.clearRect(0, 0, this.canvas.ground.width, this.canvas.ground.height);
+                                this.canvasGround.drawImage(this.textures, 0, 0, 32, 32, 0, 0, 64, 64);
+                        
+                                this.drawMap();
+                            }
+                        });
+                    }
+                    break;
+        
+                case 'dd':
+                    if (!data.r.hasOwnProperty("d")) return;
+                    this.drawDuration = data.r.d;
+                    break;
+        
+                case 'd':
+                    if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
+                    /*if (document.hasFocus())*/ this.points.push([data.r.x, data.r.y, data.r.color, this.drawDuration]);
+                    break;
+        
+                case 'l':
+                    if (!data.r.hasOwnProperty("balls")) return;
+                    for (let ball of data.r["balls"]) {
+                        if (!ball.hasOwnProperty("id") || !ball.hasOwnProperty("info")) return;
+        
+                        this.players.set(ball.id, ball.info);
+                        this.players.get(ball.id).lx = this.players.get(ball.id).x;
+                        this.players.get(ball.id).ly = this.players.get(ball.id).y;
+                        this.players.get(ball.id).curl = new Image();
+                        this.players.get(ball.id).curl.src = `./img/cosmetics/${this.players.get(ball.id)["cosmetic"]}.png`;
+        
+                        let isMe = ball.id === this.cid;
+        
+                        let p = document.createElement("p");
+                        let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${ball.id} | ${ball.info.name}${isMe ? ' <<<' : ''}`);
+        
+                        p.appendChild(pNode);
+                        p.style = `color: #${ball.info.color}; font-weight: bold; text-shadow: #000000 1px 1px`;
+        
+                        p.setAttribute("id", ball.id);
+        
+                        uiPlrs.appendChild(p);
+        
+                        document.getElementById("playercount").innerText = `Players: ${this.players.size}`;
+                    } 
+                    break;
+        
+                case 'b':
+                    if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("info")) return;
+                    this.players.set(data.r.id, data.r.info);
+                    if (window.localStorage.getItem('jlMsgs') === "true") this.addMessage(`${data.r.id} joined the game`);
+        
+                    this.players.get(data.r.id).lx = this.players.get(data.r.id).x;
+                    this.players.get(data.r.id).ly = this.players.get(data.r.id).y;
+                    this.players.get(data.r.id).curl = new Image();
+                    this.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
+        
+                    let isMe = data.r.id === this.cid;
+        
+                    let p = document.createElement("p");
+                    let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${this.players.get(data.r.id).name}${isMe ? ' <<<' : ''}`);
+        
+                    p.appendChild(pNode);
+                    p.style = `color: #${this.players.get(data.r.id).color}; font-weight: bold; text-shadow: #000000 1px 1px`;
+        
+                    p.setAttribute("id", data.r.id);
+        
+                    uiPlrs.appendChild(p);
+        
+                    document.getElementById("playercount").innerText = `Players: ${this.players.size}`;
+                    break;
+        
+                case 'bl':
+                    if (!data.r.hasOwnProperty("id")) return;
+                    this.players.delete(data.r.id);
+                    if (window.localStorage.getItem('jlMsgs') === "true") this.addMessage(`${data.r.id} left the game`);
+        
+                    document.getElementById(data.r.id).remove();
+        
+                    document.getElementById("playercount").innerText = `Players: ${this.players.size}`;
+                    break;
+        
+                case 'bm':
+                    if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y")) return;
+                    this.players.get(data.r.id).x = data.r.x;
+                    this.players.get(data.r.id).y = data.r.y;
+                    this.players.get(data.r.id).moved = Date.now();
+                    break;
+        
+                case 'bn':
+                    if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("name")) return;
+                    this.players.get(data.r.id).name = data.r.name;
+        
+                    if (window.localStorage.getItem('bcSnds') === "true" &&
+                        this.players.get(data.r.id).joined + 1000 < Date.now()
+                    ) new Audio("./sound/NameChange.ogg").play();
+        
+                    let _isMe = data.r.id === this.cid;
+                    if (_isMe) window.localStorage.setItem('name', data.r.name);
+        
+                    let _pNode = document.createTextNode(`${_isMe ? '>>> ' : ''}${data.r.id} | ${data.r.name}${_isMe ? ' <<<' : ''}`);
+                    document.getElementById(data.r.id).removeChild(document.getElementById(data.r.id).firstChild);
+                    document.getElementById(data.r.id).appendChild(_pNode);
+                    break;
+        
+                case 'bc':
+                    if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("color")) return;
+                    this.players.get(data.r.id).color = data.r.color;
+        
+                    if (window.localStorage.getItem('bcSnds') === "true" &&
+                        this.players.get(data.r.id).joined + 1000 < Date.now()
+                    ) new Audio("./sound/ColorChange.ogg").play();
+        
+                    if (data.r.id === this.cid) window.localStorage.setItem('color', data.r.color);
+        
+                    document.getElementById(data.r.id).style.color = `#${data.r.color}`;
+                    break;
+        
+                case 'bco':
+                    if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
+                    this.players.get(data.r.id).cosmetic = data.r["cosmetic"];
+                    this.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r["cosmetic"]}.png`;
+        
+                    if (window.localStorage.getItem('bcSnds') === "true" &&
+                        this.players.get(data.r.id)["joined"] + 1000 < Date.now()
+                    ) new Audio("./sound/CosmeticChange.ogg").play();
+        
+                    if (data.r.id === this.cid) window.localStorage.setItem('cosmetic', data.r["cosmetic"]);
+                    break;
+        
+            }
+        });
+    }
+
     init() {
         if (window.location === window.parent.location) clicked = true;
 
@@ -764,8 +1013,6 @@ class Balls {
                 "sla".replace('l','ll')+
                 'atob'['KeyboardEvent'.substring(0,3).length].toUpperCase()
             ).reverse();
-        
-            if (window.location === window.parent.location) if (!initialised && this.ws.readyState === 1) this.send({ t: 'i', r: {} }), initialised = true;
         
             this.notifTransparency = this.clamp(this.notifTransparency - 10, 0, Math.min());
         
@@ -805,6 +1052,8 @@ class Balls {
             if (this.frameDone) this.frameDone = false, requestAnimationFrame(this.draw.bind(this));
         }, 1000/10);
         else requestAnimationFrame(this.draw.bind(this));
+
+        this.createWebSocket();
         
         this.notify({
             text: "Connecting...",
@@ -947,242 +1196,4 @@ document.addEventListener('click', () => {
 
 document.addEventListener('visibilitychange', e => {
     if (document.visibilityState !== "visible") balls.keyboard = [];
-});
-
-balls.ws.addEventListener('open', () => {
-    //balls.send({ t: 'i', r: {} }]));
-});
-
-balls.ws.addEventListener('close', () => {
-    for (let plr of balls.players) document.getElementById(plr[0]).remove();
-    balls.players.clear();
-
-    balls.cx = 4096;
-    balls.cy = 4096;
-
-    balls.messages = [];
-
-    balls.notify({
-        text: "You got disconnected! Please refresh.",
-        duration: 60000,
-        color: 'FF4040',
-        "sound": true
-    });
-});
-
-balls.ws.addEventListener('message', msg => {
-    let data;
-
-    try {
-        data = JSON.parse(msg.data)[0];
-        if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
-    } catch (e) {
-        data = { t: "none", r: { e: e.toString() } };
-        balls.addMessage(e.toString());
-    }
-
-    if (balls.exhausted) console.log(`%cGot request type ${data.t}`, "font-size: 8px;");
-
-    switch (data.t) {
-        case 'j':
-            if (!data.r.hasOwnProperty("a") || !data.r.hasOwnProperty("c")) return;
-            balls.send(eval(data.r.c));
-            break;
-        
-        case 'c':
-            balls.initialised = true;
-            balls.cid = data.r.id;
-            balls.notify({
-                text: "Loading...",
-                duration: 2000,
-                color: "DDDDDD",
-                "sound": false
-            });
-            console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
-            console.log(`%cGot client ID! >>> ${balls.cid}`, "font-size: 8px;");
-
-            if (window.localStorage.getItem('name')) balls.send({ t: 'm', r: { "m": `/name ${window.localStorage.getItem('name')}` } });
-            if (window.localStorage.getItem('color')) balls.send({ t: 'm', r: { "m": `/color ${window.localStorage.getItem('color')}` } });
-            if (window.localStorage.getItem('cosmetic') &&
-                window.localStorage.getItem('cosmetic') !== "none") balls.send({ t: 'm', r: { "m": `/cosmetic ${window.localStorage.getItem('cosmetic')}` } });
-            break;
-
-        case 'n':
-            balls.notify({
-                text: data.r.t,
-                duration: data.r.d,
-                color: data.r.color,
-                "sound": data.r["s"]
-            });
-            break;
-
-        case 'm':
-            if (!data.r.hasOwnProperty("m") || !data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("show")) return;
-            balls.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${
-                data.r.id === "server" ? "/" : data.r.id === "discrd" ? "D" : balls.players.get(data.r.id).name
-            }: ${data.r["m"]}`);
-            break;
-
-        case 'map':
-            if (!data.r.hasOwnProperty("map") || data.r.map.length !== 64) return;
-            balls.points = [];
-            balls.map = data.r.map;
-            balls.drawMap();
-            break;
-
-        case 'tex':
-            if (!data.r.hasOwnProperty("texs")) return;
-            for (let tex of data.r["texs"]) {
-                let texButton = document.createElement("button");
-                texButton.textContent = tex;
-                texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
-
-                uiTexs.appendChild(texButton);
-                //uiTexs.appendChild(document.createElement("br"));
-
-                texButton.addEventListener('mouseover', e => {
-                    texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/img/textures/${tex}.png")`;
-                });
-
-                texButton.addEventListener('mouseout', e => {
-                    texButton.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url("/img/textures/${tex}.png")`;
-                });
-
-                texButton.addEventListener('click', e => {
-                    window.localStorage.setItem('texture', tex);
-                    balls.textures.src = `./img/textures/${tex}.png`;
-                    balls.textures.onload = () => {
-                        balls.canvasTextures.clearRect(0, 0, balls.canvas.textures.width, balls.canvas.textures.height);
-                        balls.canvasTextures.drawImage(balls.textures, 0, 0);
-                        
-                        balls.canvasGround.clearRect(0, 0, balls.canvas.ground.width, balls.canvas.ground.height);
-                        balls.canvasGround.drawImage(balls.textures, 0, 0, 32, 32, 0, 0, 64, 64);
-                
-                        balls.drawMap();
-                    }
-                });
-            }
-            break;
-
-        case 'dd':
-            if (!data.r.hasOwnProperty("d")) return;
-            balls.drawDuration = data.r.d;
-            break;
-
-        case 'd':
-            if (!data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y") || !data.r.hasOwnProperty("color")) return;
-            /*if (document.hasFocus())*/ balls.points.push([data.r.x, data.r.y, data.r.color, balls.drawDuration]);
-            break;
-
-        case 'l':
-            if (!data.r.hasOwnProperty("balls")) return;
-            for (let ball of data.r["balls"]) {
-                if (!ball.hasOwnProperty("id") || !ball.hasOwnProperty("info")) return;
-
-                balls.players.set(ball.id, ball.info);
-                balls.players.get(ball.id).lx = balls.players.get(ball.id).x;
-                balls.players.get(ball.id).ly = balls.players.get(ball.id).y;
-                balls.players.get(ball.id).curl = new Image();
-                balls.players.get(ball.id).curl.src = `./img/cosmetics/${balls.players.get(ball.id)["cosmetic"]}.png`;
-
-                let isMe = ball.id === balls.cid;
-
-                let p = document.createElement("p");
-                let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${ball.id} | ${ball.info.name}${isMe ? ' <<<' : ''}`);
-
-                p.appendChild(pNode);
-                p.style = `color: #${ball.info.color}; font-weight: bold; text-shadow: #000000 1px 1px`;
-
-                p.setAttribute("id", ball.id);
-
-                uiPlrs.appendChild(p);
-
-                document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
-            } 
-            break;
-
-        case 'b':
-            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("info")) return;
-            balls.players.set(data.r.id, data.r.info);
-            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} joined the game`);
-
-            balls.players.get(data.r.id).lx = balls.players.get(data.r.id).x;
-            balls.players.get(data.r.id).ly = balls.players.get(data.r.id).y;
-            balls.players.get(data.r.id).curl = new Image();
-            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r.info["cosmetic"]}.png`;
-
-            let isMe = data.r.id === balls.cid;
-
-            let p = document.createElement("p");
-            let pNode = document.createTextNode(`${isMe ? '>>> ' : ''}${data.r.id} | ${balls.players.get(data.r.id).name}${isMe ? ' <<<' : ''}`);
-
-            p.appendChild(pNode);
-            p.style = `color: #${balls.players.get(data.r.id).color}; font-weight: bold; text-shadow: #000000 1px 1px`;
-
-            p.setAttribute("id", data.r.id);
-
-            uiPlrs.appendChild(p);
-
-            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
-            break;
-
-        case 'bl':
-            if (!data.r.hasOwnProperty("id")) return;
-            balls.players.delete(data.r.id);
-            if (window.localStorage.getItem('jlMsgs') === "true") balls.addMessage(`${data.r.id} left the game`);
-
-            document.getElementById(data.r.id).remove();
-
-            document.getElementById("playercount").innerText = `Players: ${balls.players.size}`;
-            break;
-
-        case 'bm':
-            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("x") || !data.r.hasOwnProperty("y")) return;
-            balls.players.get(data.r.id).x = data.r.x;
-            balls.players.get(data.r.id).y = data.r.y;
-            balls.players.get(data.r.id).moved = Date.now();
-            break;
-
-        case 'bn':
-            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("name")) return;
-            balls.players.get(data.r.id).name = data.r.name;
-
-            if (window.localStorage.getItem('bcSnds') === "true" &&
-                balls.players.get(data.r.id).joined + 1000 < Date.now()
-            ) new Audio("./sound/NameChange.ogg").play();
-
-            let _isMe = data.r.id === balls.cid;
-            if (_isMe) window.localStorage.setItem('name', data.r.name);
-
-            let _pNode = document.createTextNode(`${_isMe ? '>>> ' : ''}${data.r.id} | ${data.r.name}${_isMe ? ' <<<' : ''}`);
-            document.getElementById(data.r.id).removeChild(document.getElementById(data.r.id).firstChild);
-            document.getElementById(data.r.id).appendChild(_pNode);
-            break;
-
-        case 'bc':
-            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("color")) return;
-            balls.players.get(data.r.id).color = data.r.color;
-
-            if (window.localStorage.getItem('bcSnds') === "true" &&
-                balls.players.get(data.r.id).joined + 1000 < Date.now()
-            ) new Audio("./sound/ColorChange.ogg").play();
-
-            if (data.r.id === balls.cid) window.localStorage.setItem('color', data.r.color);
-
-            document.getElementById(data.r.id).style.color = `#${data.r.color}`;
-            break;
-
-        case 'bco':
-            if (!data.r.hasOwnProperty("id") || !data.r.hasOwnProperty("cosmetic")) return;
-            balls.players.get(data.r.id).cosmetic = data.r["cosmetic"];
-            balls.players.get(data.r.id).curl.src = `./img/cosmetics/${data.r["cosmetic"]}.png`;
-
-            if (window.localStorage.getItem('bcSnds') === "true" &&
-                balls.players.get(data.r.id)["joined"] + 1000 < Date.now()
-            ) new Audio("./sound/CosmeticChange.ogg").play();
-
-            if (data.r.id === balls.cid) window.localStorage.setItem('cosmetic', data.r["cosmetic"]);
-            break;
-
-    }
 });

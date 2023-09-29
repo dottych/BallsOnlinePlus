@@ -32,9 +32,14 @@ server.on('connection', c => {
     c.secretAuthMethod = Math.floor(Math.random() * sauths.length);
     c.initialised = false;
 
+    c.packetCount = 0;
+
     //console.log(tick.requests);
 
     c.on('message', msg => {
+        c.packetCount++;
+        if (c.packetCount > 100) c.close();
+        
         let data;
 
         try {
@@ -48,7 +53,11 @@ server.on('connection', c => {
         event.emit("msg", {c, data});
     });
 
-    c.on('close', () => { if (c.id !== "0") m_Leave({ c }); }); 
+    c.on('close', () => { if (c.id !== "0") m_Leave({ c }); });
+
+    setInterval(() => {
+        c.packetCount = 0;
+    }, 1000);
 });
 
 

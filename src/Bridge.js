@@ -12,6 +12,7 @@ class Bridge {
         this.msgs = [];
         this.activity = `with 0 balls`;
         this.online = false;
+        this.canSend = true;
 
         this.commands = {};
 
@@ -62,7 +63,7 @@ class Bridge {
 
         setInterval(() => {
             if (this.msgs.length > 0) {
-                if (this.msgs.join('\n').length < 2000) this.send(this.msgs.join('\n'));
+                if (this.msgs.join('\n').length < 2000) if (this.canSend) this.send(this.msgs.join('\n'));
                 this.msgs = [];
             }
         }, 2500);
