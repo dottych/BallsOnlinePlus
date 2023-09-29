@@ -47,7 +47,7 @@ class Bridge {
             let command = this.commands[int.commandName];
             if (command !== undefined) {
                 try {
-                    await command.execute(int);
+                    await command.execute(int, { status: this.canSend });
                 } catch (e) {
                     console.log(e);
                     if (int.replied || int.deferred) {
@@ -81,7 +81,7 @@ class Bridge {
     }
 
     async registerCommands() {
-        this.addCommand("players", "Shows all the players online.", async function(int) {
+        this.addCommand("players", "Shows all the players online.", async function(int, info) {
             let length = utils.getBalls().length;
             let playerString = "";
 
@@ -91,12 +91,16 @@ class Bridge {
             await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
         });
 
-        this.addCommand("mapinfo", "Says the current map's info.", async function(int) {
+        this.addCommand("mapinfo", "Says the current map's info.", async function(int, info) {
             await int.reply({ content: `ID: ${map.mapID}, draw duration: ${map.currentMap().duration}, title: ${map.currentMap().name}` });
         });
 
-        this.addCommand("uptime", "Says the server's uptime.", async function(int) {
+        this.addCommand("uptime", "Says the server's uptime.", async function(int, info) {
             await int.reply({ content: `The server is running for ${Math.floor(performance.now()/1000)}s.` });
+        });
+
+        this.addCommand("bridge", "Says the bridge's status.", async function(int, info) {
+            await int.reply({ content: `The bridge is ${info.status ? "on" : "off"}.` });
         });
 
         let commands = [];

@@ -2,7 +2,7 @@ const utils = require('../../Utils');
 const cosmetics = require('../../Lists').cosmetics;
 
 const c_help = (c, input) => {
-    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, respawn, mapinfo, newmap, notify, uptime, tp, kick, admin`);
+    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, respawn, mapinfo, newmap, notify, uptime, tp, kick, bridge, admin`);
     else switch (input.trim()) {
         default:
             utils.msgClient(c, `This command does not exist.`);
@@ -56,6 +56,10 @@ const c_help = (c, input) => {
 
         case 'kick':
             utils.msgClient(c, `Kicks a specified player. Admin only.`);
+            break;
+
+        case 'bridge':
+            utils.msgClient(c, `Toggles bridge. Admin only.`);
             break;
     
         case 'admin':

@@ -22,6 +22,7 @@ const c_tp = require('./Commands/tp');
 const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
 const c_rice = require('./Commands/rice');
+const c_bridge = require('./Commands/bridge');
 
 const m_Message = ({ c, data }) => {
     if (!c.hasOwnProperty("id") || c.id === "0") return;
@@ -95,6 +96,10 @@ const m_Message = ({ c, data }) => {
 
                 case 'rice':
                     c_rice(c, input);
+                    break;
+
+                case 'bridge':
+                    c_bridge(c, input);
                     break;
                 
             }
