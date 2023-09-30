@@ -1,6 +1,5 @@
 // improve collision by actually moving the ball back by a certain amount (maybe clamp position by grid scaled position of tile?)
 // more 404 images
-// if too many (100?) packets arrive under a second, kick client (keep track, c.packetCount and then clear upon interval)
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // auto reconnect (or maybe not) (actually YEAH it would be cool)
 // check speed of player server-side (partially done?)
@@ -12,7 +11,6 @@
 // show average fps instead
 // dm command
 // emojis, replace :emoji: with an image or something
-// "turn off bridge" command in case people from my school decide to barge in and say mean comments about me
 // texture url input, but check if resolution is valid
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
