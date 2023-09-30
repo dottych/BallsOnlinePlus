@@ -1,6 +1,6 @@
 {
   "name": "BallsOnlinePlus",
-  "version": "0.1.0",
+  "version": "0.1.9",
   "description": "Client and server for Balls Online Plus",
   "dependencies": {
     "discord.js": "^14.13.0",

@@ -12,6 +12,7 @@
 // dm command
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid
+// random color
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -90,7 +91,7 @@ class Balls {
         this.fps = 0;
         this.now = 0;
 
-        this.version = "0.1.8"
+        this.version = "0.1.9"
         this.dev = true;
         this.exhausted = false;
 
