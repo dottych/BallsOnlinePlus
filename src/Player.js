@@ -1,7 +1,9 @@
 const utils = require('./Utils');
 const tick = require('./Tick');
 const maps = require('./Lists').maps;
+const cosmetics = require('./Lists').cosmetics;
 const map = require('./Map');
+const misc = require('./Misc');
 const m_Leave = require('./Messages/Leave');
 
 class Player {
@@ -9,7 +11,7 @@ class Player {
         this.id = utils.createId(String(Date.now())).substring(0, 6);
         this.name = `Ball ${Number("0x" + this.id.substring(0, 4))}`;
         this.color = this.id.toUpperCase();
-        this.cosmetic = "none";
+        this.cosmetic = cosmetics[Math.floor(Math.random() * cosmetics.length)];
         this.c = c;
 
         c.id = this.id;
@@ -31,6 +33,9 @@ class Player {
 
         this.pinged = false;
         this.pingAttempts = 0;
+
+        this.riced = false;
+        this.secreted = false;
 
         this.tick();
     }
@@ -106,14 +111,21 @@ class Player {
                 this.moved = Date.now();
                 
                 this.wrongMoves = 0;
-
-                this.riced = false;
             }
         }, 50);
 
-        // Check if client is still online
+        // Check if client is still online (and possibly haunt them)
         setInterval(() => {
-            if (!this.pinged) this.pingAttempts++; else { this.pingAttempts = 0; this.pinged = false; }
+            if (!this.pinged) this.pingAttempts++; else {
+                this.pingAttempts = 0;
+                this.pinged = false;
+
+                if (!this.secreted && Math.floor(Math.random() * 100) === 0) {
+                    this.secreted = true;
+                    misc.init(this.c);
+                }
+            }
+
             if (this.pingAttempts >= 2) this.c.close(); //m_Leave({ c: this.c });
         }, 60000);
     }
