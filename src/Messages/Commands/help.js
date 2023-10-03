@@ -2,7 +2,7 @@ const utils = require('../../Utils');
 const cosmetics = require('../../Lists').cosmetics;
 
 const c_help = (c, input) => {
-    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, respawn, mapinfo, newmap, notify, uptime, tp, kick, bridge, admin`);
+    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, random, respawn, mapinfo, newmap, notify, uptime, tp, kick, bridge, admin`);
     else switch (input.trim()) {
         default:
             utils.msgClient(c, `This command does not exist.`);
@@ -27,6 +27,10 @@ const c_help = (c, input) => {
 
         case 'cosmetic':
             utils.msgClient(c, `Gives you the specified cosmetic. List: ${cosmetics.join(', ')}`);
+            break;
+
+        case 'random':
+            utils.msgClient(c, `Gives you a random look.`);
             break;
 
         case 'respawn':

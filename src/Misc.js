@@ -13,6 +13,11 @@ class Misc {
             "It's coming.",
             "Forever miserable.",
             "Never mess with invisible forces.",
+            "Stand.",
+            "Still existing?",
+            "It will find you, eventually.",
+            "You can walk away from it, not for long.",
+            "It is always watching.",
         ];
 
         this.serverRamblings = [

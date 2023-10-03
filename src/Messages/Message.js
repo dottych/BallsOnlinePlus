@@ -13,6 +13,7 @@ const c_help = require('./Commands/help');
 const c_name = require('./Commands/name');
 const c_color = require('./Commands/color');
 const c_cosmetic = require('./Commands/cosmetic');
+const c_random = require('./Commands/random');
 const c_respawn = require('./Commands/respawn');
 const c_mapinfo = require('./Commands/mapinfo');
 const c_newmap = require('./Commands/newmap');
@@ -59,6 +60,10 @@ const m_Message = ({ c, data }) => {
 
                 case 'cosmetic':
                     c_cosmetic(c, input);
+                    break;
+
+                case 'random':
+                    c_random(c, input);
                     break;
 
                 case 'respawn':

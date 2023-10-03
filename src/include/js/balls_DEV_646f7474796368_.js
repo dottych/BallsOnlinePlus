@@ -12,7 +12,6 @@
 // dm command
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid
-// random color
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {

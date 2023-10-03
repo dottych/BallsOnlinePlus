@@ -12,7 +12,7 @@ const c_cosmetic = (c, input) => {
             tick.requests.push({
                 r: {
                     t: 'bco',
-                    r: { id: c.id, cosmetic: input.trim().toLowerCase() }
+                    r: { id: c.id, cosmetic: players.get(c.id).cosmetic }
                 },
     
                 c: utils.getAllPlayerClients()

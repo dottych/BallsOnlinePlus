@@ -11,7 +11,7 @@ const c_color = (c, input) => {
             tick.requests.push({
                 r: {
                     t: 'bc',
-                    r: { id: c.id, color: input.trim().toUpperCase() }
+                    r: { id: c.id, color: players.get(c.id).color }
                 },
     
                 c: utils.getAllPlayerClients()
