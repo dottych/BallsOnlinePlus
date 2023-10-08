@@ -1,7 +1,6 @@
 // improve collision by actually moving the ball back by a certain amount (maybe clamp position by grid scaled position of tile?)
 // more 404 images
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
-// auto reconnect (or maybe not) (actually YEAH it would be cool)
 // check speed of player server-side (partially done?)
 // make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor
@@ -12,6 +11,7 @@
 // dm command
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid
+// fix auto reconnect sounds
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -122,7 +122,7 @@ class Balls {
 
         this.shadows = true;
 
-        this.textures = new Image(192, 32);
+        this.textures = new Image(Object.entries(this.blocks).length * 32, 32);
         this.textures.src = `./img/textures/${window.localStorage.getItem('texture') !== null ? window.localStorage.getItem('texture') : 'marioood'}.png`;
 
         this.canvas.textures = document.createElement("canvas");
@@ -310,7 +310,7 @@ class Balls {
         chatMsgs.appendChild(p);
         chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
-        p.style.animation = "new 1s linear forwards";
+        p.style.animation = "new 0.2s linear forwards";
 
         new Audio("./sound/ChatMessage.ogg").play();
     }
@@ -739,7 +739,6 @@ class Balls {
         initialised = false;
         this.initialised = false;
 
-        console.log("hi")
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
 
         this.ws.addEventListener('open', () => {
@@ -752,8 +751,6 @@ class Balls {
         
             this.cx = 4096;
             this.cy = 4096;
-        
-            this.messages = [];
         
             this.notify({
                 text: "You got disconnected! Reconnecting...",
@@ -786,6 +783,8 @@ class Balls {
                     break;
                 
                 case 'c':
+                    for (let msg of this.messages) document.getElementById(msg).remove();
+                    this.messages = [];
                     this.initialised = true;
                     this.cid = data.r.id;
                     this.notify({

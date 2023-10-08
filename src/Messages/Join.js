@@ -93,8 +93,7 @@ const m_Join = ({ c, data }) => {
     let plrs = players.size;
     let motd = lists.motds[Math.floor(Math.random() * lists.motds.length)];
 
-    utils.msgClient(c, `Welcome to the server! There ${plrs===1?"is":"are"} ${plrs} player${plrs===1?"":"s"} online.`);
-    utils.msgClient(c, `Try saying /help.`);
+    utils.msgClient(c, `Welcome to Balls Online! There ${plrs===1?"is":"are"} ${plrs} player${plrs===1?"":"s"} online. Try saying /help.`);
     utils.msgClient(c, `MOTD: ${motd}`);
 
     let welcoming = lists.welcomings[Math.floor(Math.random() * lists.welcomings.length)];
