@@ -736,6 +736,7 @@ class Balls {
 
     createWebSocket() {
         if (this.ws !== null) return;
+        initialised = false;
         this.initialised = false;
 
         console.log("hi")
