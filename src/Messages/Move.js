@@ -9,8 +9,7 @@ const m_Move = ({ c, data }) => {
         Math.round(utils.clamp(data.r.y, 10, 4086)) === players.get(c.id).y) 
         return;
 
-    players.get(c.id).x = Math.round(data.r.x);
-    players.get(c.id).y = Math.round(data.r.y);
+    players.get(c.id).move(data.r.x, data.r.y);
 }
 
 module.exports = m_Move;

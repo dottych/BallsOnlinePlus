@@ -54,21 +54,10 @@ class Map {
 
         if (id !== undefined && Math.abs(+id) < maps.size) this.mapID = Math.abs(+id); else while (prevMapID === this.mapID) this.mapID = Math.floor(Math.random() * maps.size);
 
-        for (let i of players) {
-            i[1].x = 3978 + Math.round(Math.random() * 235);
-            i[1].y = 3978 + Math.round(Math.random() * 235);
-            i[1].px = i[1].x;
-            i[1].py = i[1].y;
-
-            tick.requests.push({
-                r: {
-                    t: 'bm',
-                    r: { id: i[1].id, x: i[1].x, y: i[1].y }
-                },
-        
-                c: utils.getAllPlayerClients()
-            });
-        }
+        for (let i of players) i[1].teleport(
+                                    3978 + Math.round(Math.random() * 235),
+                                    3978 + Math.round(Math.random() * 235)
+                                );
 
         tick.requests.push({
             r: {

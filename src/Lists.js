@@ -9,6 +9,25 @@ let sauths = [
     
 ];
 let cosmetics = [];
+let abbreviations = {
+    'i': 'Init',
+    'j': 'Join',
+    'c': 'Client ID',
+    'l': 'List',
+    'b': 'Ball Join',
+    'bl': 'Ball Leave',
+    'bm': 'Ball Move',
+    'bn': 'Ball Name',
+    'bc': 'Ball Color',
+    'bco': 'Ball Cosmetic',
+    'd': 'Draw',
+    'm': 'Message',
+    'n': 'Notification',
+    'map': 'Map',
+    'dd': 'Draw Duration',
+    'tex': 'Textures',
+    'rm': 'Raw Message',
+};
 
 for (let file of fs.readdirSync('./src/include/img/cosmetics/')) cosmetics.push(file.substring(0, file.length - 4));
 

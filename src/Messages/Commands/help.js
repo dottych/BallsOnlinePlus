@@ -2,7 +2,7 @@ const utils = require('../../Utils');
 const cosmetics = require('../../Lists').cosmetics;
 
 const c_help = (c, input) => {
-    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, random, respawn, mapinfo, newmap, notify, uptime, tp, kick, bridge, admin`);
+    if (input.trim() === "") utils.msgClient(c, `Commands: help, name, color, cosmetic, random, respawn, mapinfo, newmap, notify, uptime, dm, tp, kick, bridge, admin`);
     else switch (input.trim()) {
         default:
             utils.msgClient(c, `This command does not exist.`);
@@ -52,6 +52,16 @@ const c_help = (c, input) => {
         case 'uptime':
         case 'serverrun':
             utils.msgClient(c, `Says the server's uptime in seconds.`);
+            break;
+
+        case 'dm':
+        case 'pm':
+        case 'msg':
+        case 'message':
+        case 'mail':
+        case 'whisper':
+        case 'w':
+            utils.msgClient(c, `DMs a specified player.`);
             break;
 
         case 'tp':

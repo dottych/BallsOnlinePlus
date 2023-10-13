@@ -19,6 +19,7 @@ const c_mapinfo = require('./Commands/mapinfo');
 const c_newmap = require('./Commands/newmap');
 const c_notify = require('./Commands/notify');
 const c_uptime = require('./Commands/uptime');
+const c_dm = require('./Commands/dm');
 const c_tp = require('./Commands/tp');
 const c_kick = require('./Commands/kick');
 const c_admin = require('./Commands/admin');
@@ -85,6 +86,16 @@ const m_Message = ({ c, data }) => {
                 case 'uptime':
                 case 'serverrun':
                     c_uptime(c, input);
+                    break;
+
+                case 'dm':
+                case 'pm':
+                case 'msg':
+                case 'message':
+                case 'mail':
+                case 'whisper':
+                case 'w':
+                    c_dm(c, input);
                     break;
 
                 case 'tp':

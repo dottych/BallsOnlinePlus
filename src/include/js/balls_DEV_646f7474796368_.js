@@ -12,6 +12,8 @@
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid
 // fix auto reconnect sounds
+// pets?
+// setname setcolor setcosmetic utils function
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {

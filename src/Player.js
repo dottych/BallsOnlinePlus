@@ -4,7 +4,6 @@ const maps = require('./Lists').maps;
 const cosmetics = require('./Lists').cosmetics;
 const map = require('./Map');
 const misc = require('./Misc');
-const m_Leave = require('./Messages/Leave');
 
 class Player {
     constructor(c) {
@@ -175,6 +174,68 @@ class Player {
             joined: this.joined,
             moved: this.moved
         };
+    }
+
+    // finish
+    
+    move(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    teleport(x, y) {
+        this.x = x;
+        this.y = y;
+        this.px = this.x;
+        this.py = this.y;
+
+        tick.requests.push({
+            r: {
+                t: 'bm',
+                r: { id: this.id, x: this.x, y: this.y }
+            },
+    
+            c: utils.getAllPlayerClients()
+        });
+    }
+
+    setName(name) {
+        this.name = name;
+
+        tick.requests.push({
+            r: {
+                t: 'bn',
+                r: { id: this.id, name: this.name }
+            },
+
+            c: utils.getAllPlayerClients()
+        });
+    }
+
+    setColor(color) {
+        this.color = color;
+
+        tick.requests.push({
+            r: {
+                t: 'bc',
+                r: { id: this.id, color: this.color }
+            },
+
+            c: utils.getAllPlayerClients()
+        });
+    }
+
+    setCosmetic(cosmetic) {
+        this.cosmetic = cosmetic;
+
+        tick.requests.push({
+            r: {
+                t: 'bco',
+                r: { id: this.id, cosmetic: this.cosmetic }
+            },
+
+            c: utils.getAllPlayerClients()
+        });
     }
 }
 
