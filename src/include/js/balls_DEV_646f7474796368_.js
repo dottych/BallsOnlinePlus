@@ -11,7 +11,7 @@
 // dm command
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid
-// fix auto reconnect sounds
+// fix auto reconnect sounds (maybe don't play notification sound when disconnected, but put that check only on the autoreconnect sound)
 // pets?
 // setname setcolor setcosmetic utils function
 
