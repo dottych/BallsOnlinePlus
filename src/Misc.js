@@ -21,7 +21,7 @@ class Misc {
         ];
 
         this.serverRamblings = [
-            "Hello! It's the Server. I noticed that you're a really cool ball, so I used my last telekinetic powers to thank you for playing and hopefully enjoying this game!",
+            "Hello! It's the Server. I noticed that you're a really cool ball, so I used my last telepathic powers to thank you for playing and hopefully enjoying this game!",
             "Hey, Server here. Please be warned that there's a very evil ball called Ball 666. If you see it, leave the game, and join later.",
             "My name is Server, and I hope Balls Online is the best game you've ever played. I may sometimes hop in your chat to share tips or thoughts.",
             "Boo! Did I scare you? Oh. Nevermind then! You want my name? Server. I hope you enjoy this game at least!",
