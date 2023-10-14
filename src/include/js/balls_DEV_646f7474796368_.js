@@ -2,18 +2,18 @@
 // more 404 images
 // demos (client-side, with blobs and uint8s (record button), ticked (datas with checksum too)), custom client for watching demos (local commands such as spectate, freecam etc)
 // check speed of player server-side (partially done?)
-// make teleport function in player class (so no more manual px setting etc) [what did I mean]
 // fix beginning error in editor
 // fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
 // rewrite map data to hex (maybe not)
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // show average fps instead
-// dm command
+// dm command (complete client side)
 // emojis, replace :emoji: with an image or something
-// texture url input, but check if resolution is valid
+// texture url input, but check if resolution is valid (maybe not)
 // fix auto reconnect sounds (maybe don't play notification sound when disconnected, but put that check only on the autoreconnect sound)
 // pets?
-// setname setcolor setcosmetic utils function
+// debug mode in server
+// server selection ui concept
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -818,6 +818,11 @@ class Balls {
                     this.addMessage(`${data.r.show ? "(" + data.r.id + ") " : ""}${
                         data.r.id === "server" ? "/" : data.r.id === "discrd" ? "D" : this.players.get(data.r.id).name
                     }: ${data.r["m"]}`);
+                    break;
+
+                case 'rm':
+                    if (!data.r.hasOwnProperty("m")) return;
+                    this.addMessage(data.r["m"]);
                     break;
         
                 case 'map':

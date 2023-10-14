@@ -6,6 +6,7 @@ const c_dm = (c, input) => {
     let args = input.trim().split(' ');
 
     if (args.length === 1 && args[0] === '') { utils.msgClient(c, `You need to input an ID!`); return; }
+    if (args[0] === c.id) { utils.msgClient(c, `You need to input someone else's ID!`); return; }
     if (args.length === 1) { utils.msgClient(c, `You need to input a message!`); return; }
 
     let id = args[0];
@@ -26,7 +27,7 @@ const c_dm = (c, input) => {
     tick.requests.push({
         r: {
             t: 'rm',
-            r: { m: `[${id} > YOU] ${message}` }
+            r: { m: `[${c.id} > YOU] ${message}` }
         },
 
         c: [players.get(id).c]
