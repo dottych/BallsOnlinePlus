@@ -103,6 +103,10 @@ class Bridge {
             await int.reply({ content: `The bridge is ${info.status ? "on" : "off"}.` });
         });
 
+        this.addCommand("memoryusage", "Says the memory usage in MB.", async function(int, info) {
+            await int.reply({ content: `Memory used: ${Math.round(process.memoryUsage().heapUsed / 1000000)} MB` });
+        });
+
         let commands = [];
         for (let command of Object.entries(this.commands)) commands.push(command[1].data.toJSON());
 

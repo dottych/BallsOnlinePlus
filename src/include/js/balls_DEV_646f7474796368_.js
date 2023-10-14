@@ -7,10 +7,8 @@
 // rewrite map data to hex (maybe not)
 // INIT protocol type accepts an id that sets your user (so a permanent user)
 // show average fps instead
-// dm command (complete client side)
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid (maybe not)
-// fix auto reconnect sounds (maybe don't play notification sound when disconnected, but put that check only on the autoreconnect sound)
 // pets?
 // debug mode in server
 // server selection ui concept
@@ -237,6 +235,8 @@ class Balls {
 
         this.frameDone = true;
         this.limitFPS = false;
+
+        this.connectAttempts = 0;
 
         this.url = window.location.host;
         this.ws = null;
@@ -740,6 +740,7 @@ class Balls {
         if (this.ws !== null) return;
         initialised = false;
         this.initialised = false;
+        this.connectAttempts++;
 
         this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
 
@@ -750,19 +751,30 @@ class Balls {
         this.ws.addEventListener('close', () => {
             for (let plr of this.players) document.getElementById(plr[0]).remove();
             this.players.clear();
+            document.getElementById("playercount").innerText = `Players: ${this.players.size}`;
         
             this.cx = 4096;
             this.cy = 4096;
         
             this.notify({
                 text: "You got disconnected! Reconnecting...",
-                duration: 60000,
+                duration: 10000,
                 color: 'FF4040',
-                "sound": true
+                "sound": this.connectAttempts === 0 ? true : false
             });
 
-            this.ws = null;
-            this.createWebSocket();
+            if (this.connectAttempts < 10) this.ws = null, this.createWebSocket();
+            else {
+                this.notify({
+                    text: "Attempts to connect to the server were fruitless. Come back later.",
+                    duration: 60000,
+                    color: 'FF4040',
+                    "sound": true
+                });
+
+                this.map = this.emptyMap;
+                this.drawMap();
+            }
         });
 
         this.ws.addEventListener('message', msg => {
@@ -795,6 +807,9 @@ class Balls {
                         color: "DDDDDD",
                         "sound": false
                     });
+
+                    this.connectAttempts = 0;
+
                     console.log("%cConnected! %c| " + " in " + Math.round(performance.now()) + "ms", "color: #00AA00; font-size: 16px;", "");
                     console.log(`%cGot client ID! >>> ${this.cid}`, "font-size: 8px;");
         
