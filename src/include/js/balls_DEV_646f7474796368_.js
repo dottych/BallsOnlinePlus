@@ -6,7 +6,6 @@
 // fix weird antialiasing? or misalignment? issue with cosmetic (it's only an issue with firefox or something)
 // rewrite map data to hex (maybe not)
 // INIT protocol type accepts an id that sets your user (so a permanent user)
-// show average fps instead
 // emojis, replace :emoji: with an image or something
 // texture url input, but check if resolution is valid (maybe not)
 // pets?
@@ -89,6 +88,9 @@ class Balls {
     constructor() {
         this.fps = 0;
         this.now = 0;
+
+        this.averageFps = 0;
+        this.previousFps = [];
 
         this.version = "0.1.9"
         this.dev = true;
@@ -281,7 +283,7 @@ class Balls {
     }
 
     send(packet) {
-        this.ws.send(JSON.stringify([packet]));
+        this.ws.send(JSON.stringify(packet));
     }
 
     player(id) {
@@ -616,10 +618,10 @@ class Balls {
         this.ctx.fillRect(8, 30, 152, 1);
 
         this.drawText({
-            text: `FPS: ${Math.round(this.fps)}`, 
+            text: `FPS: ${Math.round(this.averageFps)}`, 
             x: 16*12,
             y: 23,
-            color: (this.fps < 30) ? (this.fps < 15) ? 'red' : 'yellow' : 'lime',
+            color: (this.averageFps < 30) ? (this.averageFps < 15) ? 'red' : 'yellow' : 'lime',
         });
 
         /*this.drawText({
@@ -781,7 +783,7 @@ class Balls {
             let data;
         
             try {
-                data = JSON.parse(msg.data)[0];
+                data = JSON.parse(msg.data);
                 if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
             } catch (e) {
                 data = { t: "none", r: { e: e.toString() } };
@@ -1066,6 +1068,12 @@ class Balls {
                 this.canvasVoid.fillStyle = `#${random}${random}${random}`;
                 this.canvasVoid.fillRect(j*128, i*128, 128, 128);
             }
+
+            this.previousFps.push(this.fps);
+            if (this.previousFps.length > 10) this.previousFps.shift();
+            let average = 0;
+            for (let i of this.previousFps) average += i;
+            this.averageFps = Math.floor(average / this.previousFps.length);
         }, 500);
 
         if (this.limitFPS) setInterval(() => {

@@ -21,12 +21,12 @@ let abbreviations = {
     'bc': 'Ball Color',
     'bco': 'Ball Cosmetic',
     'd': 'Draw',
+    'dd': 'Draw Duration',
     'm': 'Message',
+    'rm': 'Raw Message',
     'n': 'Notification',
     'map': 'Map',
-    'dd': 'Draw Duration',
     'tex': 'Textures',
-    'rm': 'Raw Message',
 };
 
 for (let file of fs.readdirSync('./src/include/img/cosmetics/')) cosmetics.push(file.substring(0, file.length - 4));

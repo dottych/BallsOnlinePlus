@@ -43,7 +43,7 @@ server.on('connection', c => {
         let data;
 
         try {
-            data = JSON.parse(msg)[0];
+            data = JSON.parse(msg);
             if (!data.hasOwnProperty("t") || !data.hasOwnProperty("r")) data = { t: "none" };
         } catch (e) {
             //log(e);
