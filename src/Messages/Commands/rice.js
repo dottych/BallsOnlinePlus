@@ -16,6 +16,7 @@ const c_rice = (c, input) => {
                 "template",
                 "smb1",
                 "mandrillmaze",
+                "smw",
             ] }
         },
 
