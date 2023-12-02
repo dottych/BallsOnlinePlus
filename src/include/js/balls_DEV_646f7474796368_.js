@@ -11,6 +11,11 @@
 // pets?
 // debug mode in server
 // server selection ui concept
+// better command importing
+// map extend vote command
+// any map size
+// spawn blocks
+// remake editor
 
 String.prototype.reverse = function() {return [...this].reverse().join('')};
 String.prototype.wobbleCase = function() {
@@ -92,7 +97,7 @@ class Balls {
         this.averageFps = 0;
         this.previousFps = [];
 
-        this.version = "0.1.9"
+        this.version = "0.2.0"
         this.dev = true;
         this.exhausted = false;
 
@@ -419,10 +424,10 @@ class Balls {
 
             let speed = !chat.matches(':focus') && document.visibilityState === "visible" ? (1/(this.sonic ? 1 : 4)) * this.elapsed : 0;
 
-            if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX = -speed;
-            if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX = speed;
-            if (this.keyboard[this.keys.up] || this.keyboard[this.keys.w]) newY = -speed;
-            if (this.keyboard[this.keys.down] || this.keyboard[this.keys.s]) newY = speed;
+            if (this.keyboard[this.keys.left] || this.keyboard[this.keys.a]) newX -= speed;
+            if (this.keyboard[this.keys.right] || this.keyboard[this.keys.d]) newX += speed;
+            if (this.keyboard[this.keys.up] || this.keyboard[this.keys.w]) newY -= speed;
+            if (this.keyboard[this.keys.down] || this.keyboard[this.keys.s]) newY += speed;
 
             newX = (newY !== 0) ? newX / Math.sqrt(2) : newX;
             newY = (newX !== 0) ? newY / Math.sqrt(2) : newY;

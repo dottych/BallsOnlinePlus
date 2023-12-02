@@ -122,13 +122,14 @@ class Bridge {
     pile(msg) {
         this.msgs.push(msg);
     }
+
+    sendChannel(channel, msg) {
+        this.bot.channels.cache.get(channel).send(msg);
+    }
     
     send(msg) {
-        let ch = this.bot.channels.cache.get('1124515966634704926');
-        ch.send(msg);
-
-        ch = this.bot.channels.cache.get('1141078695939948654');
-        ch.send(msg);
+        this.sendChannel('1124515966634704926', msg);
+        this.sendChannel('1141078695939948654', msg);
     }
 }
 

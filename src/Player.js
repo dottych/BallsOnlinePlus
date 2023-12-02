@@ -15,6 +15,8 @@ class Player {
 
         c.id = this.id;
 
+        this.room = "main";
+
         this.admin = false;
 
         this.x = 3978 + Math.round(Math.random() * 235);

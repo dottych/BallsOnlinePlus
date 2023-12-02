@@ -27,6 +27,12 @@ class Utils {
         return clients;
     }
 
+    getRoomPlayerClients() {
+        let clients = [];
+        for (let i of players) if (i[1].c !== c) clients.push(i[1].c);
+        return clients;
+    } //DO
+
     msgClient(c, msg) {
         tick.requests.push({
             r: {
@@ -39,6 +45,21 @@ class Utils {
             },
     
             c: [c]
+        });
+    }
+
+    msgRoom(msg) {
+        tick.requests.push({
+            r: {
+                t: 'm',
+                r: {
+                    id: 'server',
+                    show: false,
+                    m: msg,
+                }
+            },
+    
+            c: this.getRoomPlayerClients()
         });
     }
 
