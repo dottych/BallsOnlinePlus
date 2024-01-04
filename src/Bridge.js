@@ -26,8 +26,8 @@ class Bridge {
 
         this.bot.on(Events.MessageCreate, e => {
             if (
-                    (e.channelId === '1124515966634704926' || e.channelId === '1141078695939948654')
-                    && e.author.id !== '1112098088128094309'
+                    (e.channelId === process.env.BRIDGE_CHANNEL || e.channelId === '1141078695939948654')
+                    && e.author.id !== process.env.BOT_ID
                 ) {
                 tick.requests.push({
                     r: {
@@ -111,7 +111,7 @@ class Bridge {
         for (let command of Object.entries(this.commands)) commands.push(command[1].data.toJSON());
 
         await rest.put(
-            Routes.applicationCommands('1112098088128094309'), { body: commands }
+            Routes.applicationCommands(process.env.BOT_ID), { body: commands }
         );
     }
 
@@ -124,11 +124,10 @@ class Bridge {
     }
     
     send(msg) {
-        let ch = this.bot.channels.cache.get('1124515966634704926');
+        let ch = this.bot.channels.cache.get(process.env.BRIDGE_CHANNEL);
         ch.send(msg);
 
-        ch = this.bot.channels.cache.get('1141078695939948654');
-        ch.send(msg);
+
     }
 }
 
