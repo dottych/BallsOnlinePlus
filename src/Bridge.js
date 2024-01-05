@@ -5,6 +5,7 @@ const tick = require('./Tick');
 const utils = require('./Utils');
 const map = require('./Map');
 
+const bridgeChannels = require('./Lists').bridgeChannels;
 const rest = new REST().setToken(process.env.BOT_TOKEN);
 
 class Bridge {
@@ -26,17 +27,17 @@ class Bridge {
 
         this.bot.on(Events.MessageCreate, e => {
             if (
-                    (e.channelId === process.env.BRIDGE_CHANNEL || e.channelId === '1141078695939948654')
-                    && e.author.id !== process.env.BOT_ID
-                ) {
+                bridgeChannels.includes(e.channelId)
+                && e.author.id !== process.env.BOT_ID
+            ) {
                 tick.requests.push({
                     r: {
                         t: 'm',
                         r: { id: 'discrd', show: false, m: `${e.author.username}: ${e.content}` }
                     },
-    
+
                     c: utils.getAllPlayerClients()
-                
+
                 });
             }
         });
@@ -81,7 +82,7 @@ class Bridge {
     }
 
     async registerCommands() {
-        this.addCommand("players", "Shows all the players online.", async function(int, info) {
+        this.addCommand("players", "Shows all the players online.", async function (int, info) {
             let length = utils.getBalls().length;
             let playerString = "";
 
@@ -91,19 +92,19 @@ class Bridge {
             await int.reply({ content: `There ${length === 1 ? "is" : "are"} ${length} player${length === 1 ? "" : "s"} online.\n${playerString}` });
         });
 
-        this.addCommand("mapinfo", "Says the current map's info.", async function(int, info) {
+        this.addCommand("mapinfo", "Says the current map's info.", async function (int, info) {
             await int.reply({ content: `ID: ${map.mapID}, draw duration: ${map.currentMap().duration}, title: ${map.currentMap().name}` });
         });
 
-        this.addCommand("uptime", "Says the server's uptime.", async function(int, info) {
-            await int.reply({ content: `The server is running for ${Math.floor(performance.now()/1000)}s.` });
+        this.addCommand("uptime", "Says the server's uptime.", async function (int, info) {
+            await int.reply({ content: `The server is running for ${Math.floor(performance.now() / 1000)}s.` });
         });
 
-        this.addCommand("bridge", "Says the bridge's status.", async function(int, info) {
+        this.addCommand("bridge", "Says the bridge's status.", async function (int, info) {
             await int.reply({ content: `The bridge is ${info.status ? "on" : "off"}.` });
         });
 
-        this.addCommand("memoryusage", "Says the memory usage in MB.", async function(int, info) {
+        this.addCommand("memoryusage", "Says the memory usage in MB.", async function (int, info) {
             await int.reply({ content: `Memory used: ${Math.round(process.memoryUsage().heapUsed / 1000000)} MB` });
         });
 
@@ -122,12 +123,10 @@ class Bridge {
     pile(msg) {
         this.msgs.push(msg);
     }
-    
+
     send(msg) {
-        let ch = this.bot.channels.cache.get(process.env.BRIDGE_CHANNEL);
-        ch.send(msg);
-
-
+        for (let chId of bridgeChannels) this.bot.channels.cache.get(chId).send(msg); 
+            
     }
 }
 
