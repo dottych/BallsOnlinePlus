@@ -28,10 +28,11 @@ let abbreviations = {
     'map': 'Map',
     'tex': 'Textures',
 };
-
+let bridgeChannels = [];
 for (let file of fs.readdirSync('./src/include/img/cosmetics/')) cosmetics.push(file.substring(0, file.length - 4));
 
 welcomings = fs.readFileSync("./src/welcomings.txt", { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
 motds = fs.readFileSync("./src/motds.txt", { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
+bridgeChannels = fs.readFileSync("./channels.txt", { encoding: 'ascii' }).split(process.platform === "win32" ? '\r\n' : '\n');
 
-module.exports = { players, maps, welcomings, motds, sauths, cosmetics };
+module.exports = { players, maps, welcomings, motds, sauths, cosmetics, bridgeChannels };

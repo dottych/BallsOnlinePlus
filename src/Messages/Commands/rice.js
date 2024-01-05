@@ -17,6 +17,7 @@ const c_rice = (c, input) => {
                 "smb1",
                 "mandrillmaze",
                 "smw",
+                "orangecats",
             ] }
         },
 
