@@ -1217,7 +1217,16 @@ document.addEventListener('click', () => {
             window.navigator.userAgent.indexOf("iPhone") >= 0 ||
             window.navigator.userAgent.indexOf("iPad") >= 0
         ) keys.removeAttribute("hidden");
-
+        if (
+        window.navigator.userAgent.indexOf("Bopclientandroid")
+            then (
+       this.drawText({
+            text: `Platform: Android Client`, 
+            x: 10,
+            y: 16*4,
+            color: "#AAAAFF",
+        });
+        
         if (window.location === window.parent.location) balls.init();
     }
 });
