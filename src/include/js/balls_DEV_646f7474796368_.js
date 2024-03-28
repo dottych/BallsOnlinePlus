@@ -1215,9 +1215,11 @@ document.addEventListener('click', () => {
             window.navigator.userAgent.indexOf("Android") >= 0 ||
             window.navigator.userAgent.indexOf("iOS") >= 0 ||
             window.navigator.userAgent.indexOf("iPhone") >= 0 ||
+            window.navigator.userAgent.indexOf("Bopclientandroid") >= 0 ||
+            window.navigator.userAgent.indexOf("Bopclientios") >= 0 ||
             window.navigator.userAgent.indexOf("iPad") >= 0
         ) keys.removeAttribute("hidden");
-
+        
         if (window.location === window.parent.location) balls.init();
     }
 });
