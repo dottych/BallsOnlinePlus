@@ -47,6 +47,8 @@ const m_Join = ({ c, data }) => {
                 "deadeye",
                 "horror",
                 "void",
+                "ash",
+                "jelly",
             ] }
         },
 
