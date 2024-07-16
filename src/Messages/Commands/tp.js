@@ -3,7 +3,7 @@ const tick = require('../../Tick');
 const players = require('../../Lists').players;
 
 const c_tp = (c, input) => {
-    if (players.get(c.id).admin) { utils.msgClient(c, `You are not an admin!`); return; }
+    if (!players.get(c.id).admin) { utils.msgClient(c, `You are not an admin!`); return; }
 
     let ids = input.split(' ');
 
