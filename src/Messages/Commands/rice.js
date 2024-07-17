@@ -19,6 +19,7 @@ const c_rice = (c, input) => {
                 "smw",
                 "orangecats",
                 "monoworld",
+                "limbo"
             ] }
         },
 
