@@ -50,7 +50,9 @@ const m_Join = ({ c, data }) => {
                 "ash",
                 "jelly",
                 "faith",
-                "saladauth"
+                "saladauth",
+                "aero",
+                "turnbased"
             ] }
         },
 
