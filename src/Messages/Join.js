@@ -49,6 +49,8 @@ const m_Join = ({ c, data }) => {
                 "void",
                 "ash",
                 "jelly",
+                "aero",
+                "turnbased"
             ] }
         },
 
