@@ -126,7 +126,6 @@ class Bridge {
 
     send(msg) {
         for (let chId of bridgeChannels) this.bot.channels.cache.get(chId).send(msg); 
-            
     }
 }
 

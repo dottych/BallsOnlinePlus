@@ -10,9 +10,9 @@
 git clone https://github.com/dottych/BallsOnlinePlus
 cd BallsOnlinePlus
 ```
-2. Rename .env.example to .env and insert your Discord channel, bot token, admin password and ID key.
-3. Create a file named channels.txt and put your bridge channel ID(s) in every line.
-3. Install dependencies:
+2. Rename .env.example to .env and insert your bot token, bot ID, admin password and ball ID key.
+3. Replace the default channel ID in channels.txt with your own bridge channel IDs for each line.
+4. Install dependencies:
 ```shell
 npm i
 ```
